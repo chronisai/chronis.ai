@@ -1,6 +1,6 @@
+print("🚀 Chronis booting...", flush=True)
+print("PORT:", os.environ.get("PORT"), flush=True)
 import sys
-print("Python version:", sys.version, flush=True)
-print("Starting app.py imports...", flush=True)
 import os
 import json
 import uuid
@@ -9,10 +9,24 @@ import mimetypes
 import requests
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.utils import secure_filename
+from datetime import timedelta
 
-app = Flask(__name__, static_folder='static')
-app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max upload
+app = Flask(__name__, static_folder='static', static_url_path='')
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max upload
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+@app.errorhandler(413)
+def too_large(e):
+    return jsonify({'error': 'File too large. Max size is 10MB.'}), 413
+
 
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
@@ -69,7 +83,7 @@ def call_gemini(contents, model='gemini-1.5-flash'):
         'contents': contents,
         'generationConfig': {
             'temperature': 0.85,
-            'maxOutputTokens': 8192,
+            'maxOutputTokens': 2048,
         }
     }
     try:
@@ -267,15 +281,20 @@ def send_welcome_email(name, email, position):
 
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    return app.send_static_file('index.html')
+
 
 @app.route('/demo')
 def demo():
-    return send_from_directory('static', 'demo.html')
+    return app.send_static_file('demo.html')
 
 @app.route('/thankyou')
 def thankyou():
-    return send_from_directory('static', 'thankyou.html')
+    return app.send_static_file('thankyou.html')
+
+@app.route('/health')
+def health():
+    return {"status": "ok"}
 
 # Waitlist
 @app.route('/api/count')
@@ -304,12 +323,16 @@ def api_join():
 
 # Demo: upload + analyze
 @app.route('/api/analyze', methods=['POST'])
+@limiter.limit("5 per hour")
 def api_analyze():
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded.'}), 400
 
     file        = request.files['file']
     person_name = (request.form.get('person_name') or 'this person').strip()
+
+    if len(file.filename) > 100:
+        return jsonify({'error': 'Invalid filename.'}), 400
 
     if not file.filename:
         return jsonify({'error': 'No file selected.'}), 400
@@ -322,6 +345,9 @@ def api_analyze():
     safe_name  = f"{session_id}.{ext}"
     file_path  = os.path.join(UPLOAD_FOLDER, safe_name)
     file.save(file_path)
+    import time
+    time.sleep(1.2)
+
 
     print(f"📁 Analyzing {file.filename} as '{person_name}' (session {session_id[:8]})")
 
@@ -329,6 +355,10 @@ def api_analyze():
     if error:
         os.remove(file_path)
         return jsonify({'error': f'Analysis failed: {error}'}), 500
+    try:
+        os.remove(file_path) 
+    except:
+        pass
 
     # Build persona system prompt
     persona = build_system_persona(person_name, profile)
@@ -360,10 +390,17 @@ def api_analyze():
 
 # Demo: chat
 @app.route('/api/chat', methods=['POST'])
+@limiter.limit("30 per hour")
 def api_chat():
     data       = request.get_json(silent=True) or {}
     session_id = data.get('session_id', '')
     user_msg   = (data.get('message') or '').strip()
+
+    if len(history) > 100:
+        history = history[-100:]
+
+    if len(user_msg) > 500:
+        return jsonify({'error': 'Message too long.'}), 400
 
     if not session_id or not user_msg:
         return jsonify({'error': 'Missing session_id or message.'}), 400
@@ -372,6 +409,12 @@ def api_chat():
     session  = sessions.get(session_id)
     if not session:
         return jsonify({'error': 'Session not found. Please upload again.'}), 404
+    created = datetime.fromisoformat(session['created_at'])
+    if datetime.utcnow() - created > timedelta(hours=6):
+        sessions.pop(session_id, None)
+        save_sessions(sessions)
+        return jsonify({'error': 'Session expired. Please upload again.'}), 400
+
 
     persona      = session['persona']
     history      = session.get('messages', [])
@@ -416,11 +459,13 @@ def api_chat():
     return jsonify({'reply': reply, 'person_name': person_name})
 
 # Admin: export sessions (basic)
+ADMIN_SECRET = os.environ.get('ADMIN_SECRET')
 @app.route('/api/sessions')
 def api_sessions():
     secret = request.args.get('secret', '')
-    if secret != os.environ.get('ADMIN_SECRET', 'chronis-admin'):
+    if not ADMIN_SECRET or secret != ADMIN_SECRET:
         return jsonify({'error': 'Unauthorized'}), 401
+
     sessions = load_sessions()
     summary = []
     for sid, s in sessions.items():
