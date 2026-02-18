@@ -1,3 +1,5 @@
+import os
+from flask import Flask, request, jsonify
 print("🚀 Chronis booting...", flush=True)
 print("PORT:", os.environ.get("PORT"), flush=True)
 import sys
@@ -31,10 +33,13 @@ def too_large(e):
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
 NOTIFY_EMAIL   = os.environ.get('NOTIFY_EMAIL', '')
+if not GEMINI_API_KEY:
+    print("❌ GEMINI_API_KEY is missing!", flush=True)
 
 UPLOAD_FOLDER  = 'uploads'
 SESSIONS_FILE  = 'sessions.json'
 WAITLIST_FILE  = 'waitlist.csv'
+COUNTER_FILE = "counter.txt"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -276,6 +281,21 @@ def send_welcome_email(name, email, position):
             timeout=10)
     except Exception as e:
         print(f'Welcome email error: {e}')
+def get_lifetime_count():
+    if not os.path.exists(COUNTER_FILE):
+        with open(COUNTER_FILE, "w") as f:
+            f.write("93")
+        return 93
+
+    with open(COUNTER_FILE, "r") as f:
+        return int(f.read().strip() or 93)
+
+
+def increment_lifetime_count():
+    count = get_lifetime_count() + 1
+    with open(COUNTER_FILE, "w") as f:
+        f.write(str(count))
+    return count
 
 # ── Routes ────────────────────────────────────────────────────────────────────
 
@@ -299,7 +319,7 @@ def health():
 # Waitlist
 @app.route('/api/count')
 def api_count():
-    return jsonify({'count': get_count()})
+    return jsonify({'count': get_lifetime_count()})
 
 @app.route('/api/join', methods=['POST'])
 def api_join():
@@ -359,6 +379,7 @@ def api_analyze():
         os.remove(file_path) 
     except:
         pass
+    increment_lifetime_count()
 
     # Build persona system prompt
     persona = build_system_persona(person_name, profile)
@@ -396,9 +417,6 @@ def api_chat():
     session_id = data.get('session_id', '')
     user_msg   = (data.get('message') or '').strip()
 
-    if len(history) > 100:
-        history = history[-100:]
-
     if len(user_msg) > 500:
         return jsonify({'error': 'Message too long.'}), 400
 
@@ -418,20 +436,29 @@ def api_chat():
 
     persona      = session['persona']
     history      = session.get('messages', [])
+    if len(history) >= 50:
+        return jsonify({'error': 'Session message limit reached. Please start a new session.'}), 400
+
     person_name  = session['person_name']
 
     # Build Gemini contents: system as first user turn (Gemini doesn't have system role)
     contents = []
 
     # Inject persona as a priming exchange
-    contents.append({
+    if not history:
+        contents.append({
         'role': 'user',
-        'parts': [{'text': f'From now on you are {person_name}. Here is your complete identity and memory profile:\n\n{persona}\n\nAcknowledge briefly that you understand who you are, then stop.'}]
-    })
-    contents.append({
+        'parts': [{
+            'text': f'From now on you are {person_name}. Here is your complete identity and memory profile:\n\n{persona}\n\nAcknowledge briefly that you understand who you are, then stop.'
+            }]
+        })
+        contents.append({
         'role': 'model',
-        'parts': [{'text': f"Yeah, it's me — {person_name}. What's up?"}]
-    })
+        'parts': [{
+            'text': f"Yeah, it's me — {person_name}. What's up?"
+            }]
+        })
+
 
     # Add conversation history (last 20 messages to stay within context)
     for msg in history[-20:]:
@@ -446,7 +473,7 @@ def api_chat():
         'parts': [{'text': user_msg}]
     })
 
-    reply, error = call_gemini(contents, model='gemini-1.5-pro')
+    reply, error = call_gemini(contents, model='gemini-1.5-flash')
     if error:
         return jsonify({'error': f'AI error: {error}'}), 500
 
@@ -467,6 +494,13 @@ def api_sessions():
         return jsonify({'error': 'Unauthorized'}), 401
 
     sessions = load_sessions()
+    if len(sessions) > 200:
+        sessions = dict(sorted(
+            sessions.items(),
+            key=lambda x: x[1].get('created_at', ''),
+            reverse=True
+    )[:200])
+
     summary = []
     for sid, s in sessions.items():
         summary.append({
