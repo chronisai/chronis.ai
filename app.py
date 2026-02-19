@@ -11,19 +11,19 @@ import mimetypes
 import requests
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+# from flask_limiter import Limiter
+# from flask_limiter.util import get_remote_address
 from werkzeug.utils import secure_filename
 from datetime import timedelta
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max upload
 
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["200 per day", "50 per hour"]
-)
+# limiter = Limiter(
+#    get_remote_address,
+#   app=app,
+# default_limits=["200 per day", "50 per hour"]
+#)
 
 @app.errorhandler(413)
 def too_large(e):
@@ -343,7 +343,7 @@ def api_join():
 
 # Demo: upload + analyze
 @app.route('/api/analyze', methods=['POST'])
-@limiter.limit("5 per hour")
+#@limiter.limit("5 per hour")
 def api_analyze():
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded.'}), 400
@@ -411,7 +411,7 @@ def api_analyze():
 
 # Demo: chat
 @app.route('/api/chat', methods=['POST'])
-@limiter.limit("30 per hour")
+#@limiter.limit("30 per hour")
 def api_chat():
     data       = request.get_json(silent=True) or {}
     session_id = data.get('session_id', '')
