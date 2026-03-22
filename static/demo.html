@@ -7,184 +7,148 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     :root{
       --black:#080808;--surface:rgba(255,255,255,0.03);--surface2:rgba(255,255,255,0.055);
       --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
       --text:#f0ede8;--muted:rgba(240,237,232,0.42);--faint:rgba(240,237,232,0.13);
-      --accent:#f0ede8;
     }
     html,body{height:100%}
-    body{
-      font-family:'Geist Mono',monospace;background:var(--black);
-      color:var(--text);-webkit-font-smoothing:antialiased;overflow:hidden;
-    }
-    body::before{
-      content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.3;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
-    }
+    body{font-family:'Geist Mono',monospace;background:var(--black);color:var(--text);-webkit-font-smoothing:antialiased;overflow:hidden}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.3;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E")}
 
-    /* ── Layout ── */
     .app{display:flex;flex-direction:column;height:100vh}
 
-    /* Top bar */
-    .topbar{
-      flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
-      padding:0 24px;height:56px;border-bottom:1px solid var(--border);
-      background:rgba(8,8,8,.9);backdrop-filter:blur(20px);
-    }
+    /* Topbar */
+    .topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;border-bottom:1px solid var(--border);background:rgba(8,8,8,.9);backdrop-filter:blur(20px)}
     .topbar-left{display:flex;align-items:center;gap:16px}
     .logo{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;letter-spacing:.15em}
     .demo-tag{font-size:9px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;padding:3px 8px;border:1px solid var(--border);border-radius:100px}
     .back-link{font-size:10px;letter-spacing:.1em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .3s}
     .back-link:hover{color:var(--text)}
-
-    /* Person tag in topbar (shown after analysis) */
-    .person-tag{
-      display:none;align-items:center;gap:8px;
-      padding:5px 12px;border:1px solid var(--border2);border-radius:100px;
-      font-size:11px;color:var(--muted);
-    }
+    .topbar-right{display:flex;align-items:center;gap:10px}
+    .person-tag{display:none;align-items:center;gap:8px;padding:5px 12px;border:1px solid var(--border2);border-radius:100px;font-size:11px;color:var(--muted)}
     .person-tag.show{display:flex}
     .person-tag strong{color:var(--text);font-weight:400}
     .pulse{width:6px;height:6px;background:rgba(240,237,232,.6);border-radius:50%;animation:blink 2s ease-in-out infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .voice-badge{display:none;align-items:center;gap:6px;padding:4px 10px;border:1px solid rgba(255,255,255,0.12);border-radius:100px;font-size:9px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+    .voice-badge.show{display:flex}
+    .voice-dot{width:5px;height:5px;background:rgba(200,255,200,.7);border-radius:50%;animation:blink 2s ease-in-out infinite}
 
-    /* ── Main content area ── */
     .main{flex:1;display:flex;overflow:hidden}
 
-    /* ── Upload Panel ── */
-    #uploadPanel{
-      flex-shrink:0;width:360px;border-right:1px solid var(--border);
-      display:flex;flex-direction:column;padding:32px 28px;gap:24px;
-      overflow-y:auto;transition:width .4s ease,opacity .4s ease;
-    }
+    /* Upload panel */
+    #uploadPanel{flex-shrink:0;width:360px;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:32px 28px;gap:24px;overflow-y:auto;transition:width .4s ease,opacity .4s ease}
     #uploadPanel.collapsed{width:0;padding:0;opacity:0;overflow:hidden}
-
     .panel-label{font-size:9px;letter-spacing:.25em;color:var(--faint);text-transform:uppercase;margin-bottom:4px}
     .panel-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;line-height:1.2;margin-bottom:6px}
     .panel-sub{font-size:11px;color:var(--muted);line-height:1.8;letter-spacing:.02em}
-
-    /* Name input */
     .input-group{display:flex;flex-direction:column;gap:6px}
     .input-label{font-size:10px;letter-spacing:.15em;color:var(--faint);text-transform:uppercase}
-    input[type=text]{
-      width:100%;padding:13px 16px;background:var(--surface);
-      border:1px solid var(--border);border-radius:8px;
-      color:var(--text);font-family:'Geist Mono',monospace;font-size:13px;
-      outline:none;transition:border-color .3s;
-    }
+    input[type=text]{width:100%;padding:13px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Geist Mono',monospace;font-size:13px;outline:none;transition:border-color .3s}
     input[type=text]:focus{border-color:var(--border2)}
     input[type=text]::placeholder{color:var(--faint)}
 
-    /* Drop zone */
-    .dropzone{
-      border:1px dashed var(--border2);border-radius:12px;
-      padding:32px 20px;text-align:center;cursor:pointer;
-      transition:border-color .3s,background .3s;position:relative;
+    /* Format cards */
+    .format-cards{display:flex;flex-direction:column;gap:8px}
+    .format-card{
+      padding:14px 16px;border:1px solid var(--border);border-radius:10px;
+      cursor:pointer;transition:border-color .2s,background .2s;position:relative;
     }
+    .format-card:hover{border-color:var(--border2);background:rgba(255,255,255,.03)}
+    .format-card.active{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04)}
+    .format-card.disabled{opacity:.5;cursor:not-allowed}
+    .format-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+    .format-card-name{font-size:12px;color:var(--text);letter-spacing:.05em}
+    .format-card-price{font-size:11px;color:var(--muted);letter-spacing:.05em}
+    .format-card-price.free{color:rgba(200,255,200,.7)}
+    .format-card-price.paid{color:var(--text)}
+    .format-card-price.coming{color:var(--faint)}
+    .format-card-desc{font-size:10px;color:var(--faint);letter-spacing:.03em;line-height:1.6}
+    .format-coming-badge{position:absolute;top:10px;right:10px;font-size:8px;letter-spacing:.1em;color:var(--faint);text-transform:uppercase;padding:2px 7px;border:1px solid var(--border);border-radius:100px}
+
+    /* Dropzone */
+    .dropzone{border:1px dashed var(--border2);border-radius:12px;padding:32px 20px;text-align:center;cursor:pointer;transition:border-color .3s,background .3s;position:relative}
     .dropzone:hover,.dropzone.drag-over{border-color:rgba(240,237,232,.35);background:rgba(255,255,255,.03)}
     .dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
     .dz-icon{font-size:28px;margin-bottom:12px;opacity:.4}
     .dz-text{font-size:12px;color:var(--muted);line-height:1.7;letter-spacing:.02em}
     .dz-sub{font-size:10px;color:var(--faint);margin-top:6px;letter-spacing:.05em}
-    .file-selected{
-      display:none;align-items:center;gap:10px;
-      padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-    }
+    .file-selected{display:none;align-items:center;gap:10px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px}
     .file-selected.show{display:flex}
-    .file-icon{font-size:18px;opacity:.6}
     .file-name{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
     .file-remove{background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;transition:color .2s}
     .file-remove:hover{color:var(--text)}
 
-    /* Analyze button */
-    .analyze-btn{
-      width:100%;padding:14px;background:var(--text);color:var(--black);
-      border:none;border-radius:8px;font-family:'Geist Mono',monospace;
-      font-size:11px;letter-spacing:.15em;text-transform:uppercase;
-      cursor:pointer;transition:opacity .3s,transform .2s;
-    }
+    .analyze-btn{width:100%;padding:14px;background:var(--text);color:var(--black);border:none;border-radius:8px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:opacity .3s,transform .2s}
     .analyze-btn:hover{opacity:.88}
     .analyze-btn:active{transform:scale(.98)}
     .analyze-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
 
-    /* Progress */
     .progress-wrap{display:none;flex-direction:column;gap:10px}
     .progress-wrap.show{display:flex}
     .progress-bar-bg{height:2px;background:var(--border);border-radius:100px;overflow:hidden}
     .progress-bar{height:100%;background:var(--text);border-radius:100px;width:0%;transition:width .4s ease}
     .progress-status{font-size:11px;color:var(--muted);letter-spacing:.05em;text-align:center}
 
-    /* Profile preview */
-    .profile-box{
-      display:none;background:var(--surface);border:1px solid var(--border);
-      border-radius:10px;padding:16px;
-    }
+    .profile-box{display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
     .profile-box.show{display:block}
     .profile-box-label{font-size:9px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase;margin-bottom:10px}
-    .profile-text{font-size:11px;color:var(--muted);line-height:1.8;max-height:160px;overflow-y:auto;letter-spacing:.02em}
+    .profile-text{font-size:11px;color:var(--muted);line-height:1.8;max-height:140px;overflow-y:auto;letter-spacing:.02em}
     .profile-text::-webkit-scrollbar{width:3px}
     .profile-text::-webkit-scrollbar-thumb{background:var(--border2)}
 
-    .new-session-btn{
-      width:100%;padding:12px;background:transparent;color:var(--muted);
-      border:1px solid var(--border);border-radius:8px;font-family:'Geist Mono',monospace;
-      font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-      cursor:pointer;transition:color .3s,border-color .3s;display:none;
-    }
+    .new-session-btn{width:100%;padding:12px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:color .3s,border-color .3s;display:none}
     .new-session-btn.show{display:block}
     .new-session-btn:hover{color:var(--text);border-color:var(--border2)}
 
     .panel-error{font-size:11px;color:#ff8080;text-align:center;display:none;letter-spacing:.03em;line-height:1.6}
     .panel-error.show{display:block}
 
-    /* ── Chat panel ── */
-    #chatPanel{
-      flex:1;display:flex;flex-direction:column;
-      opacity:0;transition:opacity .5s ease;
-    }
+    /* Chat panel */
+    #chatPanel{flex:1;display:flex;flex-direction:column;opacity:0;transition:opacity .5s ease}
     #chatPanel.visible{opacity:1}
-
-    /* Empty state */
-    .chat-empty{
-      flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:16px;padding:40px;text-align:center;
-    }
-    .chat-empty-glyph{
-      font-family:'Cormorant Garamond',serif;font-size:80px;font-weight:300;
-      color:var(--faint);line-height:1;
-      animation:breathe 7s ease-in-out infinite;
-    }
+    .chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px;text-align:center}
+    .chat-empty-glyph{font-family:'Cormorant Garamond',serif;font-size:80px;font-weight:300;color:var(--faint);line-height:1;animation:breathe 7s ease-in-out infinite}
     @keyframes breathe{0%,100%{opacity:.13}50%{opacity:.22}}
     .chat-empty-text{font-size:13px;color:var(--faint);letter-spacing:.08em;line-height:1.8}
 
-    /* Messages */
-    .messages{
-      flex:1;overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:20px;
-    }
+    .messages{flex:1;overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:20px}
     .messages::-webkit-scrollbar{width:4px}
     .messages::-webkit-scrollbar-thumb{background:var(--border)}
-
-    .msg{display:flex;flex-direction:column;gap:4px;max-width:72%;animation:msgIn .3s ease}
+    .msg{display:flex;flex-direction:column;gap:6px;max-width:72%;animation:msgIn .3s ease}
     @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .msg.user{align-self:flex-end;align-items:flex-end}
     .msg.ai{align-self:flex-start;align-items:flex-start}
+    .msg-bubble{padding:13px 17px;border-radius:14px;font-size:13px;line-height:1.7;letter-spacing:.02em}
+    .msg.user .msg-bubble{background:var(--text);color:var(--black);border-radius:14px 14px 4px 14px}
+    .msg.ai .msg-bubble{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:14px 14px 14px 4px}
+    .msg-meta{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--faint);letter-spacing:.05em}
 
-    .msg-bubble{
-      padding:13px 17px;border-radius:14px;font-size:13px;line-height:1.7;letter-spacing:.02em;
-    }
-    .msg.user .msg-bubble{
-      background:var(--text);color:var(--black);border-radius:14px 14px 4px 14px;
-    }
-    .msg.ai .msg-bubble{
-      background:var(--surface2);border:1px solid var(--border);color:var(--text);
-      border-radius:14px 14px 14px 4px;
-    }
-    .msg-meta{font-size:10px;color:var(--faint);letter-spacing:.05em}
+    /* Voice play button */
+    .voice-play-btn{display:none;align-items:center;justify-content:center;width:24px;height:24px;background:var(--surface2);border:1px solid var(--border);border-radius:50%;cursor:pointer;transition:border-color .2s,background .2s;flex-shrink:0}
+    .voice-play-btn.visible{display:flex}
+    .voice-play-btn:hover{border-color:var(--border2);background:rgba(255,255,255,.08)}
+    .voice-play-btn svg{width:9px;height:9px;fill:var(--muted)}
+    .voice-play-btn.loading svg{animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .voice-play-btn.playing{border-color:rgba(200,255,200,.4)}
+    .voice-play-btn.playing svg{fill:rgba(200,255,200,.8)}
 
-    /* Typing indicator */
+    /* Message counter */
+    .msg-counter{
+      flex-shrink:0;text-align:center;padding:8px 24px;
+      font-size:10px;color:var(--faint);letter-spacing:.08em;
+      border-top:1px solid var(--border);
+      transition:color .3s;display:none;
+    }
+    .msg-counter.show{display:block}
+    .msg-counter.warning{color:rgba(255,180,100,.6)}
+    .msg-counter.critical{color:rgba(255,100,100,.7)}
+
     .typing{display:none;align-self:flex-start;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:14px 14px 14px 4px}
     .typing.show{display:flex;gap:5px;align-items:center}
     .typing span{width:5px;height:5px;background:var(--faint);border-radius:50%;animation:typeDot 1.2s ease-in-out infinite}
@@ -192,53 +156,119 @@
     .typing span:nth-child(3){animation-delay:.4s}
     @keyframes typeDot{0%,80%,100%{transform:scale(.8);opacity:.4}40%{transform:scale(1.1);opacity:1}}
 
-    /* Input bar */
-    .input-bar{
-      flex-shrink:0;padding:16px 24px;border-top:1px solid var(--border);
-      display:flex;align-items:center;gap:12px;
-      background:rgba(8,8,8,.8);backdrop-filter:blur(12px);
-    }
-    .chat-input{
-      flex:1;padding:13px 16px;background:var(--surface);border:1px solid var(--border);
-      border-radius:10px;color:var(--text);font-family:'Geist Mono',monospace;
-      font-size:13px;outline:none;transition:border-color .3s;resize:none;height:46px;
-      line-height:1.4;
-    }
+    .input-bar{flex-shrink:0;padding:16px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;background:rgba(8,8,8,.8);backdrop-filter:blur(12px)}
+    .chat-input{flex:1;padding:13px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Geist Mono',monospace;font-size:13px;outline:none;transition:border-color .3s;resize:none;height:46px;line-height:1.4}
     .chat-input:focus{border-color:var(--border2)}
     .chat-input::placeholder{color:var(--faint)}
-    .send-btn{
-      width:46px;height:46px;flex-shrink:0;
-      background:var(--text);color:var(--black);border:none;border-radius:10px;
-      cursor:pointer;display:flex;align-items:center;justify-content:center;
-      transition:opacity .25s,transform .15s;
-    }
+    .send-btn{width:46px;height:46px;flex-shrink:0;background:var(--text);color:var(--black);border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .25s,transform .15s}
     .send-btn:hover{opacity:.85}
     .send-btn:active{transform:scale(.94)}
     .send-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
     .send-btn svg{width:16px;height:16px}
 
-    /* Mobile */
+    /* ── Paywall Modal ── */
+    .paywall-overlay{
+      position:fixed;inset:0;z-index:1000;
+      background:rgba(8,8,8,.92);backdrop-filter:blur(20px);
+      display:none;align-items:center;justify-content:center;padding:20px;
+    }
+    .paywall-overlay.show{display:flex}
+    .paywall-card{
+      width:100%;max-width:520px;
+      background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+      border:1px solid var(--border2);border-radius:20px;
+      padding:40px 36px;
+      animation:riseUp .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes riseUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .paywall-eyebrow{font-size:9px;letter-spacing:.28em;color:var(--faint);text-transform:uppercase;margin-bottom:16px}
+    .paywall-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,40px);font-weight:300;line-height:1.15;margin-bottom:10px}
+    .paywall-title em{font-style:italic;color:var(--muted)}
+    .paywall-sub{font-size:12px;color:var(--muted);line-height:1.8;letter-spacing:.03em;margin-bottom:32px}
+    .paywall-name{color:var(--text)}
+
+    .pay-options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px}
+    .pay-option{
+      padding:18px 14px;border:1px solid var(--border);border-radius:12px;
+      cursor:pointer;transition:border-color .2s,background .2s;
+      display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;
+    }
+    .pay-option:hover:not(.pay-disabled){border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.04)}
+    .pay-option.pay-highlight{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.03)}
+    .pay-option.pay-disabled{cursor:default;opacity:.6}
+    .pay-option-icon{font-size:20px;line-height:1}
+    .pay-option-name{font-size:11px;color:var(--text);letter-spacing:.05em;font-weight:400}
+    .pay-option-desc{font-size:10px;color:var(--faint);letter-spacing:.02em;line-height:1.6;flex:1}
+    .pay-option-price{
+      font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;
+      color:var(--text);letter-spacing:.02em;
+    }
+    .pay-option-price.coming-price{font-size:14px;color:var(--faint);font-family:'Geist Mono',monospace}
+    .pay-coming-badge{
+      position:absolute;bottom:0;left:0;right:0;
+      background:rgba(255,255,255,.04);border-top:1px solid var(--border);
+      padding:5px;text-align:center;
+      font-size:8px;letter-spacing:.15em;color:var(--faint);text-transform:uppercase;
+    }
+
+    .paywall-dismiss{
+      width:100%;padding:12px;background:transparent;color:var(--faint);
+      border:1px solid var(--border);border-radius:8px;
+      font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+      cursor:pointer;transition:color .3s,border-color .3s;
+    }
+    .paywall-dismiss:hover{color:var(--muted);border-color:var(--border2)}
+    .paywall-dismiss:disabled{opacity:.3;cursor:not-allowed}
+
+    /* Toast */
+    .toast{
+      position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
+      padding:12px 22px;background:rgba(30,30,30,.95);border:1px solid var(--border2);
+      border-radius:100px;font-size:12px;color:var(--text);letter-spacing:.05em;
+      opacity:0;transition:opacity .3s,transform .3s;z-index:2000;white-space:nowrap;
+      backdrop-filter:blur(12px);
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* Payment success banner */
+    .payment-banner{
+      display:none;align-items:center;justify-content:center;gap:10px;
+      padding:10px 24px;background:rgba(200,255,200,.05);
+      border-bottom:1px solid rgba(200,255,200,.12);
+      font-size:11px;color:rgba(200,255,200,.7);letter-spacing:.08em;
+    }
+    .payment-banner.show{display:flex}
+    .payment-banner-dot{width:5px;height:5px;background:rgba(200,255,200,.6);border-radius:50%}
+
     @media(max-width:700px){
       #uploadPanel{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:50vh}
       .main{flex-direction:column}
       .messages{padding:20px 16px}
       .msg{max-width:88%}
       .input-bar{padding:12px 16px}
+      .pay-options{grid-template-columns:1fr}
+      .paywall-card{padding:28px 20px}
     }
   </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- Top bar -->
+  <!-- Payment success banner -->
+  <div class="payment-banner" id="paymentBanner">
+    <span class="payment-banner-dot"></span>
+    <span id="paymentBannerText">Payment verified — session unlocked</span>
+  </div>
+
+  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-left">
       <div class="logo">CHRONIS</div>
       <div class="demo-tag">Demo</div>
     </div>
-    <div class="person-tag" id="personTag">
-      <span class="pulse"></span>
-      Talking to <strong id="personTagName">—</strong>
+    <div class="topbar-right">
+      <div class="voice-badge" id="voiceBadge"><span class="voice-dot"></span>Voice cloned</div>
+      <div class="person-tag" id="personTag"><span class="pulse"></span>Talking to <strong id="personTagName">—</strong></div>
     </div>
     <a href="/" class="back-link">← Back</a>
   </div>
@@ -250,7 +280,7 @@
       <div>
         <div class="panel-label">Step 01</div>
         <div class="panel-title">Upload a<br/><em style="font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(240,237,232,.5)">memory.</em></div>
-        <div class="panel-sub" style="margin-top:10px">Upload a video or audio file. Our AI will extract everything — voice, personality, memories — then let you talk to them.</div>
+        <div class="panel-sub" style="margin-top:10px">Our AI extracts voice, personality, and memories — then lets you talk to them.</div>
       </div>
 
       <div class="input-group">
@@ -258,16 +288,50 @@
         <input type="text" id="personName" placeholder="e.g. Harry"/>
       </div>
 
+      <!-- Format selector -->
+      <div>
+        <div class="input-label" style="margin-bottom:10px">Choose format</div>
+        <div class="format-cards">
+
+          <div class="format-card active" id="cardAudio" onclick="selectFormat('audio')">
+            <div class="format-card-top">
+              <span class="format-card-name">🎙 Voice Recording</span>
+              <span class="format-card-price free">Free</span>
+            </div>
+            <div class="format-card-desc">Upload an audio file · 5 free messages then $1 to continue</div>
+          </div>
+
+          <div class="format-card" id="cardVideo" onclick="selectFormat('video')">
+            <div class="format-card-top">
+              <span class="format-card-name">📹 Video</span>
+              <span class="format-card-price paid">$1</span>
+            </div>
+            <div class="format-card-desc">Full video analysis · unlimited chat · voice + visual profile</div>
+          </div>
+
+          <div class="format-card disabled" id="cardLive">
+            <div class="format-card-top">
+              <span class="format-card-name">⚡ Live Interact</span>
+              <span class="format-card-price coming">$10</span>
+            </div>
+            <div class="format-card-desc">Real-time interaction with your past self · launching Q3 2026</div>
+            <div class="format-coming-badge">Coming Soon</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- File upload -->
       <div>
         <div class="input-label" style="margin-bottom:8px">Upload file</div>
         <div class="dropzone" id="dropzone">
-          <input type="file" id="fileInput" accept="video/*,audio/*"/>
+          <input type="file" id="fileInput" accept="audio/*"/>
           <div class="dz-icon">◈</div>
-          <div class="dz-text">Drop your video or audio here<br/>or click to browse</div>
-          <div class="dz-sub">MP4 · MOV · MP3 · WAV · M4A · up to 100MB</div>
+          <div class="dz-text" id="dzText">Drop your audio here<br/>or click to browse</div>
+          <div class="dz-sub" id="dzSub">MP3 · WAV · M4A · up to 50MB · Free</div>
         </div>
         <div class="file-selected" id="fileSelected">
-          <span class="file-icon" id="fileIcon">▷</span>
+          <span style="font-size:18px;opacity:.6" id="fileIcon">♪</span>
           <span class="file-name" id="fileName">—</span>
           <button class="file-remove" id="fileRemove">✕</button>
         </div>
@@ -279,7 +343,6 @@
       </div>
 
       <div class="panel-error" id="panelError"></div>
-
       <button class="analyze-btn" id="analyzeBtn" disabled>Analyze & Begin</button>
 
       <div class="profile-box" id="profileBox">
@@ -292,19 +355,16 @@
 
     <!-- Chat panel -->
     <div id="chatPanel">
-      <!-- Empty state -->
       <div class="chat-empty" id="chatEmpty">
         <div class="chat-empty-glyph">∞</div>
-        <div class="chat-empty-text">Upload a video or audio on the left.<br/>Then talk to whoever is in it.</div>
+        <div class="chat-empty-text">Upload a voice recording or video on the left.<br/>Then talk to whoever is in it.</div>
       </div>
 
-      <!-- Messages -->
       <div class="messages" id="messages" style="display:none"></div>
-      <div class="typing" id="typing">
-        <span></span><span></span><span></span>
-      </div>
+      <div class="typing" id="typing"><span></span><span></span><span></span></div>
 
-      <!-- Input -->
+      <div class="msg-counter" id="msgCounter"></div>
+
       <div class="input-bar" id="inputBar" style="display:none">
         <textarea class="chat-input" id="chatInput" placeholder="Say something..." rows="1"></textarea>
         <button class="send-btn" id="sendBtn" disabled>
@@ -318,46 +378,218 @@
   </div>
 </div>
 
+<!-- ── Paywall Modal ── -->
+<div class="paywall-overlay" id="paywallOverlay">
+  <div class="paywall-card">
+    <div class="paywall-eyebrow">Free limit reached</div>
+    <div class="paywall-title">This conversation<br/><em>doesn't have to end.</em></div>
+    <p class="paywall-sub" id="paywallSub">You've had 5 free messages with <span class="paywall-name" id="paywallName">them</span>. Keep going for just $1.</p>
+
+    <div class="pay-options">
+
+      <div class="pay-option pay-highlight" onclick="startPayment('chat')">
+        <div class="pay-option-icon">💬</div>
+        <div class="pay-option-name">Continue Chat</div>
+        <div class="pay-option-desc">Unlimited messages — never lose this conversation</div>
+        <div class="pay-option-price">$1</div>
+      </div>
+
+      <div class="pay-option" onclick="startPayment('video')">
+        <div class="pay-option-icon">📹</div>
+        <div class="pay-option-name">Video Analysis</div>
+        <div class="pay-option-desc">Upload a video + unlimited chat + visual profile</div>
+        <div class="pay-option-price">$1</div>
+      </div>
+
+      <div class="pay-option pay-disabled">
+        <div class="pay-option-icon">⚡</div>
+        <div class="pay-option-name">Live Interact</div>
+        <div class="pay-option-desc">Real-time interaction with your past self</div>
+        <div class="pay-option-price coming-price">Q3 2026</div>
+        <div class="pay-coming-badge">Coming Soon</div>
+      </div>
+
+    </div>
+
+    <button class="paywall-dismiss" id="paywallDismiss" onclick="dismissPaywall()">
+      Give me one last message — I'll decide after
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
 <script>
-  let sessionId   = null;
-  let personName  = '';
-  let selectedFile = null;
+  // ── State ─────────────────────────────────────────────────────────────────
+  let sessionId      = null;
+  let personName     = '';
+  let selectedFile   = null;
+  let selectedFormat = 'audio';
+  let hasVoice       = false;
+  let currentAudio   = null;
+  let msgCount       = 0;
+  let unlocked       = false;
+  let bonusUsed      = false;      // "one last message" used
+  let paywallShown   = false;
+  const FREE_LIMIT   = 5;
 
-  const fileInput    = document.getElementById('fileInput');
-  const dropzone     = document.getElementById('dropzone');
-  const fileSelected = document.getElementById('fileSelected');
-  const fileName     = document.getElementById('fileName');
-  const fileIcon     = document.getElementById('fileIcon');
-  const fileRemove   = document.getElementById('fileRemove');
-  const analyzeBtn   = document.getElementById('analyzeBtn');
-  const personNameIn = document.getElementById('personName');
-  const progressWrap = document.getElementById('progressWrap');
-  const progressBar  = document.getElementById('progressBar');
+  // ── DOM refs ──────────────────────────────────────────────────────────────
+  const fileInput      = document.getElementById('fileInput');
+  const dropzone       = document.getElementById('dropzone');
+  const fileSelected   = document.getElementById('fileSelected');
+  const fileName       = document.getElementById('fileName');
+  const fileIcon       = document.getElementById('fileIcon');
+  const fileRemove     = document.getElementById('fileRemove');
+  const analyzeBtn     = document.getElementById('analyzeBtn');
+  const personNameIn   = document.getElementById('personName');
+  const progressWrap   = document.getElementById('progressWrap');
+  const progressBar    = document.getElementById('progressBar');
   const progressStatus = document.getElementById('progressStatus');
-  const panelError   = document.getElementById('panelError');
-  const profileBox   = document.getElementById('profileBox');
-  const profileText  = document.getElementById('profileText');
-  const newSessionBtn = document.getElementById('newSessionBtn');
+  const panelError     = document.getElementById('panelError');
+  const profileBox     = document.getElementById('profileBox');
+  const profileText    = document.getElementById('profileText');
+  const newSessionBtn  = document.getElementById('newSessionBtn');
+  const chatEmpty      = document.getElementById('chatEmpty');
+  const messages       = document.getElementById('messages');
+  const typing         = document.getElementById('typing');
+  const inputBar       = document.getElementById('inputBar');
+  const chatInput      = document.getElementById('chatInput');
+  const sendBtn        = document.getElementById('sendBtn');
+  const chatPanel      = document.getElementById('chatPanel');
+  const personTag      = document.getElementById('personTag');
+  const personTagName  = document.getElementById('personTagName');
+  const voiceBadge     = document.getElementById('voiceBadge');
+  const msgCounter     = document.getElementById('msgCounter');
+  const paywallOverlay = document.getElementById('paywallOverlay');
+  const paywallName    = document.getElementById('paywallName');
+  const paywallDismiss = document.getElementById('paywallDismiss');
 
-  const chatEmpty = document.getElementById('chatEmpty');
-  const messages  = document.getElementById('messages');
-  const typing    = document.getElementById('typing');
-  const inputBar  = document.getElementById('inputBar');
-  const chatInput = document.getElementById('chatInput');
-  const sendBtn   = document.getElementById('sendBtn');
-  const chatPanel = document.getElementById('chatPanel');
-  const personTag = document.getElementById('personTag');
-  const personTagName = document.getElementById('personTagName');
-
-  // Make chat panel visible immediately
   chatPanel.classList.add('visible');
 
-  // ── File selection ──
+  // ── On page load — check for payment return ───────────────────────────────
+  window.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('payment') === 'success') {
+      const csession = params.get('csession');
+      const ss       = params.get('ss');
+      const type     = params.get('type') || 'chat';
+      if (csession && ss) {
+        await handlePaymentReturn(csession, ss, type);
+      }
+      // Clean URL
+      window.history.replaceState({}, '', '/demo');
+    } else if (params.get('payment') === 'cancelled') {
+      showToast('Payment cancelled — you can try again anytime.');
+      window.history.replaceState({}, '', '/demo');
+    }
+  });
+
+  async function handlePaymentReturn(csession, ss, type) {
+    showToast('Verifying payment...');
+    try {
+      // Verify with backend
+      const vRes  = await fetch('/api/verify-checkout', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({stripe_session_id: ss, chronis_session: csession, type}),
+      });
+      const vData = await vRes.json();
+      if (!vRes.ok) {
+        showToast('Payment verification failed. Contact support.');
+        return;
+      }
+
+      // Restore session
+      const sRes  = await fetch(`/api/session/${csession}`);
+      const sData = await sRes.json();
+      if (!sRes.ok) {
+        showToast('Session expired. Please upload again.');
+        return;
+      }
+
+      // Show payment banner
+      const banner = document.getElementById('paymentBanner');
+      const bannerText = document.getElementById('paymentBannerText');
+      bannerText.textContent = type === 'video'
+        ? '✓ Payment verified — video analysis unlocked'
+        : '✓ Payment verified — unlimited conversation unlocked';
+      banner.classList.add('show');
+      setTimeout(() => banner.classList.remove('show'), 5000);
+
+      // Restore state
+      sessionId  = csession;
+      personName = sData.person_name;
+      unlocked   = true;
+      hasVoice   = sData.has_voice || false;
+      msgCount   = sData.messages.filter(m => m.role === 'user').length;
+
+      profileText.textContent = (sData.profile || '').slice(0, 600) + ((sData.profile || '').length > 600 ? '...' : '');
+      profileBox.classList.add('show');
+      newSessionBtn.classList.add('show');
+      personTagName.textContent = personName;
+      personTag.classList.add('show');
+      if (hasVoice) voiceBadge.classList.add('show');
+
+      chatEmpty.style.display = 'none';
+      messages.style.display  = 'flex';
+      inputBar.style.display  = 'flex';
+      sendBtn.disabled = false;
+
+      // Restore messages
+      for (const msg of sData.messages) {
+        appendMessage(msg.role === 'user' ? 'user' : 'ai', msg.content, true);
+      }
+
+      if (type === 'video') {
+        // They paid for video — switch to video upload mode
+        selectFormat('video');
+        appendMessage('ai', `Video analysis unlocked! Upload your video file on the left to begin.`, true);
+      } else {
+        appendMessage('ai', `We're back. I'm still here — where were we?`, false);
+      }
+
+      updateCounter();
+      setTimeout(() => chatInput.focus(), 100);
+
+    } catch (err) {
+      showToast('Something went wrong. Please try again.');
+    }
+  }
+
+  // ── Format selection ──────────────────────────────────────────────────────
+  function selectFormat(format) {
+    if (format === 'live') return; // disabled
+    selectedFormat = format;
+
+    document.getElementById('cardAudio').classList.toggle('active', format === 'audio');
+    document.getElementById('cardVideo').classList.toggle('active', format === 'video');
+
+    const isVideo = format === 'video';
+    fileInput.accept  = isVideo ? 'video/*' : 'audio/*';
+    document.getElementById('dzText').innerHTML = isVideo
+      ? 'Drop your video here<br/>or click to browse'
+      : 'Drop your audio here<br/>or click to browse';
+    document.getElementById('dzSub').textContent = isVideo
+      ? 'MP4 · MOV · WEBM · up to 50MB · $1'
+      : 'MP3 · WAV · M4A · up to 50MB · Free';
+
+    // Clear any selected file when switching
+    if (selectedFile) {
+      selectedFile = null;
+      fileInput.value = '';
+      fileSelected.classList.remove('show');
+      dropzone.style.display = '';
+    }
+    checkReady();
+  }
+
+  // ── File handling ─────────────────────────────────────────────────────────
   function setFile(file) {
     if (!file) return;
     selectedFile = file;
-    const isVideo = file.type.startsWith('video');
-    fileIcon.textContent = isVideo ? '▷' : '♪';
+    const isVid = file.type.startsWith('video');
+    fileIcon.textContent = isVid ? '▷' : '♪';
     fileName.textContent = file.name;
     dropzone.style.display = 'none';
     fileSelected.classList.add('show');
@@ -365,7 +597,6 @@
   }
 
   fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
-
   dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
   dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
   dropzone.addEventListener('drop', (e) => {
@@ -373,34 +604,29 @@
     const f = e.dataTransfer.files[0];
     if (f) { fileInput.files = e.dataTransfer.files; setFile(f); }
   });
-
   fileRemove.addEventListener('click', () => {
     selectedFile = null; fileInput.value = '';
     fileSelected.classList.remove('show');
     dropzone.style.display = '';
     checkReady();
   });
-
   personNameIn.addEventListener('input', checkReady);
 
   function checkReady() {
     analyzeBtn.disabled = !(selectedFile && personNameIn.value.trim());
   }
 
-  function showError(msg) {
-    panelError.textContent = msg;
-    panelError.classList.add('show');
-  }
-  function hideError() { panelError.classList.remove('show'); }
+  function showError(msg) { panelError.textContent = msg; panelError.classList.add('show'); }
+  function hideError()    { panelError.classList.remove('show'); }
 
-  // ── Animate progress bar ──
+  // ── Progress ──────────────────────────────────────────────────────────────
   function animateProgress(targetPct, status, duration=800) {
     progressStatus.textContent = status;
     const start = parseFloat(progressBar.style.width) || 0;
     const diff  = targetPct - start;
-    const startTime = performance.now();
+    const t0    = performance.now();
     function step(now) {
-      const t = Math.min((now - startTime) / duration, 1);
+      const t    = Math.min((now - t0) / duration, 1);
       const ease = t < .5 ? 2*t*t : -1+(4-2*t)*t;
       progressBar.style.width = (start + diff * ease) + '%';
       if (t < 1) requestAnimationFrame(step);
@@ -408,12 +634,40 @@
     requestAnimationFrame(step);
   }
 
-  // ── Analyze ──
+  // ── Analyze ───────────────────────────────────────────────────────────────
   analyzeBtn.addEventListener('click', async () => {
     if (!selectedFile || !personNameIn.value.trim()) return;
+
+    // Video format: go through Stripe payment first
+    if (selectedFormat === 'video' && !unlocked) {
+      await startVideoPayment();
+      return;
+    }
+
+    await doAnalyze();
+  });
+
+  async function startVideoPayment() {
+    // Create a temp session placeholder so we can link payment to it
+    const tempSession = 'pending_' + Math.random().toString(36).slice(2);
+    showToast('Opening payment...');
+    try {
+      const res  = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({session_id: tempSession, type: 'video'}),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast('Payment setup failed. Try again.'); return; }
+      window.location.href = data.url;
+    } catch {
+      showToast('Payment error. Please try again.');
+    }
+  }
+
+  async function doAnalyze() {
     personName = personNameIn.value.trim();
     hideError();
-
     analyzeBtn.disabled = true;
     progressWrap.classList.add('show');
     animateProgress(15, 'Uploading file...', 600);
@@ -423,10 +677,10 @@
     fd.append('person_name', personName);
 
     try {
-      animateProgress(35, 'Sending to AI...');
+      const isAudio = selectedFile.type.startsWith('audio');
+      animateProgress(30, isAudio ? 'Transcribing with Groq Whisper...' : 'Sending to Gemini...');
       const res  = await fetch('/api/analyze', { method: 'POST', body: fd });
-
-      animateProgress(70, 'Extracting memories...');
+      animateProgress(75, isAudio ? 'Building persona...' : 'Extracting memories...');
       const data = await res.json();
 
       if (!res.ok) {
@@ -437,30 +691,27 @@
       }
 
       animateProgress(100, 'Profile complete ✓');
+      hasVoice  = data.has_voice || false;
+      sessionId = data.session_id;
+      msgCount  = 0;
 
       setTimeout(() => {
-        sessionId = data.session_id;
-
-        // Show profile
         profileText.textContent = data.profile.slice(0, 600) + (data.profile.length > 600 ? '...' : '');
         profileBox.classList.add('show');
         newSessionBtn.classList.add('show');
         progressWrap.classList.remove('show');
 
-        // Update topbar
         personTagName.textContent = personName;
         personTag.classList.add('show');
+        if (hasVoice) voiceBadge.classList.add('show');
 
-        // Switch to chat
         chatEmpty.style.display = 'none';
         messages.style.display  = 'flex';
         inputBar.style.display  = 'flex';
         sendBtn.disabled = false;
 
-        // Greeting message from the AI
-        appendMessage('ai', `Hey, it's ${personName}. What's up?`);
-
-        // Focus input
+        appendMessage('ai', `Hey, it's ${personName}. What's up?`, true);
+        updateCounter();
         setTimeout(() => chatInput.focus(), 100);
       }, 600);
 
@@ -469,47 +720,146 @@
       progressWrap.classList.remove('show');
       analyzeBtn.disabled = false;
     }
-  });
+  }
 
-  // ── New session ──
+  // ── New session ───────────────────────────────────────────────────────────
   newSessionBtn.addEventListener('click', () => {
-    sessionId   = null;
-    personName  = '';
-    selectedFile = null;
-    fileInput.value = '';
-    personNameIn.value = '';
+    sessionId = null; personName = ''; selectedFile = null;
+    hasVoice = false; msgCount = 0; unlocked = false; bonusUsed = false; paywallShown = false;
+    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+    fileInput.value = ''; personNameIn.value = '';
     fileSelected.classList.remove('show');
     dropzone.style.display = '';
     profileBox.classList.remove('show');
     newSessionBtn.classList.remove('show');
     progressWrap.classList.remove('show');
     progressBar.style.width = '0%';
-    analyzeBtn.disabled = true;
-    hideError();
+    analyzeBtn.disabled = true; hideError();
     personTag.classList.remove('show');
+    voiceBadge.classList.remove('show');
     messages.innerHTML = '';
     messages.style.display = 'none';
     inputBar.style.display = 'none';
     chatEmpty.style.display = '';
     sendBtn.disabled = true;
+    msgCounter.classList.remove('show');
+    selectFormat('audio');
   });
 
-  // ── Chat ──
-  function appendMessage(role, text) {
-    const wrap = document.createElement('div');
+  // ── Message counter ───────────────────────────────────────────────────────
+  function updateCounter() {
+    if (unlocked) { msgCounter.classList.remove('show'); return; }
+    const remaining = FREE_LIMIT - msgCount;
+    msgCounter.classList.add('show');
+    if (remaining > 2) {
+      msgCounter.textContent = `${msgCount} of ${FREE_LIMIT} free messages used`;
+      msgCounter.className = 'msg-counter show';
+    } else if (remaining === 2) {
+      msgCounter.textContent = `2 free messages remaining`;
+      msgCounter.className = 'msg-counter show warning';
+    } else if (remaining === 1) {
+      msgCounter.textContent = `1 free message remaining · upgrade for unlimited`;
+      msgCounter.className = 'msg-counter show critical';
+    } else {
+      msgCounter.classList.remove('show');
+    }
+  }
+
+  // ── Paywall ───────────────────────────────────────────────────────────────
+  function showPaywall() {
+    paywallName.textContent = personName || 'them';
+    paywallShown = true;
+    // If bonus already used, disable dismiss button
+    if (bonusUsed) {
+      paywallDismiss.disabled = true;
+      paywallDismiss.textContent = 'One last message already used';
+    } else {
+      paywallDismiss.disabled = false;
+      paywallDismiss.textContent = 'Give me one last message — I\'ll decide after';
+    }
+    paywallOverlay.classList.add('show');
+  }
+
+  function dismissPaywall() {
+    if (bonusUsed) return;
+    bonusUsed = true;
+    paywallOverlay.classList.remove('show');
+    showToast('One last message on us. Make it count.');
+    sendBtn.disabled = false;
+    chatInput.disabled = false;
+    chatInput.focus();
+  }
+
+  async function startPayment(type) {
+    if (!sessionId) { showToast('No active session. Please upload a file first.'); return; }
+    paywallOverlay.classList.remove('show');
+    showToast('Opening payment...');
+    try {
+      const res  = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({session_id: sessionId, type}),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast('Payment setup failed. Try again.'); return; }
+      window.location.href = data.url;
+    } catch {
+      showToast('Payment error. Please try again.');
+    }
+  }
+
+  // ── Voice playback ────────────────────────────────────────────────────────
+  async function playVoice(btn, text) {
+    if (!sessionId || !hasVoice) return;
+    if (currentAudio) {
+      currentAudio.pause(); currentAudio = null;
+      document.querySelectorAll('.voice-play-btn.playing').forEach(b => { b.classList.remove('playing'); b.innerHTML = playIcon(); });
+    }
+    btn.classList.add('loading'); btn.innerHTML = spinnerIcon();
+    try {
+      const res  = await fetch('/api/speak', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({session_id: sessionId, text}) });
+      const data = await res.json();
+      if (!res.ok || !data.audio) { btn.classList.remove('loading'); btn.innerHTML = playIcon(); return; }
+      const bytes = Uint8Array.from(atob(data.audio), c => c.charCodeAt(0));
+      const url   = URL.createObjectURL(new Blob([bytes], {type:'audio/mpeg'}));
+      currentAudio = new Audio(url);
+      btn.classList.remove('loading'); btn.classList.add('playing'); btn.innerHTML = stopIcon();
+      currentAudio.play();
+      currentAudio.onended = () => { btn.classList.remove('playing'); btn.innerHTML = playIcon(); URL.revokeObjectURL(url); currentAudio = null; };
+    } catch { btn.classList.remove('loading'); btn.innerHTML = playIcon(); }
+  }
+
+  function playIcon()    { return '<svg viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9"/></svg>'; }
+  function stopIcon()    { return '<svg viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="3" height="7" rx=".5"/><rect x="5.5" y="1.5" width="3" height="7" rx=".5"/></svg>'; }
+  function spinnerIcon() { return '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="8 4"/></svg>'; }
+
+  // ── Append message ────────────────────────────────────────────────────────
+  function appendMessage(role, text, skipVoiceBtn = false) {
+    const wrap   = document.createElement('div');
     wrap.className = `msg ${role}`;
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
     bubble.textContent = text;
-    const meta = document.createElement('div');
-    meta.className = 'msg-meta';
-    meta.textContent = role === 'user' ? 'You' : personName;
     wrap.appendChild(bubble);
+    const meta   = document.createElement('div');
+    meta.className = 'msg-meta';
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = role === 'user' ? 'You' : personName;
+    meta.appendChild(nameSpan);
+    if (role === 'ai' && hasVoice && !skipVoiceBtn) {
+      const vBtn = document.createElement('button');
+      vBtn.className = 'voice-play-btn visible';
+      vBtn.title = 'Play in cloned voice';
+      vBtn.innerHTML = playIcon();
+      vBtn.addEventListener('click', () => playVoice(vBtn, text));
+      meta.appendChild(vBtn);
+    }
     wrap.appendChild(meta);
     messages.appendChild(wrap);
     messages.scrollTop = messages.scrollHeight;
   }
 
+  // ── Send message ──────────────────────────────────────────────────────────
   async function sendMessage() {
     const text = chatInput.value.trim();
     if (!text || !sessionId) return;
@@ -517,9 +867,8 @@
     chatInput.value = '';
     chatInput.style.height = '46px';
     sendBtn.disabled = true;
-    appendMessage('user', text);
+    appendMessage('user', text, true);
 
-    // Show typing
     messages.appendChild(typing);
     typing.classList.add('show');
     messages.scrollTop = messages.scrollHeight;
@@ -527,20 +876,49 @@
     try {
       const res  = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, message: text }),
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({session_id: sessionId, message: text}),
       });
       const data = await res.json();
       typing.classList.remove('show');
 
+      // Handle paywall response
+      if (res.status === 402 && data.error === 'limit_reached') {
+        // Remove the user message we just added optimistically
+        appendMessage('ai', `We've reached the free limit. Tap below to keep this conversation going.`, true);
+        showPaywall();
+        sendBtn.disabled = false;
+        chatInput.disabled = true;
+        return;
+      }
+
       if (res.ok) {
         appendMessage('ai', data.reply);
+        msgCount   = data.messages_used || msgCount + 1;
+        unlocked   = data.unlocked || false;
+
+        // If bonus used and limit now reached, lock and show paywall
+        if (bonusUsed && data.limit_reached) {
+          chatInput.disabled = true;
+          sendBtn.disabled = true;
+          showPaywall();
+          return;
+        }
+
+        if (data.limit_reached && !bonusUsed) {
+          chatInput.disabled = true;
+          sendBtn.disabled = true;
+          showPaywall();
+          return;
+        }
+
+        updateCounter();
       } else {
-        appendMessage('ai', `[Error: ${data.error || 'something went wrong'}]`);
+        appendMessage('ai', `[Error: ${data.error || 'something went wrong'}]`, true);
       }
     } catch {
       typing.classList.remove('show');
-      appendMessage('ai', '[Connection error — please try again]');
+      appendMessage('ai', '[Connection error — please try again]', true);
     }
 
     sendBtn.disabled = false;
@@ -551,12 +929,20 @@
   chatInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
-
-  // Auto-resize textarea
   chatInput.addEventListener('input', () => {
     chatInput.style.height = '46px';
     chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
   });
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg, duration = 3000) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+  }
 </script>
 </body>
 </html>
