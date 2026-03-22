@@ -319,6 +319,7 @@ def get_voice_reference_url(filename):
         if r.ok:
             signed_path = r.json().get('signedURL', '')
             full_url = f'{SUPABASE_URL}/storage/v1{signed_path}'
+            print(f'  → Signed URL: {full_url[:80]}...', flush=True)
             return full_url, None
         return None, f'Sign error: {r.status_code} {r.text[:200]}'
     except Exception as e:
