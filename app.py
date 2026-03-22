@@ -320,32 +320,36 @@ def get_voice_reference_b64(filename):
         return None, str(e)
 
 def synthesize_xtts(text, voice_ref_filename):
-    """
-    Send text + voice reference to XTTS HuggingFace Space.
-    Returns (audio_base64, error).
-    """
     if not XTTS_SPACE_URL:
+        print('  ❌ XTTS_SPACE_URL not set', flush=True)
         return None, 'XTTS_SPACE_URL not configured'
     ref_b64, err = get_voice_reference_b64(voice_ref_filename)
     if err:
+        print(f'  ❌ Could not fetch voice ref: {err}', flush=True)
         return None, f'Could not fetch voice reference: {err}'
+    print(f'  → Calling XTTS Space...', flush=True)
     try:
         resp = requests.post(
             f'{XTTS_SPACE_URL}/run/predict',
             json={'data': [text[:500], ref_b64, XTTS_SECRET]},
-            timeout=90,
+            timeout=120,
         )
+        print(f'  → XTTS response: {resp.status_code}', flush=True)
         if resp.ok:
             result = resp.json()
             data   = result.get('data', [])
+            print(f'  → XTTS data length: {len(data)}', flush=True)
             if len(data) >= 2:
                 audio_b64 = data[0]
                 status    = data[1]
+                print(f'  → XTTS status: {status}', flush=True)
                 if status == 'ok' and audio_b64:
                     return audio_b64, None
                 return None, f'XTTS error: {status}'
+        print(f'  ❌ XTTS failed: {resp.status_code} {resp.text[:300]}', flush=True)
         return None, f'XTTS API error: {resp.status_code} {resp.text[:200]}'
     except Exception as e:
+        print(f'  ❌ XTTS exception: {str(e)}', flush=True)
         return None, str(e)
 
 # ── Persona builder ───────────────────────────────────────────────────────────
