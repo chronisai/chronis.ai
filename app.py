@@ -300,22 +300,27 @@ def store_voice_reference(audio_path, session_id):
     except Exception as e:
         return None, str(e)
 
-def get_voice_reference_b64(filename):
+def get_voice_reference_url(filename):
     """
-    Fetch voice reference bytes from Supabase Storage, return as base64.
+    Generate a signed URL for the voice reference in Supabase Storage.
+    HF Space downloads directly from this URL — no base64 bloat.
     """
     try:
-        r = requests.get(
-            f'{SUPABASE_URL}/storage/v1/object/voice-refs/{filename}',
+        r = requests.post(
+            f'{SUPABASE_URL}/storage/v1/object/sign/voice-refs/{filename}',
             headers={
                 'apikey': SUPABASE_KEY,
                 'Authorization': f'Bearer {SUPABASE_KEY}',
+                'Content-Type': 'application/json',
             },
-            timeout=15,
+            json={'expiresIn': 300},
+            timeout=10,
         )
         if r.ok:
-            return base64.b64encode(r.content).decode('utf-8'), None
-        return None, f'Fetch error: {r.status_code}'
+            signed_path = r.json().get('signedURL', '')
+            full_url = f'{SUPABASE_URL}/storage/v1{signed_path}'
+            return full_url, None
+        return None, f'Sign error: {r.status_code} {r.text[:200]}'
     except Exception as e:
         return None, str(e)
 
@@ -323,7 +328,7 @@ def synthesize_xtts(text, voice_ref_filename):
     if not XTTS_SPACE_URL:
         print('  ❌ XTTS_SPACE_URL not set', flush=True)
         return None, 'XTTS_SPACE_URL not configured'
-    ref_b64, err = get_voice_reference_b64(voice_ref_filename)
+    ref_url, err = get_voice_reference_url(voice_ref_filename)
     if err:
         print(f'  ❌ Could not fetch voice ref: {err}', flush=True)
         return None, f'Could not fetch voice reference: {err}'
@@ -331,7 +336,7 @@ def synthesize_xtts(text, voice_ref_filename):
     try:
         resp = requests.post(
             f'{XTTS_SPACE_URL}/run/predict',
-            json={'data': [text[:500], ref_b64, XTTS_SECRET]},
+            json={'data': [text[:500], ref_url, XTTS_SECRET]},
             timeout=120,
         )
         print(f'  → XTTS response: {resp.status_code}', flush=True)
