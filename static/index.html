@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronis — Digital Immortality</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0a; --surface: #111; --border: rgba(255,255,255,0.07);
+    --text: #e8e6e0; --muted: rgba(255,255,255,0.35); --accent: #fff;
+  }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+  header { width: 100%; max-width: 1100px; padding: 28px 32px; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-size: 16px; font-weight: 300; letter-spacing: 5px; text-transform: uppercase; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 13px; margin-left: 24px; transition: color .2s; }
+  nav a:hover { color: var(--text); }
+  .hero { max-width: 700px; text-align: center; padding: 80px 24px 60px; }
+  .hero h1 { font-size: clamp(36px, 6vw, 64px); font-weight: 200; line-height: 1.1; letter-spacing: -1px; margin-bottom: 24px; }
+  .hero h1 em { font-style: normal; color: rgba(255,255,255,0.45); }
+  .hero p { font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 520px; margin: 0 auto 40px; }
+  .counter { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .counter span { color: var(--text); font-weight: 500; }
+  .join-form { display: flex; flex-direction: column; gap: 12px; max-width: 420px; margin: 0 auto; }
+  .join-form input, .join-form select {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-size: 15px; padding: 13px 16px;
+    outline: none; width: 100%; transition: border-color .2s; font-family: inherit;
+  }
+  .join-form input:focus, .join-form select:focus { border-color: rgba(255,255,255,0.25); }
+  .join-form select option { background: #1a1a1a; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 28px; border-radius: 10px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: opacity .2s; letter-spacing: .3px; width: 100%; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #000; }
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 860px; padding: 40px 24px 80px; width: 100%; }
+  @media (max-width: 640px) { .features { grid-template-columns: 1fr; } }
+  .feature { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+  .feature .icon { font-size: 22px; margin-bottom: 12px; }
+  .feature h3 { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+  .feature p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .msg { font-size: 13px; margin-top: 12px; min-height: 20px; text-align: center; }
+  .msg.ok { color: #86efac; } .msg.err { color: #fca5a5; }
+  footer { width: 100%; border-top: 1px solid var(--border); padding: 24px 32px; display: flex; justify-content: center; }
+  footer p { font-size: 12px; color: rgba(255,255,255,0.18); }
+  .demo-link { display: inline-block; margin-top: 20px; padding: 10px 22px; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 13px; transition: border-color .2s, color .2s; }
+  .demo-link:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Chronis</div>
+  <nav>
+    <a href="/demo">Try Demo</a>
+    <a href="/live">Live V2</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <h1>Talk to the people<br><em>you've lost.</em></h1>
+  <p>Upload a video or audio of someone you love. Chronis builds a voice-cloned, personality-matched replica you can actually have a conversation with.</p>
+
+  <div class="counter">Already <span id="count">—</span> people on the waitlist</div>
+
+  <div class="join-form">
+    <input type="text"  id="name"    placeholder="Your name"          maxlength="80">
+    <input type="email" id="email"   placeholder="Email address"      maxlength="120">
+    <select id="country">
+      <option value="" disabled selected>Your country</option>
+      <option>India</option><option>United States</option><option>United Kingdom</option>
+      <option>Canada</option><option>Australia</option><option>Germany</option>
+      <option>France</option><option>Singapore</option><option>UAE</option>
+      <option>Other</option>
+    </select>
+    <button class="btn btn-primary" id="join-btn" onclick="joinWaitlist()">Join the Waitlist</button>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <a href="/demo" class="demo-link">Try the text demo →</a>
+</div>
+
+<div class="features">
+  <div class="feature">
+    <div class="icon">🎙️</div>
+    <h3>Voice cloning</h3>
+    <p>Upload 30 seconds of their voice. We recreate how they actually sounded — accent, cadence, everything.</p>
+  </div>
+  <div class="feature">
+    <div class="icon">🧠</div>
+    <h3>Memory &amp; personality</h3>
+    <p>From their videos and recordings, we extract how they thought, joked, and talked about the people they loved.</p>
+  </div>
+  <div class="feature">
+    <div class="icon">💬</div>
+    <h3>Real conversation</h3>
+    <p>Not a chatbot. A live, real-time conversation with a lip-synced avatar. Ask them anything.</p>
+  </div>
+</div>
+
+<footer><p>© 2026 Chronis · Preserving humanity, one voice at a time</p></footer>
+
+<script>
+async function loadCount() {
+  try {
+    const r = await fetch('/api/count');
+    const d = await r.json();
+    document.getElementById('count').textContent = d.count.toLocaleString();
+  } catch (_) {}
+}
+loadCount();
+
+async function joinWaitlist() {
+  const btn  = document.getElementById('join-btn');
+  const msg  = document.getElementById('msg');
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const country = document.getElementById('country').value;
+
+  if (!name || !email || !country) { msg.className = 'msg err'; msg.textContent = 'All fields are required.'; return; }
+
+  btn.disabled = true; btn.textContent = 'Joining...'; msg.textContent = '';
+  try {
+    const r = await fetch('/api/join', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({name, email, country}) });
+    const d = await r.json();
+    if (d.success) {
+      msg.className = 'msg ok'; msg.textContent = `You're #${d.count} on the waitlist. Check your email.`;
+      btn.textContent = 'You\'re in ✓';
+      document.getElementById('count').textContent = d.count.toLocaleString();
+    } else {
+      msg.className = 'msg err'; msg.textContent = d.error || 'Something went wrong.';
+      btn.disabled = false; btn.textContent = 'Join the Waitlist';
+    }
+  } catch (e) {
+    msg.className = 'msg err'; msg.textContent = 'Network error. Please try again.';
+    btn.disabled = false; btn.textContent = 'Join the Waitlist';
+  }
+}
+</script>
+</body>
+</html>

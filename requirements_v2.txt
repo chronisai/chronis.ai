@@ -1,0 +1,49 @@
+# ── Chronis V2 requirements ────────────────────────────────────────────────
+
+# ── Web framework ──────────────────────────────────────────────────────────
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+
+# ── HTTP clients ───────────────────────────────────────────────────────────
+httpx>=0.27.0
+requests>=2.31.0
+
+# ── WebSocket ──────────────────────────────────────────────────────────────
+websockets>=12.0
+
+# ── Audio processing ───────────────────────────────────────────────────────
+webrtcvad>=2.0.10
+numpy>=1.26.0
+scipy>=1.12.0
+librosa>=0.10.0                  # audio validation (SNR, speech ratio, duration)
+soundfile>=0.12.1                # required by librosa for audio I/O
+
+# ── Computer vision (photo validation) ─────────────────────────────────────
+mediapipe>=0.10.0                # MediaPipe FaceMesh for photo validation
+opencv-python-headless>=4.9.0   # cv2 image decode + Laplacian sharpness
+                                 # headless = no GUI deps (server-safe)
+
+# ── LLM ────────────────────────────────────────────────────────────────────
+groq>=0.5.0
+
+# ── Payments ───────────────────────────────────────────────────────────────
+razorpay>=1.4.1
+
+# ── Legacy XTTS HuggingFace Space (v1 demo) ────────────────────────────────
+gradio-client>=0.16.0
+
+# ── Modal (XTTS v2 GPU deployment) ─────────────────────────────────────────
+modal>=0.62.0                    # only needed on the machine running modal deploy
+                                 # not needed on Railway — comment out if deploy fails
+
+# ── Utilities ──────────────────────────────────────────────────────────────
+python-multipart>=0.0.9
+aiofiles>=23.2.1
+python-dotenv>=1.0.0
+
+# ── System dependency (NOT pip-installable) ─────────────────────────────────
+# ffmpeg must be installed on the host and on PATH.
+# Railway: add a Nixpacks build config or use a Docker image that includes it.
+# Local: brew install ffmpeg  OR  apt-get install ffmpeg
+# Used by: validators/audio_validator.py (one-time conversion during onboarding)
+#          utils/ffmpeg_utils.py (frame extraction from video uploads)

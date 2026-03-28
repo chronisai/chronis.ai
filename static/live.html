@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronis — Live Conversation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0a0a0a;
+    --surface:   #111111;
+    --border:    rgba(255,255,255,0.08);
+    --text:      #e8e6e0;
+    --muted:     rgba(255,255,255,0.35);
+    --accent:    #ffffff;
+    --green:     #22c55e;
+    --amber:     #f59e0b;
+    --red:       #ef4444;
+    --blue:      #3b82f6;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Header ── */
+  header {
+    width: 100%;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  header .logo { font-size: 18px; font-weight: 300; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; }
+  header .pill { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
+  /* ── Main container ── */
+  main {
+    width: 100%;
+    max-width: 960px;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .card-title { font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+
+  /* ── Steps ── */
+  .steps { display: flex; gap: 8px; margin-bottom: 28px; }
+  .step { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+  .step.done { background: var(--green); }
+  .step.active { background: var(--accent); }
+
+  /* ── Forms ── */
+  .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .field label { font-size: 13px; color: var(--muted); }
+  .field input, .field textarea {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 15px;
+    padding: 12px 16px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .field input:focus, .field textarea:focus { border-color: rgba(255,255,255,0.3); }
+  .field textarea { min-height: 100px; }
+
+  /* ── Upload boxes ── */
+  .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .upload-box {
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .upload-box:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.02); }
+  .upload-box.has-file { border-color: var(--green); border-style: solid; }
+  .upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-box .icon { font-size: 28px; margin-bottom: 10px; }
+  .upload-box .label { font-size: 13px; color: var(--muted); }
+  .upload-box .filename { font-size: 12px; color: var(--green); margin-top: 6px; word-break: break-all; }
+  .upload-box .req { font-size: 11px; color: rgba(255,255,255,0.2); margin-top: 4px; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.3px;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-secondary { background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid var(--border); }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-full { width: 100%; }
+
+  /* ── Progress bar ── */
+  .progress-wrap { background: rgba(255,255,255,0.06); border-radius: 8px; height: 4px; overflow: hidden; margin: 16px 0; }
+  .progress-bar { height: 100%; background: var(--accent); border-radius: 8px; transition: width 0.5s ease; }
+  .progress-log { max-height: 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+  .progress-log .log-line { font-size: 12px; color: var(--muted); display: flex; gap: 8px; }
+  .progress-log .log-step { color: var(--accent); min-width: 100px; }
+
+  /* ── Live session ── */
+  .session-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+  .avatar-area {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    aspect-ratio: 3/4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-area iframe { width: 100%; height: 100%; border: none; border-radius: 12px; }
+  .avatar-placeholder { text-align: center; color: var(--muted); }
+  .avatar-placeholder .big { font-size: 48px; margin-bottom: 12px; }
+
+  /* ── State indicator ── */
+  .state-ring {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    backdrop-filter: blur(8px);
+  }
+  .state-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .state-dot.idle       { background: var(--muted); }
+  .state-dot.listening  { background: var(--green); animation: pulse 1.5s ease-in-out infinite; }
+  .state-dot.thinking   { background: var(--amber); }
+  .state-dot.speaking   { background: var(--blue);  animation: pulse 0.8s ease-in-out infinite; }
+  .state-dot.interrupted { background: var(--red); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── Right panel ── */
+  .panel { display: flex; flex-direction: column; gap: 16px; }
+  .transcript-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 80px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+    font-style: italic;
+    transition: color 0.2s;
+  }
+  .transcript-box.has-text { color: var(--text); font-style: normal; }
+
+  /* ── Session stats ── */
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-box { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+  .stat-box .stat-val { font-size: 22px; font-weight: 300; }
+  .stat-box .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ── Error / info banners ── */
+  .banner { border-radius: 10px; padding: 12px 16px; font-size: 13px; margin-bottom: 16px; }
+  .banner-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+  .banner-info  { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
+  .banner-ok    { background: rgba(34,197,94,0.1);  border: 1px solid rgba(34,197,94,0.3);  color: #86efac; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Chronis</div>
+  <div class="pill">V2 Live</div>
+</header>
+
+<main>
+
+  <!-- ── Error banner (global) ── -->
+  <div id="error-banner" class="banner banner-error hidden"></div>
+
+  <!-- ════════════════════════════════════
+       PHASE 1: ONBOARDING
+       ════════════════════════════════════ -->
+  <div id="phase-onboard" class="card">
+    <div class="card-title">Create your replica</div>
+
+    <div class="steps">
+      <div class="step active" id="s1"></div>
+      <div class="step" id="s2"></div>
+      <div class="step" id="s3"></div>
+    </div>
+
+    <div id="onboard-form">
+      <div class="field">
+        <label>Person's name</label>
+        <input type="text" id="agent-name" placeholder="e.g. Mom, Dad, Priya..." maxlength="60">
+      </div>
+      <div class="field">
+        <label>Personality (describe how they speak, their mannerisms, key phrases)</label>
+        <textarea id="personality" placeholder="She always starts sentences with 'Look...' and laughs before punchlines. Very direct. Never sugarcoats things. Loves cricket analogies..."></textarea>
+      </div>
+
+      <div class="upload-grid">
+        <div class="upload-box" id="photo-box">
+          <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" onchange="onPhotoChange(this)">
+          <div class="icon">📷</div>
+          <div class="label">Upload photo</div>
+          <div class="filename" id="photo-name"></div>
+          <div class="req">Frontal face · min 512×512px · JPG/PNG</div>
+        </div>
+        <div class="upload-box" id="audio-box">
+          <input type="file" id="audio-input" accept="audio/*,video/*" onchange="onAudioChange(this)">
+          <div class="icon">🎙️</div>
+          <div class="label">Upload voice recording</div>
+          <div class="filename" id="audio-name"></div>
+          <div class="req">Min 30s of clear speech · MP3/WAV/M4A</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="validate-btn" onclick="validateInputs()" disabled>
+        Validate &amp; Continue →
+      </button>
+    </div>
+
+    <!-- Validation result -->
+    <div id="validate-result" class="hidden">
+      <div id="validate-banner" class="banner"></div>
+      <button class="btn btn-primary btn-full" id="start-onboard-btn" onclick="startOnboarding()">
+        Create Replica (takes 60-90s)
+      </button>
+    </div>
+
+    <!-- Onboarding progress -->
+    <div id="onboard-progress" class="hidden">
+      <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:5%"></div></div>
+      <div class="progress-log" id="progress-log"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       PHASE 2: LIVE SESSION
+       ════════════════════════════════════ -->
+  <div id="phase-session" class="card hidden">
+    <div class="card-title" id="session-title">Live conversation</div>
+
+    <div class="session-grid">
+
+      <!-- Avatar -->
+      <div class="avatar-area" id="avatar-area">
+        <div class="avatar-placeholder" id="avatar-placeholder">
+          <div class="big">👤</div>
+          <div>Starting session...</div>
+        </div>
+        <!-- Daily.co iframe injected here when session starts -->
+        <div class="state-ring" id="state-ring">
+          <div class="state-dot idle" id="state-dot"></div>
+          <span id="state-label">idle</span>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="panel">
+        <div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;">Live transcript</div>
+          <div class="transcript-box" id="transcript-box">Listening for your voice...</div>
+        </div>
+
+        <div class="stats">
+          <div class="stat-box">
+            <div class="stat-val" id="stat-turns">0</div>
+            <div class="stat-lbl">Turns</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-duration">0s</div>
+            <div class="stat-lbl">Duration</div>
+          </div>
+        </div>
+
+        <button class="btn btn-danger btn-full" id="end-btn" onclick="endSession()">
+          End Conversation
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script type="module">
+// ── State ────────────────────────────────────────────────────────────────────
+let agentId     = null;
+let sessionId   = null;
+let client      = null;   // ChronisV2Client
+let sessionStart = null;
+let durationTimer = null;
+let turnCount   = 0;
+
+// ── File selection ────────────────────────────────────────────────────────────
+window.onPhotoChange = (input) => {
+  const file = input.files[0];
+  document.getElementById('photo-name').textContent = file ? file.name : '';
+  document.getElementById('photo-box').classList.toggle('has-file', !!file);
+  checkBothFiles();
+};
+
+window.onAudioChange = (input) => {
+  const file = input.files[0];
+  document.getElementById('audio-name').textContent = file ? file.name : '';
+  document.getElementById('audio-box').classList.toggle('has-file', !!file);
+  checkBothFiles();
+};
+
+function checkBothFiles() {
+  const hasPhoto = !!document.getElementById('photo-input').files[0];
+  const hasAudio = !!document.getElementById('audio-input').files[0];
+  const hasName  = document.getElementById('agent-name').value.trim().length > 0;
+  document.getElementById('validate-btn').disabled = !(hasPhoto && hasAudio && hasName);
+}
+
+document.getElementById('agent-name').addEventListener('input', checkBothFiles);
+
+// ── Phase 1a: Validate inputs ─────────────────────────────────────────────────
+window.validateInputs = async () => {
+  clearError();
+  const btn = document.getElementById('validate-btn');
+  btn.disabled = true;
+  btn.textContent = 'Validating...';
+
+  const photo = document.getElementById('photo-input').files[0];
+  const audio = document.getElementById('audio-input').files[0];
+
+  const form = new FormData();
+  form.append('photo', photo);
+  form.append('audio', audio);
+
+  try {
+    const r    = await fetch('/api/v2/onboard/validate', { method: 'POST', body: form });
+    const data = await r.json();
+
+    const resultDiv = document.getElementById('validate-result');
+    const banner    = document.getElementById('validate-banner');
+    resultDiv.classList.remove('hidden');
+
+    if (data.valid) {
+      banner.className = 'banner banner-ok';
+      banner.textContent =
+        `✓ Photo: ${data.photo.resolution}, sharpness ${data.photo.sharpness} · ` +
+        `Audio: ${data.audio.duration_s}s, SNR ${data.audio.snr_db}dB, speech ${Math.round(data.audio.speech_ratio*100)}%`;
+      document.getElementById('start-onboard-btn').classList.remove('hidden');
+    } else {
+      banner.className = 'banner banner-error';
+      banner.textContent = `✗ ${data.failed_step === 'photo' ? '📷 Photo' : '🎙️ Audio'}: ${data.reason}`;
+      document.getElementById('start-onboard-btn').classList.add('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Validate & Continue →';
+    }
+  } catch (e) {
+    showError(`Validation error: ${e.message}`);
+    btn.disabled = false;
+    btn.textContent = 'Validate & Continue →';
+  }
+};
+
+// ── Phase 1b: Start onboarding ────────────────────────────────────────────────
+window.startOnboarding = async () => {
+  clearError();
+  document.getElementById('validate-result').classList.add('hidden');
+  document.getElementById('onboard-form').classList.add('hidden');
+  document.getElementById('onboard-progress').classList.remove('hidden');
+  document.getElementById('s1').classList.remove('active');
+  document.getElementById('s2').classList.add('active');
+
+  const form = new FormData();
+  form.append('user_id',     'demo-user-' + Math.random().toString(36).slice(2, 8));
+  form.append('agent_name',  document.getElementById('agent-name').value.trim());
+  form.append('personality', document.getElementById('personality').value.trim());
+  form.append('photo',       document.getElementById('photo-input').files[0]);
+  form.append('audio',       document.getElementById('audio-input').files[0]);
+
+  try {
+    const r    = await fetch('/api/v2/onboard/start', { method: 'POST', body: form });
+    const data = await r.json();
+
+    if (data.status === 'ready') {
+      // Already existed
+      agentId = data.agent_id;
+      onOnboardingComplete();
+      return;
+    }
+
+    agentId = data.agent_id;
+
+    // Connect to SSE stream for real-time progress
+    const es = new EventSource(`/api/v2/onboard/stream/${agentId}`);
+    es.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      appendProgressLog(msg.step, msg.message || '');
+      updateProgressBar(msg.step);
+
+      if (msg.status === 'ready') {
+        es.close();
+        onOnboardingComplete();
+      } else if (msg.status === 'failed') {
+        es.close();
+        showError(`Onboarding failed: ${msg.message}`);
+        resetOnboardingUI();
+      }
+    };
+    es.onerror = () => {
+      es.close();
+      // Fall back to polling
+      pollOnboardingStatus();
+    };
+
+  } catch (e) {
+    showError(`Failed to start onboarding: ${e.message}`);
+    resetOnboardingUI();
+  }
+};
+
+async function pollOnboardingStatus() {
+  for (let i = 0; i < 40; i++) {  // max 200s of polling
+    await new Promise(r => setTimeout(r, 5000));
+    try {
+      const r    = await fetch(`/api/v2/onboard/status/${agentId}`);
+      const data = await r.json();
+
+      if (data.progress) {
+        data.progress.forEach(p => appendProgressLog(p.step, p.message));
+      }
+
+      if (data.status === 'ready') {
+        onOnboardingComplete();
+        return;
+      } else if (data.status === 'failed') {
+        showError(`Onboarding failed: ${data.error}`);
+        resetOnboardingUI();
+        return;
+      }
+    } catch (e) {
+      console.error('Poll error:', e);
+    }
+  }
+  showError('Onboarding timed out. Please try again.');
+  resetOnboardingUI();
+}
+
+function onOnboardingComplete() {
+  appendProgressLog('complete', '✓ Replica ready!');
+  document.getElementById('progress-bar').style.width = '100%';
+  document.getElementById('s2').classList.remove('active');
+  document.getElementById('s3').classList.add('active');
+
+  setTimeout(() => startLiveSession(), 1500);
+}
+
+function appendProgressLog(step, message) {
+  const log  = document.getElementById('progress-log');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-step">${step}</span><span>${message}</span>`;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+const PROGRESS_STEPS = {
+  photo_validate: 15, audio_validate: 25, idempotency: 30,
+  agent_create: 35, photo_upload: 45, simli_create: 50,
+  simli_poll: 75, voice_upload: 90, complete: 100,
+};
+function updateProgressBar(step) {
+  const pct = PROGRESS_STEPS[step] || null;
+  if (pct) document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function resetOnboardingUI() {
+  document.getElementById('onboard-form').classList.remove('hidden');
+  document.getElementById('onboard-progress').classList.add('hidden');
+  document.getElementById('validate-result').classList.add('hidden');
+  document.getElementById('validate-btn').disabled = false;
+  document.getElementById('validate-btn').textContent = 'Validate & Continue →';
+  document.getElementById('s2').classList.remove('active');
+  document.getElementById('s1').classList.add('active');
+}
+
+// ── Phase 2: Live session ─────────────────────────────────────────────────────
+async function startLiveSession() {
+  document.getElementById('phase-onboard').classList.add('hidden');
+  document.getElementById('phase-session').classList.remove('hidden');
+  document.getElementById('session-title').textContent =
+    `Live conversation — ${document.getElementById('agent-name').value.trim()}`;
+
+  // Dynamically import the V2 client module
+  const { ChronisV2Client } = await import('/js/chronis_v2_client.js');
+
+  client = new ChronisV2Client({
+    agentId: agentId,
+
+    onStateChange: (state) => {
+      updateStateUI(state);
+      // Count turns when we transition back to listening after speaking
+      if (state === 'listening' && document.getElementById('state-label').textContent === 'speaking') {
+        turnCount++;
+        document.getElementById('stat-turns').textContent = turnCount;
+      }
+    },
+
+    onPartialTranscript: (text) => {
+      const box = document.getElementById('transcript-box');
+      box.textContent = text;
+      box.classList.add('has-text');
+    },
+
+    onError: (msg) => showError(msg),
+
+    onSessionEnd: () => {
+      clearInterval(durationTimer);
+      updateStateUI('ended');
+      document.getElementById('end-btn').textContent = 'Session ended';
+      document.getElementById('end-btn').disabled = true;
+    },
+  });
+
+  try {
+    await client.start();
+    sessionStart  = Date.now();
+    sessionId     = client.sessionId;
+
+    // Inject Daily.co iframe into avatar area
+    const iframe = document.createElement('iframe');
+    iframe.src   = `${client.dailyRoomUrl}?showLeaveButton=false&showFullscreenButton=false`;
+    iframe.allow = 'microphone; camera; autoplay; display-capture';
+    document.getElementById('avatar-placeholder').remove();
+    document.getElementById('avatar-area').prepend(iframe);
+
+    // Duration timer
+    durationTimer = setInterval(() => {
+      const secs = Math.floor((Date.now() - sessionStart) / 1000);
+      const m    = Math.floor(secs / 60);
+      const s    = secs % 60;
+      document.getElementById('stat-duration').textContent =
+        m > 0 ? `${m}m ${s}s` : `${s}s`;
+    }, 1000);
+
+  } catch (e) {
+    showError(`Failed to start session: ${e.message}`);
+  }
+}
+
+window.endSession = async () => {
+  document.getElementById('end-btn').disabled = true;
+  document.getElementById('end-btn').textContent = 'Ending...';
+  clearInterval(durationTimer);
+  if (client) await client.end();
+};
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function updateStateUI(state) {
+  const dot   = document.getElementById('state-dot');
+  const label = document.getElementById('state-label');
+  dot.className = `state-dot ${state}`;
+  label.textContent = state;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-banner');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 8000);
+}
+
+function clearError() {
+  document.getElementById('error-banner').classList.add('hidden');
+}
+</script>
+</body>
+</html>
