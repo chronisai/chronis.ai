@@ -2,613 +2,528 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chronis — Live Conversation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Chronis — Create Your Replica</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--glass:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.09);
+  --glass-hover:rgba(255,255,255,0.07);--text:#f0eeea;--muted:rgba(255,255,255,0.38);
+  --chrome:rgba(255,255,255,0.72);--accent:#fff;--green:#4ade80;--red:#f87171;
+  --amber:#fbbf24;--blue:#60a5fa;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-20vh;left:50%;transform:translateX(-50%);width:70vw;height:50vh;background:radial-gradient(ellipse,rgba(255,255,255,0.025) 0%,transparent 70%);pointer-events:none;z-index:0}
 
-  :root {
-    --bg:        #0a0a0a;
-    --surface:   #111111;
-    --border:    rgba(255,255,255,0.08);
-    --text:      #e8e6e0;
-    --muted:     rgba(255,255,255,0.35);
-    --accent:    #ffffff;
-    --green:     #22c55e;
-    --amber:     #f59e0b;
-    --red:       #ef4444;
-    --blue:      #3b82f6;
-  }
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;background:rgba(8,8,8,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border)}
+.nav-logo{font-size:12px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:var(--chrome);text-decoration:none}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-back{color:var(--muted);text-decoration:none;font-size:13px;transition:color .2s}
+.nav-back:hover{color:var(--text)}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+/* Layout */
+main{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:88px 20px 80px}
 
-  /* ── Header ── */
-  header {
-    width: 100%;
-    padding: 20px 32px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  header .logo { font-size: 18px; font-weight: 300; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; }
-  header .pill { background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+/* Gate screen */
+#gate-screen{text-align:center;padding:40px 0}
+.gate-icon{font-size:32px;margin-bottom:24px;display:block}
+.gate-title{font-size:24px;font-weight:300;letter-spacing:-.5px;margin-bottom:12px}
+.gate-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:36px}
+.field{width:100%;background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;color:var(--text);font-size:15px;padding:14px 18px;outline:none;font-family:inherit;transition:border-color .2s,background .2s;-webkit-appearance:none;display:block}
+.field:focus{border-color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.06)}
+.field::placeholder{color:var(--muted)}
+.btn{width:100%;padding:15px;background:var(--accent);color:#000;border:none;border-radius:12px;font-size:14px;font-weight:600;letter-spacing:.3px;cursor:pointer;transition:opacity .2s;font-family:inherit;margin-top:10px}
+.btn:hover{opacity:.9}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--glass-border);margin-top:12px}
+.btn-ghost:hover{opacity:1;border-color:rgba(255,255,255,0.2);color:var(--text)}
+.msg{font-size:13px;min-height:18px;margin-top:10px;text-align:center}
+.msg.err{color:var(--red)}.msg.ok{color:var(--green)}
 
-  /* ── Main container ── */
-  main {
-    width: 100%;
-    max-width: 960px;
-    padding: 40px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-  }
+/* Progress bar */
+.steps-bar{display:flex;gap:6px;margin-bottom:36px}
+.step-seg{flex:1;height:2px;border-radius:2px;background:var(--glass-border);transition:background .4s}
+.step-seg.done{background:var(--green)}.step-seg.active{background:var(--chrome)}
 
-  /* ── Cards ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-  }
-  .card-title { font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+/* Section headers */
+.section-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
+.section-title{font-size:22px;font-weight:300;letter-spacing:-.4px;margin-bottom:8px}
+.section-sub{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:28px}
 
-  /* ── Steps ── */
-  .steps { display: flex; gap: 8px; margin-bottom: 28px; }
-  .step { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
-  .step.done { background: var(--green); }
-  .step.active { background: var(--accent); }
+/* Cards */
+.card{background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:24px;margin-bottom:16px}
 
-  /* ── Forms ── */
-  .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-  .field label { font-size: 13px; color: var(--muted); }
-  .field input, .field textarea {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-size: 15px;
-    padding: 12px 16px;
-    width: 100%;
-    outline: none;
-    transition: border-color 0.2s;
-    font-family: inherit;
-    resize: vertical;
-  }
-  .field input:focus, .field textarea:focus { border-color: rgba(255,255,255,0.3); }
-  .field textarea { min-height: 100px; }
+/* Video upload */
+.upload-zone{
+  border:1.5px dashed var(--glass-border);border-radius:16px;
+  padding:48px 24px;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;position:relative;overflow:hidden;
+  background:var(--glass);
+}
+.upload-zone:hover,.upload-zone.drag{border-color:rgba(255,255,255,0.22);background:var(--glass-hover)}
+.upload-zone.has-file{border-color:var(--green);border-style:solid}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:32px;margin-bottom:14px;display:block;color:var(--muted)}
+.upload-label{font-size:14px;color:var(--muted);line-height:1.6}
+.upload-label strong{color:var(--chrome);display:block;margin-bottom:4px}
+.upload-label small{font-size:12px;color:rgba(255,255,255,0.22)}
+.upload-filename{font-size:13px;color:var(--green);margin-top:10px;word-break:break-all}
+.upload-preview{width:100%;max-height:200px;border-radius:10px;object-fit:cover;margin-top:14px;display:none}
 
-  /* ── Upload boxes ── */
-  .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  .upload-box {
-    border: 1px dashed var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    position: relative;
-  }
-  .upload-box:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.02); }
-  .upload-box.has-file { border-color: var(--green); border-style: solid; }
-  .upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .upload-box .icon { font-size: 28px; margin-bottom: 10px; }
-  .upload-box .label { font-size: 13px; color: var(--muted); }
-  .upload-box .filename { font-size: 12px; color: var(--green); margin-top: 6px; word-break: break-all; }
-  .upload-box .req { font-size: 11px; color: rgba(255,255,255,0.2); margin-top: 4px; }
+/* Form fields */
+.field-group{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.field-label{font-size:12px;color:var(--muted);letter-spacing:.3px;margin-bottom:4px}
+textarea.field{resize:none;line-height:1.6;min-height:90px}
 
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 13px 28px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-    letter-spacing: 0.3px;
-  }
-  .btn:active { transform: scale(0.98); }
-  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .btn-primary { background: var(--accent); color: #000; }
-  .btn-secondary { background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid var(--border); }
-  .btn-danger { background: var(--red); color: #fff; }
-  .btn-full { width: 100%; }
+/* Validation result */
+.val-result{border-radius:12px;padding:14px 18px;font-size:13px;line-height:1.6;margin-bottom:16px;display:none}
+.val-result.ok{background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);color:var(--green)}
+.val-result.err{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--red)}
 
-  /* ── Progress bar ── */
-  .progress-wrap { background: rgba(255,255,255,0.06); border-radius: 8px; height: 4px; overflow: hidden; margin: 16px 0; }
-  .progress-bar { height: 100%; background: var(--accent); border-radius: 8px; transition: width 0.5s ease; }
-  .progress-log { max-height: 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-  .progress-log .log-line { font-size: 12px; color: var(--muted); display: flex; gap: 8px; }
-  .progress-log .log-step { color: var(--accent); min-width: 100px; }
+/* Progress screen */
+#progress-screen{display:none;text-align:center;padding:20px 0}
+.progress-ring-wrap{position:relative;width:80px;height:80px;margin:0 auto 28px}
+.progress-ring{transform:rotate(-90deg)}
+.progress-ring-bg{fill:none;stroke:var(--glass-border);stroke-width:3}
+.progress-ring-fill{fill:none;stroke:var(--chrome);stroke-width:3;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset .6s ease}
+.progress-title{font-size:20px;font-weight:300;margin-bottom:8px}
+.progress-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.progress-log{background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;padding:16px;text-align:left;max-height:180px;overflow-y:auto}
+.log-entry{font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--glass-border);line-height:1.5}
+.log-entry:last-child{border-bottom:none;color:var(--text)}
+.log-entry.done{color:var(--green)}
+.log-entry.fail{color:var(--red)}
 
-  /* ── Live session ── */
-  .session-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
-  .avatar-area {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    aspect-ratio: 3/4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .avatar-area iframe { width: 100%; height: 100%; border: none; border-radius: 12px; }
-  .avatar-placeholder { text-align: center; color: var(--muted); }
-  .avatar-placeholder .big { font-size: 48px; margin-bottom: 12px; }
+/* Session screen */
+#session-screen{display:none}
+.avatar-frame{
+  width:100%;aspect-ratio:16/9;
+  border-radius:16px;overflow:hidden;
+  background:#000;border:1px solid var(--glass-border);
+  position:relative;margin-bottom:16px;
+}
+.avatar-frame iframe{width:100%;height:100%;border:none}
+.avatar-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted)}
+.avatar-placeholder .spinner{width:32px;height:32px;border:2px solid var(--glass-border);border-top-color:var(--chrome);border-radius:50%;animation:spin .8s linear infinite}
+.status-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;letter-spacing:.5px;text-transform:uppercase;padding:4px 12px;border-radius:20px;background:var(--glass);border:1px solid var(--glass-border);color:var(--muted)}
+.status-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.status-pill.listening .dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.status-pill.speaking .dot{background:var(--blue);box-shadow:0 0 6px var(--blue);animation:pulse 1s ease infinite}
+.status-pill.thinking .dot{background:var(--amber);animation:pulse .6s ease infinite}
+.end-btn{padding:8px 18px;background:transparent;border:1px solid var(--glass-border);border-radius:8px;color:var(--muted);font-size:13px;cursor:pointer;transition:border-color .2s,color .2s;font-family:inherit}
+.end-btn:hover{border-color:rgba(248,113,113,0.4);color:var(--red)}
 
-  /* ── State indicator ── */
-  .state-ring {
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0,0,0,0.7);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 12px;
-    backdrop-filter: blur(8px);
-  }
-  .state-dot { width: 7px; height: 7px; border-radius: 50%; }
-  .state-dot.idle       { background: var(--muted); }
-  .state-dot.listening  { background: var(--green); animation: pulse 1.5s ease-in-out infinite; }
-  .state-dot.thinking   { background: var(--amber); }
-  .state-dot.speaking   { background: var(--blue);  animation: pulse 0.8s ease-in-out infinite; }
-  .state-dot.interrupted { background: var(--red); }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-  /* ── Right panel ── */
-  .panel { display: flex; flex-direction: column; gap: 16px; }
-  .transcript-box {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    min-height: 80px;
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--muted);
-    font-style: italic;
-    transition: color 0.2s;
-  }
-  .transcript-box.has-text { color: var(--text); font-style: normal; }
-
-  /* ── Session stats ── */
-  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .stat-box { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
-  .stat-box .stat-val { font-size: 22px; font-weight: 300; }
-  .stat-box .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 1px; text-transform: uppercase; }
-
-  /* ── Error / info banners ── */
-  .banner { border-radius: 10px; padding: 12px 16px; font-size: 13px; margin-bottom: 16px; }
-  .banner-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
-  .banner-info  { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
-  .banner-ok    { background: rgba(34,197,94,0.1);  border: 1px solid rgba(34,197,94,0.3);  color: #86efac; }
-  .hidden { display: none !important; }
+@media(max-width:480px){
+  main{padding:76px 16px 60px}
+  .upload-zone{padding:36px 16px}
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">Chronis</div>
-  <div class="pill">V2 Live</div>
-</header>
+<nav>
+  <a href="/" class="nav-logo">Chronis</a>
+  <div class="nav-right">
+    <a href="/" class="nav-back">← Back</a>
+  </div>
+</nav>
 
 <main>
 
-  <!-- ── Error banner (global) ── -->
-  <div id="error-banner" class="banner banner-error hidden"></div>
-
-  <!-- ════════════════════════════════════
-       PHASE 1: ONBOARDING
-       ════════════════════════════════════ -->
-  <div id="phase-onboard" class="card">
-    <div class="card-title">Create your replica</div>
-
-    <div class="steps">
-      <div class="step active" id="s1"></div>
-      <div class="step" id="s2"></div>
-      <div class="step" id="s3"></div>
-    </div>
-
-    <div id="onboard-form">
-      <div class="field">
-        <label>Person's name</label>
-        <input type="text" id="agent-name" placeholder="e.g. Mom, Dad, Priya..." maxlength="60">
-      </div>
-      <div class="field">
-        <label>Personality (describe how they speak, their mannerisms, key phrases)</label>
-        <textarea id="personality" placeholder="She always starts sentences with 'Look...' and laughs before punchlines. Very direct. Never sugarcoats things. Loves cricket analogies..."></textarea>
-      </div>
-
-      <div class="upload-grid">
-        <div class="upload-box" id="photo-box">
-          <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" onchange="onPhotoChange(this)">
-          <div class="icon">📷</div>
-          <div class="label">Upload photo</div>
-          <div class="filename" id="photo-name"></div>
-          <div class="req">Frontal face · min 512×512px · JPG/PNG</div>
-        </div>
-        <div class="upload-box" id="audio-box">
-          <input type="file" id="audio-input" accept="audio/*,video/*" onchange="onAudioChange(this)">
-          <div class="icon">🎙️</div>
-          <div class="label">Upload voice recording</div>
-          <div class="filename" id="audio-name"></div>
-          <div class="req">Min 30s of clear speech · MP3/WAV/M4A</div>
-        </div>
-      </div>
-
-      <button class="btn btn-primary btn-full" id="validate-btn" onclick="validateInputs()" disabled>
-        Validate &amp; Continue →
-      </button>
-    </div>
-
-    <!-- Validation result -->
-    <div id="validate-result" class="hidden">
-      <div id="validate-banner" class="banner"></div>
-      <button class="btn btn-primary btn-full" id="start-onboard-btn" onclick="startOnboarding()">
-        Create Replica (takes 60-90s)
-      </button>
-    </div>
-
-    <!-- Onboarding progress -->
-    <div id="onboard-progress" class="hidden">
-      <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:5%"></div></div>
-      <div class="progress-log" id="progress-log"></div>
-    </div>
+  <!-- GATE: waitlist email check -->
+  <div id="gate-screen">
+    <span class="gate-icon">◈</span>
+    <div class="gate-title">Early Access</div>
+    <p class="gate-sub">Chronis Live V2 is currently waitlist-only.<br>Enter your email to verify your access.</p>
+    <input class="field" type="email" id="gate-email" placeholder="Your email address" maxlength="120">
+    <button class="btn" onclick="checkGate()">Continue</button>
+    <button class="btn btn-ghost" onclick="window.location.href='/'">Join the Waitlist</button>
+    <div class="msg" id="gate-msg"></div>
   </div>
 
-  <!-- ════════════════════════════════════
-       PHASE 2: LIVE SESSION
-       ════════════════════════════════════ -->
-  <div id="phase-session" class="card hidden">
-    <div class="card-title" id="session-title">Live conversation</div>
+  <!-- STEP 1: Upload video -->
+  <div id="step1" style="display:none">
+    <div class="steps-bar">
+      <div class="step-seg active" id="seg1"></div>
+      <div class="step-seg" id="seg2"></div>
+      <div class="step-seg" id="seg3"></div>
+    </div>
 
-    <div class="session-grid">
+    <div class="section-label">Step 1 of 3</div>
+    <div class="section-title">Upload a video</div>
+    <p class="section-sub">Any video where the person's face is clearly visible and they're speaking. 30 seconds minimum for best voice quality.</p>
 
-      <!-- Avatar -->
-      <div class="avatar-area" id="avatar-area">
-        <div class="avatar-placeholder" id="avatar-placeholder">
-          <div class="big">👤</div>
-          <div>Starting session...</div>
-        </div>
-        <!-- Daily.co iframe injected here when session starts -->
-        <div class="state-ring" id="state-ring">
-          <div class="state-dot idle" id="state-dot"></div>
-          <span id="state-label">idle</span>
-        </div>
+    <div class="upload-zone" id="video-zone">
+      <input type="file" id="video-input" accept="video/mp4,video/mov,video/quicktime,video/webm,video/avi,video/x-msvideo,video/mkv" onchange="onVideoChange(this)">
+      <span class="upload-icon">▶</span>
+      <div class="upload-label">
+        <strong>Tap to upload video</strong>
+        MP4, MOV, or WebM · up to 500MB
+        <small style="display:block;margin-top:6px">Best results: well-lit, face forward, clear audio</small>
       </div>
+      <div class="upload-filename" id="video-name"></div>
+    </div>
 
-      <!-- Right panel -->
-      <div class="panel">
-        <div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;">Live transcript</div>
-          <div class="transcript-box" id="transcript-box">Listening for your voice...</div>
-        </div>
+    <div class="val-result" id="val-result"></div>
 
-        <div class="stats">
-          <div class="stat-box">
-            <div class="stat-val" id="stat-turns">0</div>
-            <div class="stat-lbl">Turns</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-val" id="stat-duration">0s</div>
-            <div class="stat-lbl">Duration</div>
-          </div>
-        </div>
+    <button class="btn" id="validate-btn" onclick="validateVideo()" disabled>Validate Video</button>
+  </div>
 
-        <button class="btn btn-danger btn-full" id="end-btn" onclick="endSession()">
-          End Conversation
-        </button>
+  <!-- STEP 2: Persona details -->
+  <div id="step2" style="display:none">
+    <div class="steps-bar">
+      <div class="step-seg done"></div>
+      <div class="step-seg active" id="seg2b"></div>
+      <div class="step-seg" id="seg3b"></div>
+    </div>
+
+    <div class="section-label">Step 2 of 3</div>
+    <div class="section-title">Who is this?</div>
+    <p class="section-sub">Give your replica a name and describe their personality. The more specific, the better the conversation.</p>
+
+    <div class="field-group">
+      <div class="field-label">Their name</div>
+      <input class="field" type="text" id="agent-name" placeholder="e.g. Mom, Grandpa John, David" maxlength="60">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Personality & how they spoke</div>
+      <textarea class="field" id="personality" placeholder="e.g. Warm and funny, always told stories about their childhood. Used to say 'beta' a lot. Loved cricket and cooking..." maxlength="1000"></textarea>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Your name (so they can address you)</div>
+      <input class="field" type="text" id="your-name" placeholder="e.g. Arjun" maxlength="60">
+    </div>
+
+    <button class="btn" id="details-btn" onclick="goToStep3()">Continue</button>
+    <div class="msg" id="details-msg"></div>
+  </div>
+
+  <!-- STEP 3: Confirm & create -->
+  <div id="step3" style="display:none">
+    <div class="steps-bar">
+      <div class="step-seg done"></div>
+      <div class="step-seg done"></div>
+      <div class="step-seg active"></div>
+    </div>
+
+    <div class="section-label">Step 3 of 3</div>
+    <div class="section-title">Create replica</div>
+    <p class="section-sub">This takes 2–3 minutes. We'll extract their face from the video, clone their voice, and build the conversation model.</p>
+
+    <div class="card" style="margin-bottom:20px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px">Video uploaded</div>
+      <div style="font-size:14px;color:var(--green)" id="confirm-video">—</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:12px;margin-bottom:6px">Replica name</div>
+      <div style="font-size:14px" id="confirm-name">—</div>
+    </div>
+
+    <button class="btn" id="create-btn" onclick="startOnboarding()">Create Replica</button>
+    <div class="msg" id="create-msg"></div>
+  </div>
+
+  <!-- PROGRESS screen -->
+  <div id="progress-screen">
+    <div class="progress-ring-wrap">
+      <svg class="progress-ring" width="80" height="80" viewBox="0 0 80 80">
+        <circle class="progress-ring-bg" cx="40" cy="40" r="35"/>
+        <circle class="progress-ring-fill" id="ring-fill" cx="40" cy="40" r="35"/>
+      </svg>
+    </div>
+    <div class="progress-title" id="progress-title">Creating your replica…</div>
+    <p class="progress-sub" id="progress-sub">This takes 2–3 minutes. Don't close this tab.</p>
+    <div class="progress-log" id="progress-log"></div>
+  </div>
+
+  <!-- SESSION screen -->
+  <div id="session-screen">
+    <div class="avatar-frame" id="avatar-frame">
+      <div class="avatar-placeholder" id="avatar-placeholder">
+        <div class="spinner"></div>
+        <span style="font-size:13px">Connecting…</span>
       </div>
+      <iframe id="daily-iframe" allow="camera;microphone" style="display:none"></iframe>
+    </div>
+
+    <div class="status-row">
+      <div class="status-pill listening" id="status-pill">
+        <span class="dot"></span>
+        <span id="status-text">Listening</span>
+      </div>
+      <button class="end-btn" onclick="endSession()">End call</button>
+    </div>
+
+    <div class="card" style="font-size:13px;color:var(--muted);line-height:1.65">
+      Speak naturally. <strong style="color:var(--text)">Interrupt any time</strong> — just start talking and the replica will stop.
     </div>
   </div>
 
 </main>
 
-<script type="module">
-// ── State ────────────────────────────────────────────────────────────────────
-let agentId     = null;
-let sessionId   = null;
-let client      = null;   // ChronisV2Client
-let sessionStart = null;
-let durationTimer = null;
-let turnCount   = 0;
-
-// ── File selection ────────────────────────────────────────────────────────────
-window.onPhotoChange = (input) => {
-  const file = input.files[0];
-  document.getElementById('photo-name').textContent = file ? file.name : '';
-  document.getElementById('photo-box').classList.toggle('has-file', !!file);
-  checkBothFiles();
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+const S = {
+  userEmail: '',
+  userId: null,
+  videoFile: null,
+  videoValidated: false,
+  agentId: null,
+  sessionId: null,
+  pollTimer: null,
 };
 
-window.onAudioChange = (input) => {
-  const file = input.files[0];
-  document.getElementById('audio-name').textContent = file ? file.name : '';
-  document.getElementById('audio-box').classList.toggle('has-file', !!file);
-  checkBothFiles();
-};
+// ── Gate ──────────────────────────────────────────────────────────────────────
+async function checkGate() {
+  const email = document.getElementById('gate-email').value.trim().toLowerCase();
+  const msg   = document.getElementById('gate-msg');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    msg.className='msg err'; msg.textContent='Enter a valid email address.'; return;
+  }
+  msg.className='msg'; msg.textContent='Checking…';
 
-function checkBothFiles() {
-  const hasPhoto = !!document.getElementById('photo-input').files[0];
-  const hasAudio = !!document.getElementById('audio-input').files[0];
-  const hasName  = document.getElementById('agent-name').value.trim().length > 0;
-  document.getElementById('validate-btn').disabled = !(hasPhoto && hasAudio && hasName);
+  // Admin bypass via localStorage token
+  const adminSecret = localStorage.getItem('chronis_admin');
+
+  try {
+    const params = new URLSearchParams({email});
+    if (adminSecret) params.set('admin_secret', adminSecret);
+    const r = await fetch('/api/v2/waitlist/check?' + params);
+    const d = await r.json();
+
+    if (d.on_waitlist || d.admin) {
+      S.userEmail = email;
+      S.userId    = 'u_' + btoa(email).replace(/[^a-zA-Z0-9]/g,'').slice(0,16);
+      hide('gate-screen'); show('step1');
+    } else {
+      msg.className='msg err';
+      msg.textContent="You're not on the waitlist yet. Join at chronis.in";
+    }
+  } catch(e) {
+    msg.className='msg err'; msg.textContent='Network error. Please try again.';
+  }
 }
 
-document.getElementById('agent-name').addEventListener('input', checkBothFiles);
+// ── Step 1: Video ─────────────────────────────────────────────────────────────
+function onVideoChange(input) {
+  const file = input.files[0];
+  if (!file) return;
+  S.videoFile = file;
+  S.videoValidated = false;
+  document.getElementById('video-name').textContent = file.name;
+  document.getElementById('video-zone').classList.add('has-file');
+  document.getElementById('validate-btn').disabled = false;
+  document.getElementById('val-result').style.display = 'none';
+}
 
-// ── Phase 1a: Validate inputs ─────────────────────────────────────────────────
-window.validateInputs = async () => {
-  clearError();
+async function validateVideo() {
   const btn = document.getElementById('validate-btn');
-  btn.disabled = true;
-  btn.textContent = 'Validating...';
+  const res = document.getElementById('val-result');
+  if (!S.videoFile) return;
 
-  const photo = document.getElementById('photo-input').files[0];
-  const audio = document.getElementById('audio-input').files[0];
+  btn.disabled = true; btn.textContent = 'Checking video…';
+  res.style.display = 'none';
 
   const form = new FormData();
-  form.append('photo', photo);
-  form.append('audio', audio);
+  form.append('video', S.videoFile);
 
   try {
-    const r    = await fetch('/api/v2/onboard/validate', { method: 'POST', body: form });
-    const data = await r.json();
+    const r = await fetch('/api/v2/onboard/validate', {method:'POST', body:form});
+    const d = await r.json();
 
-    const resultDiv = document.getElementById('validate-result');
-    const banner    = document.getElementById('validate-banner');
-    resultDiv.classList.remove('hidden');
-
-    if (data.valid) {
-      banner.className = 'banner banner-ok';
-      banner.textContent =
-        `✓ Photo: ${data.photo.resolution}, sharpness ${data.photo.sharpness} · ` +
-        `Audio: ${data.audio.duration_s}s, SNR ${data.audio.snr_db}dB, speech ${Math.round(data.audio.speech_ratio*100)}%`;
-      document.getElementById('start-onboard-btn').classList.remove('hidden');
-    } else {
-      banner.className = 'banner banner-error';
-      banner.textContent = `✗ ${data.failed_step === 'photo' ? '📷 Photo' : '🎙️ Audio'}: ${data.reason}`;
-      document.getElementById('start-onboard-btn').classList.add('hidden');
+    if (d.valid) {
+      res.className='val-result ok'; res.style.display='block';
+      res.textContent = `✓ Face detected · ${d.photo.resolution} · Sharpness ${d.photo.sharpness}`;
+      S.videoValidated = true;
+      btn.textContent = 'Continue →';
+      btn.onclick = () => { hide('step1'); show('step2'); };
       btn.disabled = false;
-      btn.textContent = 'Validate & Continue →';
+    } else {
+      res.className='val-result err'; res.style.display='block';
+      res.textContent = d.reason || 'Video validation failed.';
+      btn.textContent = 'Try Another Video';
+      btn.disabled = false;
     }
-  } catch (e) {
-    showError(`Validation error: ${e.message}`);
-    btn.disabled = false;
-    btn.textContent = 'Validate & Continue →';
+  } catch(e) {
+    res.className='val-result err'; res.style.display='block';
+    res.textContent = 'Network error during validation.';
+    btn.textContent = 'Validate Video'; btn.disabled = false;
   }
-};
+}
 
-// ── Phase 1b: Start onboarding ────────────────────────────────────────────────
-window.startOnboarding = async () => {
-  clearError();
-  document.getElementById('validate-result').classList.add('hidden');
-  document.getElementById('onboard-form').classList.add('hidden');
-  document.getElementById('onboard-progress').classList.remove('hidden');
-  document.getElementById('s1').classList.remove('active');
-  document.getElementById('s2').classList.add('active');
+// Drag and drop
+const zone = document.getElementById('video-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('video/')) {
+    S.videoFile = file;
+    document.getElementById('video-name').textContent = file.name;
+    zone.classList.add('has-file');
+    document.getElementById('validate-btn').disabled = false;
+  }
+});
+
+// ── Step 2 → 3 ────────────────────────────────────────────────────────────────
+function goToStep3() {
+  const name        = document.getElementById('agent-name').value.trim();
+  const personality = document.getElementById('personality').value.trim();
+  const yourName    = document.getElementById('your-name').value.trim();
+  const msg         = document.getElementById('details-msg');
+
+  if (!name) { msg.className='msg err'; msg.textContent='Please enter their name.'; return; }
+  if (!personality || personality.length < 20) { msg.className='msg err'; msg.textContent='Please describe their personality (at least 20 characters).'; return; }
+
+  document.getElementById('confirm-video').textContent = S.videoFile.name;
+  document.getElementById('confirm-name').textContent  = name;
+  hide('step2'); show('step3');
+}
+
+// ── Start onboarding ──────────────────────────────────────────────────────────
+async function startOnboarding() {
+  const btn         = document.getElementById('create-btn');
+  const msg         = document.getElementById('create-msg');
+  const name        = document.getElementById('agent-name').value.trim();
+  const personality = document.getElementById('personality').value.trim();
+  const yourName    = document.getElementById('your-name').value.trim();
+
+  btn.disabled = true; btn.textContent = 'Starting…';
 
   const form = new FormData();
-  form.append('user_id',     'demo-user-' + Math.random().toString(36).slice(2, 8));
-  form.append('agent_name',  document.getElementById('agent-name').value.trim());
-  form.append('personality', document.getElementById('personality').value.trim());
-  form.append('photo',       document.getElementById('photo-input').files[0]);
-  form.append('audio',       document.getElementById('audio-input').files[0]);
+  form.append('user_id',     S.userId);
+  form.append('agent_name',  name);
+  form.append('personality', personality + (yourName ? `\n\nYou are speaking with ${yourName}.` : ''));
+  form.append('video',       S.videoFile);
 
   try {
-    const r    = await fetch('/api/v2/onboard/start', { method: 'POST', body: form });
-    const data = await r.json();
+    const r = await fetch('/api/v2/onboard/start', {method:'POST', body:form});
+    const d = await r.json();
 
-    if (data.status === 'ready') {
-      // Already existed
-      agentId = data.agent_id;
-      onOnboardingComplete();
+    if (!r.ok) {
+      msg.className='msg err'; msg.textContent = d.detail || 'Failed to start. Please try again.';
+      btn.disabled = false; btn.textContent = 'Create Replica'; return;
+    }
+
+    S.agentId = d.agent_id;
+    hide('step3'); show('progress-screen');
+    pollProgress(d.agent_id);
+
+  } catch(e) {
+    msg.className='msg err'; msg.textContent = 'Network error. Please try again.';
+    btn.disabled = false; btn.textContent = 'Create Replica';
+  }
+}
+
+// ── Poll progress ─────────────────────────────────────────────────────────────
+let seenSteps = 0;
+const STEP_LABELS = {
+  extract:'Extracting face & voice from video',
+  photo_validate:'Validating face',
+  audio_validate:'Validating voice',
+  idempotency:'Checking for existing replica',
+  photo_upload:'Uploading face data',
+  simli_create:'Building face model (45-90s)',
+  voice_upload:'Uploading voice reference',
+  ready:'Replica ready',
+  complete:'Complete',
+  failed:'Failed',
+};
+const STEP_WEIGHTS = ['extract','photo_validate','audio_validate','photo_upload','simli_create','voice_upload','complete'];
+
+function pollProgress(agentId) {
+  S.pollTimer = setInterval(async () => {
+    try {
+      const r = await fetch(`/api/v2/onboard/status/${agentId}`);
+      const d = await r.json();
+
+      const progress = d.progress || [];
+      const log      = document.getElementById('progress-log');
+
+      for (let i = seenSteps; i < progress.length; i++) {
+        const entry = progress[i];
+        const el    = document.createElement('div');
+        el.className = 'log-entry' + (entry.step === 'failed' ? ' fail' : entry.step === 'complete' ? ' done' : '');
+        el.textContent = (STEP_LABELS[entry.step] || entry.step) + ' — ' + entry.message;
+        log.appendChild(el);
+        log.scrollTop = log.scrollHeight;
+      }
+      seenSteps = progress.length;
+
+      // Update ring
+      const doneIdx = STEP_WEIGHTS.indexOf(d.last_step?.step || '');
+      const pct     = doneIdx >= 0 ? Math.round(((doneIdx + 1) / STEP_WEIGHTS.length) * 100) : 10;
+      const offset  = 220 - (220 * Math.min(pct, 95) / 100);
+      document.getElementById('ring-fill').style.strokeDashoffset = offset;
+      document.getElementById('progress-sub').textContent = `${Math.min(pct,95)}% complete — don't close this tab`;
+
+      if (d.status === 'ready') {
+        clearInterval(S.pollTimer);
+        document.getElementById('ring-fill').style.strokeDashoffset = 0;
+        document.getElementById('progress-title').textContent = 'Replica ready ✓';
+        document.getElementById('progress-sub').textContent  = 'Starting your conversation…';
+        setTimeout(() => startSession(agentId), 1500);
+      } else if (d.status === 'failed') {
+        clearInterval(S.pollTimer);
+        document.getElementById('progress-title').textContent = 'Something went wrong';
+        document.getElementById('progress-sub').textContent  = d.error || 'Please try again.';
+      }
+    } catch(e) {}
+  }, 3000);
+}
+
+// ── Start live session ────────────────────────────────────────────────────────
+async function startSession(agentId) {
+  try {
+    const r = await fetch('/api/v2/session/start', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({agent_id: agentId}),
+    });
+    const d = await r.json();
+
+    if (!r.ok) {
+      alert('Could not start session: ' + (d.detail || 'Unknown error'));
       return;
     }
 
-    agentId = data.agent_id;
+    S.sessionId = d.session_id;
+    hide('progress-screen'); show('session-screen');
 
-    // Connect to SSE stream for real-time progress
-    const es = new EventSource(`/api/v2/onboard/stream/${agentId}`);
-    es.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      appendProgressLog(msg.step, msg.message || '');
-      updateProgressBar(msg.step);
+    const iframe = document.getElementById('daily-iframe');
+    iframe.src = d.room_url;
+    iframe.style.display = 'block';
+    document.getElementById('avatar-placeholder').style.display = 'none';
 
-      if (msg.status === 'ready') {
-        es.close();
-        onOnboardingComplete();
-      } else if (msg.status === 'failed') {
-        es.close();
-        showError(`Onboarding failed: ${msg.message}`);
-        resetOnboardingUI();
-      }
-    };
-    es.onerror = () => {
-      es.close();
-      // Fall back to polling
-      pollOnboardingStatus();
-    };
-
-  } catch (e) {
-    showError(`Failed to start onboarding: ${e.message}`);
-    resetOnboardingUI();
+  } catch(e) {
+    alert('Network error starting session. Please refresh.');
   }
-};
-
-async function pollOnboardingStatus() {
-  for (let i = 0; i < 40; i++) {  // max 200s of polling
-    await new Promise(r => setTimeout(r, 5000));
-    try {
-      const r    = await fetch(`/api/v2/onboard/status/${agentId}`);
-      const data = await r.json();
-
-      if (data.progress) {
-        data.progress.forEach(p => appendProgressLog(p.step, p.message));
-      }
-
-      if (data.status === 'ready') {
-        onOnboardingComplete();
-        return;
-      } else if (data.status === 'failed') {
-        showError(`Onboarding failed: ${data.error}`);
-        resetOnboardingUI();
-        return;
-      }
-    } catch (e) {
-      console.error('Poll error:', e);
-    }
-  }
-  showError('Onboarding timed out. Please try again.');
-  resetOnboardingUI();
 }
 
-function onOnboardingComplete() {
-  appendProgressLog('complete', '✓ Replica ready!');
-  document.getElementById('progress-bar').style.width = '100%';
-  document.getElementById('s2').classList.remove('active');
-  document.getElementById('s3').classList.add('active');
-
-  setTimeout(() => startLiveSession(), 1500);
-}
-
-function appendProgressLog(step, message) {
-  const log  = document.getElementById('progress-log');
-  const line = document.createElement('div');
-  line.className = 'log-line';
-  line.innerHTML = `<span class="log-step">${step}</span><span>${message}</span>`;
-  log.appendChild(line);
-  log.scrollTop = log.scrollHeight;
-}
-
-const PROGRESS_STEPS = {
-  photo_validate: 15, audio_validate: 25, idempotency: 30,
-  agent_create: 35, photo_upload: 45, simli_create: 50,
-  simli_poll: 75, voice_upload: 90, complete: 100,
-};
-function updateProgressBar(step) {
-  const pct = PROGRESS_STEPS[step] || null;
-  if (pct) document.getElementById('progress-bar').style.width = pct + '%';
-}
-
-function resetOnboardingUI() {
-  document.getElementById('onboard-form').classList.remove('hidden');
-  document.getElementById('onboard-progress').classList.add('hidden');
-  document.getElementById('validate-result').classList.add('hidden');
-  document.getElementById('validate-btn').disabled = false;
-  document.getElementById('validate-btn').textContent = 'Validate & Continue →';
-  document.getElementById('s2').classList.remove('active');
-  document.getElementById('s1').classList.add('active');
-}
-
-// ── Phase 2: Live session ─────────────────────────────────────────────────────
-async function startLiveSession() {
-  document.getElementById('phase-onboard').classList.add('hidden');
-  document.getElementById('phase-session').classList.remove('hidden');
-  document.getElementById('session-title').textContent =
-    `Live conversation — ${document.getElementById('agent-name').value.trim()}`;
-
-  // Dynamically import the V2 client module
-  const { ChronisV2Client } = await import('/js/chronis_v2_client.js');
-
-  client = new ChronisV2Client({
-    agentId: agentId,
-
-    onStateChange: (state) => {
-      updateStateUI(state);
-      // Count turns when we transition back to listening after speaking
-      if (state === 'listening' && document.getElementById('state-label').textContent === 'speaking') {
-        turnCount++;
-        document.getElementById('stat-turns').textContent = turnCount;
-      }
-    },
-
-    onPartialTranscript: (text) => {
-      const box = document.getElementById('transcript-box');
-      box.textContent = text;
-      box.classList.add('has-text');
-    },
-
-    onError: (msg) => showError(msg),
-
-    onSessionEnd: () => {
-      clearInterval(durationTimer);
-      updateStateUI('ended');
-      document.getElementById('end-btn').textContent = 'Session ended';
-      document.getElementById('end-btn').disabled = true;
-    },
-  });
-
+// ── End session ───────────────────────────────────────────────────────────────
+async function endSession() {
+  if (!S.sessionId) { window.location.href = '/'; return; }
   try {
-    await client.start();
-    sessionStart  = Date.now();
-    sessionId     = client.sessionId;
-
-    // Inject Daily.co iframe into avatar area
-    const iframe = document.createElement('iframe');
-    iframe.src   = `${client.dailyRoomUrl}?showLeaveButton=false&showFullscreenButton=false`;
-    iframe.allow = 'microphone; camera; autoplay; display-capture';
-    document.getElementById('avatar-placeholder').remove();
-    document.getElementById('avatar-area').prepend(iframe);
-
-    // Duration timer
-    durationTimer = setInterval(() => {
-      const secs = Math.floor((Date.now() - sessionStart) / 1000);
-      const m    = Math.floor(secs / 60);
-      const s    = secs % 60;
-      document.getElementById('stat-duration').textContent =
-        m > 0 ? `${m}m ${s}s` : `${s}s`;
-    }, 1000);
-
-  } catch (e) {
-    showError(`Failed to start session: ${e.message}`);
-  }
+    await fetch(`/api/v2/session/${S.sessionId}/end`, {method:'POST'});
+  } catch(e) {}
+  window.location.href = '/';
 }
 
-window.endSession = async () => {
-  document.getElementById('end-btn').disabled = true;
-  document.getElementById('end-btn').textContent = 'Ending...';
-  clearInterval(durationTimer);
-  if (client) await client.end();
-};
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function show(id){ document.getElementById(id).style.display = '' }
+function hide(id){ document.getElementById(id).style.display = 'none' }
 
-// ── UI helpers ────────────────────────────────────────────────────────────────
-function updateStateUI(state) {
-  const dot   = document.getElementById('state-dot');
-  const label = document.getElementById('state-label');
-  dot.className = `state-dot ${state}`;
-  label.textContent = state;
-}
-
-function showError(msg) {
-  const el = document.getElementById('error-banner');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-  setTimeout(() => el.classList.add('hidden'), 8000);
-}
-
-function clearError() {
-  document.getElementById('error-banner').classList.add('hidden');
+// Check URL for admin token
+const params = new URLSearchParams(window.location.search);
+if (params.get('admin_secret')) {
+  localStorage.setItem('chronis_admin', params.get('admin_secret'));
+  // Clean URL
+  window.history.replaceState({}, '', '/live');
 }
 </script>
 </body>

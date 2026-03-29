@@ -919,8 +919,32 @@ async def admin():
     return FileResponse("static/admin.html")
 
 @app.get("/live")
-async def live():
+async def live(email: str = ""):
+    """
+    Live V2 demo — requires waitlist membership.
+    Pass ?email=user@example.com to verify.
+    Admin bypass: ?admin_secret=SECRET
+    """
     return FileResponse("static/live.html")
+
+@app.get("/api/v2/waitlist/check")
+async def check_waitlist(email: str = "", admin_secret: str = ""):
+    """Check if an email is on the waitlist. Used by live.html gate.
+    Admin bypass: pass admin_secret=ADMIN_SECRET to skip waitlist check."""
+    if not email:
+        return {"on_waitlist": False, "admin": False}
+    # Admin bypass
+    if admin_secret and admin_secret == ADMIN_SECRET and ADMIN_SECRET:
+        return {"on_waitlist": True, "admin": True, "email": email.strip().lower()}
+    on_list = is_on_waitlist(email.strip().lower())
+    return {"on_waitlist": on_list, "admin": False, "email": email.strip().lower()}
+
+@app.get("/test")
+async def test_page(admin_secret: str = ""):
+    """Admin-only test page — bypasses waitlist. Requires ?admin_secret=SECRET."""
+    if not admin_secret or admin_secret != ADMIN_SECRET:
+        raise HTTPException(403, "Invalid admin secret. Use /test?admin_secret=YOUR_SECRET")
+    return FileResponse("static/test.html")
 
 @app.get("/health")
 async def health():

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Chronis — Admin Test</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--glass:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.09);
+  --glass-hover:rgba(255,255,255,0.07);--text:#f0eeea;--muted:rgba(255,255,255,0.38);
+  --chrome:rgba(255,255,255,0.72);--accent:#fff;--green:#4ade80;--red:#f87171;--amber:#fbbf24;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;background:rgba(8,8,8,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border)}
+.nav-logo{font-size:12px;letter-spacing:6px;text-transform:uppercase;color:var(--chrome);text-decoration:none}
+.admin-badge{font-size:11px;letter-spacing:2px;text-transform:uppercase;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);color:var(--amber);padding:4px 12px;border-radius:20px}
+main{max-width:600px;margin:0 auto;padding:80px 20px 60px}
+.page-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.page-title{font-size:24px;font-weight:300;letter-spacing:-.4px;margin-bottom:8px}
+.page-sub{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:36px}
+.steps-bar{display:flex;gap:6px;margin-bottom:36px}
+.step-seg{flex:1;height:2px;border-radius:2px;background:var(--glass-border);transition:background .4s}
+.step-seg.done{background:var(--green)}.step-seg.active{background:var(--amber)}
+.section-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.section-title{font-size:20px;font-weight:300;margin-bottom:8px;letter-spacing:-.3px}
+.section-sub{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:24px}
+.field{width:100%;background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;color:var(--text);font-size:15px;padding:14px 18px;outline:none;font-family:inherit;transition:border-color .2s,background .2s;-webkit-appearance:none;display:block;margin-bottom:10px}
+.field:focus{border-color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.06)}
+.field::placeholder{color:var(--muted)}
+textarea.field{resize:none;min-height:80px;line-height:1.6}
+.field-label{font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.3px;display:block}
+.field-group{margin-bottom:16px}
+.btn{width:100%;padding:15px;background:var(--accent);color:#000;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s;font-family:inherit;margin-top:4px}
+.btn:hover{opacity:.9}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-amber{background:var(--amber);color:#000}
+.msg{font-size:13px;min-height:18px;margin-top:10px;text-align:center}
+.msg.err{color:var(--red)}.msg.ok{color:var(--green)}
+.upload-zone{border:1.5px dashed var(--glass-border);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;overflow:hidden;background:var(--glass);margin-bottom:10px}
+.upload-zone:hover{border-color:rgba(255,255,255,0.22);background:var(--glass-hover)}
+.upload-zone.has-file{border-color:var(--green);border-style:solid}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:28px;margin-bottom:10px;display:block;color:var(--muted)}
+.upload-label{font-size:13px;color:var(--muted)}
+.upload-label strong{color:var(--chrome);display:block;margin-bottom:4px}
+.upload-filename{font-size:12px;color:var(--green);margin-top:8px}
+.val-result{border-radius:12px;padding:14px 18px;font-size:13px;line-height:1.6;margin-bottom:12px;display:none}
+.val-result.ok{background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);color:var(--green)}
+.val-result.err{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--red)}
+.card{background:var(--glass);border:1px solid var(--glass-border);border-radius:14px;padding:20px;margin-bottom:14px}
+.progress-log{background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;padding:16px;max-height:200px;overflow-y:auto;margin-bottom:16px}
+.log-entry{font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--glass-border);line-height:1.5}
+.log-entry:last-child{border-bottom:none;color:var(--text)}
+.log-entry.done{color:var(--green)}.log-entry.fail{color:var(--red)}
+.avatar-frame{width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--glass-border);position:relative;margin-bottom:14px}
+.avatar-frame iframe{width:100%;height:100%;border:none}
+.avatar-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted)}
+.spinner{width:28px;height:28px;border:2px solid var(--glass-border);border-top-color:var(--chrome);border-radius:50%;animation:spin .8s linear infinite}
+.status-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0 14px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;padding:4px 12px;border-radius:20px;background:var(--glass);border:1px solid var(--glass-border);color:var(--muted)}
+.status-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.status-pill.listening .dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.end-btn{padding:8px 18px;background:transparent;border:1px solid var(--glass-border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;transition:color .2s,border-color .2s}
+.end-btn:hover{border-color:rgba(248,113,113,0.4);color:var(--red)}
+#progress-screen,#session-screen{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:480px){main{padding:72px 16px 60px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Chronis</a>
+  <span class="admin-badge">Admin Test</span>
+</nav>
+
+<main>
+
+  <!-- Step 1 -->
+  <div id="step1">
+    <div class="steps-bar">
+      <div class="step-seg active"></div>
+      <div class="step-seg"></div>
+      <div class="step-seg"></div>
+    </div>
+    <div class="page-label">Admin · No waitlist</div>
+    <div class="page-title">Upload test video</div>
+    <p class="page-sub" style="margin-bottom:24px">Upload any video to test the full pipeline. Waitlist check bypassed for admin.</p>
+
+    <div class="upload-zone" id="video-zone">
+      <input type="file" id="video-input" accept="video/*" onchange="onVideoChange(this)">
+      <span class="upload-icon">▶</span>
+      <div class="upload-label"><strong>Upload video</strong>MP4, MOV, WebM</div>
+      <div class="upload-filename" id="video-name"></div>
+    </div>
+
+    <div class="val-result" id="val-result"></div>
+    <button class="btn btn-amber" id="validate-btn" onclick="validateVideo()" disabled>Validate Video</button>
+  </div>
+
+  <!-- Step 2 -->
+  <div id="step2" style="display:none">
+    <div class="steps-bar">
+      <div class="step-seg done"></div>
+      <div class="step-seg active"></div>
+      <div class="step-seg"></div>
+    </div>
+    <div class="section-title">Persona details</div>
+    <p class="section-sub" style="margin-bottom:20px">Who is this replica?</p>
+
+    <div class="field-group">
+      <label class="field-label">Name</label>
+      <input class="field" type="text" id="agent-name" placeholder="e.g. Test Person" maxlength="60">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Personality</label>
+      <textarea class="field" id="personality" placeholder="Describe how they spoke and their personality..."></textarea>
+    </div>
+
+    <button class="btn btn-amber" onclick="goToStep3()">Continue</button>
+    <div class="msg" id="details-msg"></div>
+  </div>
+
+  <!-- Step 3 -->
+  <div id="step3" style="display:none">
+    <div class="steps-bar">
+      <div class="step-seg done"></div>
+      <div class="step-seg done"></div>
+      <div class="step-seg active"></div>
+    </div>
+    <div class="section-title">Confirm & create</div>
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Video</div>
+      <div style="font-size:13px;color:var(--green)" id="confirm-video">—</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px;margin-bottom:4px">Name</div>
+      <div style="font-size:13px" id="confirm-name">—</div>
+    </div>
+    <button class="btn btn-amber" id="create-btn" onclick="startOnboarding()">Create Replica</button>
+    <div class="msg" id="create-msg"></div>
+  </div>
+
+  <!-- Progress -->
+  <div id="progress-screen">
+    <div class="section-title" id="progress-title" style="margin-bottom:8px">Creating replica…</div>
+    <p class="section-sub" id="progress-sub" style="margin-bottom:20px">Don't close this tab.</p>
+    <div class="progress-log" id="progress-log"></div>
+  </div>
+
+  <!-- Session -->
+  <div id="session-screen">
+    <div class="avatar-frame">
+      <div class="avatar-placeholder" id="avatar-placeholder">
+        <div class="spinner"></div>
+        <span style="font-size:12px">Connecting…</span>
+      </div>
+      <iframe id="daily-iframe" allow="camera;microphone" style="display:none"></iframe>
+    </div>
+    <div class="status-row">
+      <div class="status-pill listening"><span class="dot"></span><span>Live</span></div>
+      <button class="end-btn" onclick="endSession()">End</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const S = {videoFile:null, agentId:null, sessionId:null, pollTimer:null};
+const userId = 'admin_test_' + Date.now();
+
+function onVideoChange(input) {
+  const file = input.files[0]; if(!file) return;
+  S.videoFile = file;
+  document.getElementById('video-name').textContent = file.name;
+  document.getElementById('video-zone').classList.add('has-file');
+  document.getElementById('validate-btn').disabled = false;
+  document.getElementById('val-result').style.display='none';
+}
+
+async function validateVideo() {
+  const btn=document.getElementById('validate-btn');
+  const res=document.getElementById('val-result');
+  btn.disabled=true; btn.textContent='Checking…'; res.style.display='none';
+  const form=new FormData(); form.append('video',S.videoFile);
+  try {
+    const r=await fetch('/api/v2/onboard/validate',{method:'POST',body:form});
+    const d=await r.json();
+    if(d.valid){
+      res.className='val-result ok'; res.style.display='block';
+      res.textContent=`✓ Face OK · ${d.photo.resolution} · Sharpness ${d.photo.sharpness}`;
+      btn.textContent='Continue →'; btn.onclick=()=>{hide('step1');show('step2')}; btn.disabled=false;
+    } else {
+      res.className='val-result err'; res.style.display='block';
+      res.textContent=d.reason||'Validation failed';
+      btn.textContent='Try Another Video'; btn.disabled=false;
+    }
+  } catch(e) {
+    res.className='val-result err'; res.style.display='block';
+    res.textContent='Network error'; btn.textContent='Validate Video'; btn.disabled=false;
+  }
+}
+
+function goToStep3() {
+  const name=document.getElementById('agent-name').value.trim();
+  const msg=document.getElementById('details-msg');
+  if(!name){msg.className='msg err';msg.textContent='Enter a name.';return}
+  document.getElementById('confirm-video').textContent=S.videoFile.name;
+  document.getElementById('confirm-name').textContent=name;
+  hide('step2'); show('step3');
+}
+
+async function startOnboarding() {
+  const btn=document.getElementById('create-btn');
+  const name=document.getElementById('agent-name').value.trim();
+  const personality=document.getElementById('personality').value.trim()||'Friendly and conversational.';
+  btn.disabled=true; btn.textContent='Starting…';
+  const form=new FormData();
+  form.append('user_id',userId); form.append('agent_name',name);
+  form.append('personality',personality); form.append('video',S.videoFile);
+  try {
+    const r=await fetch('/api/v2/onboard/start',{method:'POST',body:form});
+    const d=await r.json();
+    if(!r.ok){document.getElementById('create-msg').className='msg err';document.getElementById('create-msg').textContent=d.detail||'Failed';btn.disabled=false;btn.textContent='Create Replica';return}
+    S.agentId=d.agent_id; hide('step3'); show('progress-screen'); pollProgress(d.agent_id);
+  } catch(e) {document.getElementById('create-msg').className='msg err';document.getElementById('create-msg').textContent='Network error';btn.disabled=false;btn.textContent='Create Replica'}
+}
+
+let seenSteps=0;
+function pollProgress(agentId) {
+  S.pollTimer=setInterval(async()=>{
+    try {
+      const r=await fetch(`/api/v2/onboard/status/${agentId}`);
+      const d=await r.json();
+      const progress=d.progress||[];
+      const log=document.getElementById('progress-log');
+      for(let i=seenSteps;i<progress.length;i++){
+        const el=document.createElement('div');
+        el.className='log-entry'+(progress[i].step==='failed'?' fail':progress[i].step==='complete'?' done':'');
+        el.textContent=progress[i].step+' — '+progress[i].message;
+        log.appendChild(el); log.scrollTop=log.scrollHeight;
+      }
+      seenSteps=progress.length;
+      if(d.status==='ready'){clearInterval(S.pollTimer);document.getElementById('progress-title').textContent='Ready ✓';setTimeout(()=>startSession(agentId),1200)}
+      else if(d.status==='failed'){clearInterval(S.pollTimer);document.getElementById('progress-title').textContent='Failed';document.getElementById('progress-sub').textContent=d.error||'Check logs'}
+    } catch(e){}
+  },3000);
+}
+
+async function startSession(agentId) {
+  try {
+    const r=await fetch('/api/v2/session/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_id:agentId})});
+    const d=await r.json();
+    if(!r.ok){alert('Session error: '+(d.detail||'unknown'));return}
+    S.sessionId=d.session_id; hide('progress-screen'); show('session-screen');
+    const iframe=document.getElementById('daily-iframe');
+    iframe.src=d.room_url; iframe.style.display='block';
+    document.getElementById('avatar-placeholder').style.display='none';
+  } catch(e){alert('Network error')}
+}
+
+async function endSession() {
+  if(S.sessionId){try{await fetch(`/api/v2/session/${S.sessionId}/end`,{method:'POST'})}catch(e){}}
+  window.location.href='/';
+}
+
+function show(id){document.getElementById(id).style.display=''}
+function hide(id){document.getElementById(id).style.display='none'}
+</script>
+</body>
+</html>
