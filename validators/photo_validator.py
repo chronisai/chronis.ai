@@ -8,55 +8,59 @@ Bad photos that pass here will cause Simli to fail 45 minutes later with
 a cryptic error. Catching them here takes milliseconds and gives a clear,
 actionable rejection message.
 
-Five checks (all must pass):
-  1. Face detected         — MediaPipe FaceMesh finds at least one face
-  2. Yaw angle < 25°      — face not too sideways
-  3. Pitch angle < 20°    — face not too tilted up/down
-  4. Laplacian var > 100  — image not blurry
-  5. Min 512×512 px       — sufficient resolution for Simli
+Uses OpenCV only (no mediapipe). The frontal-face Haar cascade naturally
+rejects extreme yaw angles (> ~35°) because it can only detect near-frontal
+faces by design. Eye detection provides a secondary quality signal.
 
-Head angle calculation:
-  Uses the 3D face landmarks from MediaPipe FaceMesh.
-  Yaw  = rotation around vertical axis (left-right turn)
-  Pitch = rotation around horizontal axis (up-down tilt)
-  We estimate these from specific landmark positions rather than
-  running a full PnP solve (fast and accurate enough for our threshold).
+Four checks (all must pass):
+  1. Face detected         — cv2 frontal-face Haar cascade finds at least one face
+  2. Eyes detectable       — at least one eye found inside the face region
+                             (fails for extreme yaw, closed-eye photos, very dark shots)
+  3. Laplacian var > 100   — image not blurry
+  4. Min 512×512 px        — sufficient resolution for Simli
+
+Why we removed mediapipe:
+  mediapipe>=0.10.0 dropped mp.solutions on Python 3.11 Linux in later patch
+  releases, causing an AttributeError at startup. The Haar cascade approach
+  is dependency-free (bundled with opencv-python-headless), works on all
+  platforms, and is fast enough for this use case.
 """
 
-import io
-import math
-from typing import Dict, Tuple
+from typing import Dict
 
 import cv2
-import mediapipe as mp
 import numpy as np
 
 
 # ── Thresholds ────────────────────────────────────────────────────────────────
-MAX_YAW_DEG         = 25.0   # degrees
-MAX_PITCH_DEG       = 20.0   # degrees
-MIN_LAPLACIAN_VAR   = 100.0  # below this → blurry
-MIN_DIMENSION_PX    = 512    # minimum of width and height
+MIN_LAPLACIAN_VAR   = 100.0   # below this → blurry
+MIN_DIMENSION_PX    = 512     # minimum of width and height
+MIN_FACE_AREA_RATIO = 0.03    # face must be at least 3% of image area
 
 
 class PhotoValidator:
 
     def __init__(self):
-        # Initialize MediaPipe FaceMesh once — reuse across calls
-        self._mp_face_mesh = mp.solutions.face_mesh
-        self._face_mesh    = self._mp_face_mesh.FaceMesh(
-            static_image_mode=True,
-            max_num_faces=1,
-            refine_landmarks=True,
-            min_detection_confidence=0.5,
+        # Both cascade files are bundled with opencv-python-headless — no download needed
+        self._face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
         )
+        self._eye_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_eye.xml"
+        )
+
+        if self._face_cascade.empty():
+            raise RuntimeError(
+                "OpenCV frontal-face cascade not found. "
+                "Ensure opencv-python-headless is installed correctly."
+            )
 
     def validate(self, image_bytes: bytes) -> Dict:
         """
         Validate a photo for Simli agent creation.
 
         Returns:
-            {"valid": True}
+            {"valid": True, "resolution": "WxH", "sharpness": float}
             {"valid": False, "reason": "Human-readable rejection message"}
         """
         # ── Decode image ──────────────────────────────────────────────────
@@ -64,119 +68,116 @@ class PhotoValidator:
         img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
 
         if img is None:
-            return {"valid": False, "reason": "Could not decode image. Please upload a JPG or PNG."}
+            return {
+                "valid":  False,
+                "reason": "Could not decode image. Please upload a JPG or PNG.",
+            }
 
         h, w = img.shape[:2]
 
-        # ── Check 5: Minimum resolution ────────────────────────────────────
+        # ── Check: Minimum resolution ──────────────────────────────────────
         if min(h, w) < MIN_DIMENSION_PX:
             return {
                 "valid":  False,
-                "reason": f"Photo resolution too low ({w}×{h}px). Please use a photo that is at least 512×512 pixels.",
+                "reason": (
+                    f"Photo resolution too low ({w}x{h}px). "
+                    f"Please use a photo that is at least 512x512 pixels."
+                ),
             }
 
-        # ── Check 4: Blur (Laplacian variance) ────────────────────────────
-        # Run BEFORE face detection — avoid wasting FaceMesh time on blurry images
-        gray     = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        lap_var  = cv2.Laplacian(gray, cv2.CV_64F).var()
+        # ── Check: Blur (Laplacian variance) ──────────────────────────────
+        # Run BEFORE face detection — skip cascade time on blurry images
+        gray    = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        lap_var = cv2.Laplacian(gray, cv2.CV_64F).var()
         if lap_var < MIN_LAPLACIAN_VAR:
             return {
                 "valid":  False,
-                "reason": f"Photo is too blurry (sharpness score: {lap_var:.0f}). Please use a sharper, well-lit photo.",
+                "reason": (
+                    f"Photo is too blurry (sharpness score: {lap_var:.0f}). "
+                    f"Please use a sharper, well-lit photo."
+                ),
             }
 
-        # ── Run MediaPipe FaceMesh ─────────────────────────────────────────
-        rgb    = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        result = self._face_mesh.process(rgb)
+        # ── Check: Face detected ───────────────────────────────────────────
+        # The frontal-face cascade only detects near-frontal faces (yaw < ~35 deg)
+        # so extreme sideways photos fail here automatically.
+        faces = self._face_cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(80, 80),
+        )
 
-        # ── Check 1: Face detected ─────────────────────────────────────────
-        if not result.multi_face_landmarks:
+        if len(faces) == 0:
+            # Retry with relaxed params — catches smaller or darker faces
+            faces = self._face_cascade.detectMultiScale(
+                gray,
+                scaleFactor=1.05,
+                minNeighbors=3,
+                minSize=(60, 60),
+            )
+
+        if len(faces) == 0:
             return {
                 "valid":  False,
-                "reason": "No face found in the photo. Please upload a clear photo showing your face.",
+                "reason": (
+                    "No face found in the photo. "
+                    "Please upload a clear, well-lit photo where you are "
+                    "looking directly at the camera."
+                ),
             }
 
-        landmarks = result.multi_face_landmarks[0].landmark
+        # Use the largest detected face
+        x, y, fw, fh = max(faces, key=lambda f: f[2] * f[3])
 
-        # ── Check 2 & 3: Head angles ───────────────────────────────────────
-        yaw, pitch = self._estimate_head_angles(landmarks, w, h)
-
-        if abs(yaw) > MAX_YAW_DEG:
+        # ── Check: Face large enough ───────────────────────────────────────
+        face_area_ratio = (fw * fh) / (w * h)
+        if face_area_ratio < MIN_FACE_AREA_RATIO:
             return {
                 "valid":  False,
-                "reason": f"Face is turned too far sideways (angle: {abs(yaw):.0f}°). Please look more directly at the camera.",
+                "reason": (
+                    "Your face is too small in the photo. "
+                    "Please move closer to the camera so your face fills more of the frame."
+                ),
             }
 
-        if abs(pitch) > MAX_PITCH_DEG:
+        # ── Check: Eye detection (angle + quality proxy) ───────────────────
+        # At least one eye must be detectable inside the face region.
+        # Rejects faces turned sideways enough to hide both eyes (>~30 deg),
+        # very dark shots, and sunglasses.
+        face_roi = gray[y: y + fh, x: x + fw]
+        # Only scan top 60% of face — eye cascade false-positives on mouth/chin
+        eye_roi  = face_roi[: int(fh * 0.6), :]
+        eyes     = self._eye_cascade.detectMultiScale(
+            eye_roi,
+            scaleFactor=1.1,
+            minNeighbors=3,
+            minSize=(20, 20),
+        )
+
+        if len(eyes) == 0:
             return {
                 "valid":  False,
-                "reason": f"Face is tilted too far up or down (angle: {abs(pitch):.0f}°). Please hold your head level.",
+                "reason": (
+                    "Eyes not clearly visible in the photo. "
+                    "Please look directly at the camera with both eyes open, "
+                    "remove sunglasses, and ensure the photo is well-lit."
+                ),
             }
 
         return {
             "valid":      True,
-            "resolution": f"{w}×{h}",
+            "resolution": f"{w}x{h}",
             "sharpness":  round(lap_var, 1),
-            "yaw_deg":    round(yaw, 1),
-            "pitch_deg":  round(pitch, 1),
         }
 
-    def _estimate_head_angles(
-        self,
-        landmarks,
-        img_w: int,
-        img_h: int,
-    ) -> Tuple[float, float]:
-        """
-        Estimate yaw and pitch in degrees from FaceMesh 3D landmarks.
-
-        Uses a simplified approach based on key facial landmark positions:
-          - Nose tip (1), left eye outer (33), right eye outer (263)
-          - Left mouth corner (61), right mouth corner (291)
-          - Chin (152), forehead (10)
-
-        This avoids the full PnP solve while being accurate to ~5° for
-        our purposes (rejecting angles > 25°/20°).
-        """
-        # Extract key landmark positions (normalized 0-1, with z component)
-        def lm(idx):
-            p = landmarks[idx]
-            return np.array([p.x * img_w, p.y * img_h, p.z * img_w])
-
-        nose_tip      = lm(1)
-        left_eye_out  = lm(33)
-        right_eye_out = lm(263)
-        chin          = lm(152)
-        forehead      = lm(10)
-
-        # ── Yaw: asymmetry between eye distances relative to nose ──────────
-        # If face is turned right, left eye appears farther from nose than right
-        dist_left  = np.linalg.norm(nose_tip[:2] - left_eye_out[:2])
-        dist_right = np.linalg.norm(nose_tip[:2] - right_eye_out[:2])
-
-        # Ratio maps to angle: 1.0 = frontal, <0.6 or >1.6 = extreme turn
-        ratio = dist_left / (dist_right + 1e-6)
-        # Approximate: ratio of 1.0 → 0°, ratio of 0.5 → ~30°
-        yaw = math.degrees(math.atan2(ratio - 1.0, 0.5)) * 2.0
-
-        # ── Pitch: nose tip position relative to chin-forehead midpoint ────
-        face_center_y = (chin[1] + forehead[1]) / 2
-        face_height   = abs(chin[1] - forehead[1]) + 1e-6
-
-        # Positive = nose above center → head tilted down (camera sees more forehead)
-        # Negative = nose below center → head tilted up
-        nose_offset = (nose_tip[1] - face_center_y) / face_height
-        pitch       = math.degrees(math.asin(np.clip(nose_offset * 1.5, -1, 1)))
-
-        return yaw, pitch
-
     def close(self):
-        """Release MediaPipe resources."""
-        self._face_mesh.close()
+        """No-op — cascade classifiers have no persistent resources to release."""
+        pass
 
 
 # ── Module-level singleton ────────────────────────────────────────────────────
-_validator: PhotoValidator | None = None
+_validator = None
 
 def get_photo_validator() -> PhotoValidator:
     global _validator

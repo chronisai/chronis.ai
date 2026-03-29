@@ -19,7 +19,7 @@ librosa>=0.10.0                  # audio validation (SNR, speech ratio, duration
 soundfile>=0.12.1                # required by librosa for audio I/O
 
 # ── Computer vision (photo validation) ─────────────────────────────────────
-mediapipe>=0.10.0                # MediaPipe FaceMesh for photo validation
+# mediapipe removed — photo_validator.py uses cv2 Haar cascades (bundled with opencv-python-headless)
 opencv-python-headless>=4.9.0   # cv2 image decode + Laplacian sharpness
                                  # headless = no GUI deps (server-safe)
 
