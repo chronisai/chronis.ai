@@ -92,7 +92,7 @@ DEEPGRAM_API_KEY   = os.environ.get("DEEPGRAM_API_KEY", "")
 DAILY_API_KEY      = os.environ.get("DAILY_API_KEY", "")
 MODAL_XTTS_URL     = os.environ.get("MODAL_XTTS_URL", "")
 
-FREE_MSG_LIMIT = 5
+FREE_MSG_LIMIT = 9999  # Payments disabled — free access for all
 WATCHDOG_TIMEOUT_S = 90.0    # kill session after 90s of no audio + no heartbeat
 
 UPLOAD_FOLDER  = tempfile.gettempdir()
@@ -1058,13 +1058,8 @@ async def api_chat(request: Request):
     unlocked   = session.get("unlocked", False) or is_admin
     exchanges  = len([m for m in history if m["role"] == "user"])
 
-    if not unlocked and exchanges >= FREE_MSG_LIMIT:
-        return JSONResponse(status_code=402, content={
-            "error": "limit_reached",
-            "message": f"Free limit of {FREE_MSG_LIMIT} messages reached.",
-            "session_id": session_id,
-            "person_name": session["person_name"],
-        })
+    # Payments disabled — no limit check
+    # if not unlocked and exchanges >= FREE_MSG_LIMIT: (disabled)
 
     history.append({"role": "user", "content": user_msg,
                     "ts": datetime.utcnow().isoformat()})
@@ -1155,15 +1150,8 @@ async def api_analyze(
     is_admin   = (admin_secret == ADMIN_SECRET and bool(ADMIN_SECRET))
     is_video   = ext in VIDEO_EXT
 
-    if is_video and not is_admin:
-        if not unlock_token:
-            return JSONResponse(status_code=402,
-                                content={"error": "payment_required",
-                                         "message": "Video analysis requires payment."})
-        rows = sb_select("payment_tokens", f"token=eq.{unlock_token}&used=eq.false&select=id")
-        if not rows:
-            raise HTTPException(402, "Invalid or already used payment token.")
-        sb_update("payment_tokens", "token", unlock_token, {"used": True})
+    # Payments disabled — video analysis free for all
+    # if is_video and not is_admin: (payment gate disabled)
 
     session_id = str(uuid.uuid4())
     safe_name  = f"{session_id}.{ext}"
