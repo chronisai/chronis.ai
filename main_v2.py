@@ -772,7 +772,7 @@ def sb_count(table, query=""):
         print(f"[SB count error] {e}", flush=True)
         return 0
 
-WAITLIST_BASELINE = 93
+WAITLIST_BASELINE = 94
 
 def get_waitlist_count():
     return max(sb_count("waitlist") + WAITLIST_BASELINE, WAITLIST_BASELINE)
@@ -950,6 +950,121 @@ async def test_page(admin_secret: str = ""):
 async def health():
     return {"status": "ok", "ts": datetime.utcnow().isoformat(),
             "live_sessions": len(_live_sessions)}
+
+@app.get("/admin-dash")
+async def admin_dash(request: Request, admin_secret: str = ""):
+    """Chronis Service Health Dashboard — admin only."""
+    if not admin_secret or admin_secret != ADMIN_SECRET:
+        raise HTTPException(403, "Admin secret required. Add ?admin_secret=YOUR_SECRET")
+    return FileResponse("static/dashboard.html")
+
+@app.get("/api/health/services")
+async def health_services(admin_secret: str = ""):
+    """Return live health status for every external service. Admin only."""
+    if not admin_secret or admin_secret != ADMIN_SECRET:
+        raise HTTPException(403, "Admin access required")
+
+    import concurrent.futures, traceback
+
+    def _check(name, fn):
+        try:
+            result = fn()
+            return name, result
+        except Exception as e:
+            return name, {"ok": False, "error": str(e), "detail": traceback.format_exc(limit=3)}
+
+    def chk_gemini():
+        if not GEMINI_API_KEY:
+            return {"ok": False, "error": "GEMINI_API_KEY not set"}
+        r = requests.get(
+            f"https://generativelanguage.googleapis.com/v1beta/models?key={GEMINI_API_KEY}",
+            timeout=8)
+        return {"ok": r.ok, "status": r.status_code,
+                "model_count": len(r.json().get("models", [])) if r.ok else None,
+                "error": r.text[:200] if not r.ok else None}
+
+    def chk_groq():
+        if not GROQ_API_KEY:
+            return {"ok": False, "error": "GROQ_API_KEY not set"}
+        r = requests.get("https://api.groq.com/openai/v1/models",
+                         headers={"Authorization": f"Bearer {GROQ_API_KEY}"}, timeout=8)
+        return {"ok": r.ok, "status": r.status_code,
+                "error": r.text[:200] if not r.ok else None}
+
+    def chk_supabase():
+        if not SUPABASE_URL or not SUPABASE_KEY:
+            return {"ok": False, "error": "SUPABASE_URL or SUPABASE_SERVICE_KEY not set"}
+        r = requests.get(f"{SUPABASE_URL}/rest/v1/",
+                         headers={"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"},
+                         timeout=8)
+        return {"ok": r.ok, "status": r.status_code,
+                "error": r.text[:200] if not r.ok else None,
+                "waitlist_count": get_waitlist_count()}
+
+    def chk_daily():
+        if not DAILY_API_KEY:
+            return {"ok": False, "error": "DAILY_API_KEY not set"}
+        r = requests.get("https://api.daily.co/v1/rooms",
+                         headers={"Authorization": f"Bearer {DAILY_API_KEY}"}, timeout=8)
+        return {"ok": r.ok, "status": r.status_code,
+                "error": r.text[:200] if not r.ok else None}
+
+    def chk_simli():
+        if not SIMLI_API_KEY:
+            return {"ok": False, "error": "SIMLI_API_KEY not set"}
+        # Simli doesn't have a free ping endpoint; just validate key format
+        return {"ok": True, "note": "key configured (no free ping endpoint)", "key_len": len(SIMLI_API_KEY)}
+
+    def chk_deepgram():
+        if not DEEPGRAM_API_KEY:
+            return {"ok": False, "error": "DEEPGRAM_API_KEY not set"}
+        r = requests.get("https://api.deepgram.com/v1/projects",
+                         headers={"Authorization": f"Token {DEEPGRAM_API_KEY}"}, timeout=8)
+        return {"ok": r.ok, "status": r.status_code,
+                "error": r.text[:200] if not r.ok else None}
+
+    def chk_xtts():
+        if not XTTS_SPACE_URL:
+            return {"ok": False, "error": "XTTS_SPACE_URL not set"}
+        try:
+            r = requests.get(XTTS_SPACE_URL, timeout=10)
+            return {"ok": r.ok, "status": r.status_code,
+                    "error": r.text[:100] if not r.ok else None}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
+    def chk_razorpay():
+        configured = bool(_RZP_KEY_CONFIGURED)
+        return {"ok": configured,
+                "error": "RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET not set" if not configured else None,
+                "note": "key present" if configured else None}
+
+    checks = [
+        ("gemini",    chk_gemini),
+        ("groq",      chk_groq),
+        ("supabase",  chk_supabase),
+        ("daily",     chk_daily),
+        ("simli",     chk_simli),
+        ("deepgram",  chk_deepgram),
+        ("xtts",      chk_xtts),
+        ("razorpay",  chk_razorpay),
+    ]
+
+    loop = asyncio.get_event_loop()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+        futures = [loop.run_in_executor(pool, _check, name, fn) for name, fn in checks]
+        results = await asyncio.gather(*futures)
+
+    services = {name: res for name, res in results}
+    all_ok = all(v.get("ok") for v in services.values())
+    return {
+        "ts": datetime.utcnow().isoformat(),
+        "overall": "ok" if all_ok else "degraded",
+        "live_sessions": len(_live_sessions),
+        "services": services,
+    }
+
+
 
 # ────────────────────────────────────────────────────────────────────────────
 # WAITLIST ROUTES (migrated from app.py)
@@ -1311,7 +1426,14 @@ def _analyze_video_gemini(file_path, filename, person_name):
             resp = requests.post(url, json=payload, timeout=180)
             data = resp.json()
             if resp.ok:
-                return data["candidates"][0]["content"]["parts"][0]["text"], None
+                candidates = data.get("candidates", [])
+                if not candidates:
+                    block_reason = data.get("promptFeedback", {}).get("blockReason", "unknown")
+                    return None, f"Gemini returned no candidates (blockReason={block_reason})"
+                try:
+                    return candidates[0]["content"]["parts"][0]["text"], None
+                except (KeyError, IndexError) as e:
+                    return None, f"Gemini response parse error: {e}"
             return None, data.get("error", {}).get("message", "Gemini inline error")
 
         else:
@@ -1363,7 +1485,8 @@ def _analyze_video_gemini(file_path, filename, person_name):
 
             # Step 3: Wait for file to be processed (state=ACTIVE)
             file_name = upload_resp.json().get("file", {}).get("name", "")
-            for _ in range(30):
+            file_active = False
+            for _ in range(40):  # up to 120s
                 time.sleep(3)
                 status_resp = requests.get(
                     f"https://generativelanguage.googleapis.com/v1beta/{file_name}?key={GEMINI_API_KEY}",
@@ -1372,9 +1495,13 @@ def _analyze_video_gemini(file_path, filename, person_name):
                 if status_resp.ok:
                     state = status_resp.json().get("state", "")
                     if state == "ACTIVE":
+                        file_active = True
                         break
                     if state == "FAILED":
-                        return None, "Gemini file processing failed"
+                        return None, "Gemini file processing failed (state=FAILED)"
+
+            if not file_active:
+                return None, "Gemini file processing timed out — file never became ACTIVE after 120s. Try a shorter clip."
 
             # Step 4: Generate content using file URI
             gen_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
@@ -1398,7 +1525,14 @@ def _analyze_video_gemini(file_path, filename, person_name):
                 pass
 
             if gen_resp.ok:
-                return gen_data["candidates"][0]["content"]["parts"][0]["text"], None
+                candidates = gen_data.get("candidates", [])
+                if not candidates:
+                    block_reason = gen_data.get("promptFeedback", {}).get("blockReason", "unknown")
+                    return None, f"Gemini returned no candidates (blockReason={block_reason}). Try a different video."
+                try:
+                    return candidates[0]["content"]["parts"][0]["text"], None
+                except (KeyError, IndexError) as e:
+                    return None, f"Gemini response parse error: {e}. Raw: {str(gen_data)[:300]}"
             return None, gen_data.get("error", {}).get("message", "Gemini generation error")
 
     except Exception as e:

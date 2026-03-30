@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronis · Service Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #7c6aff;
+    --accent2: #a78bfa;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card: #13131d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 12px; color: var(--muted); margin-left: 4px; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .overall-badge {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .badge-ok { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .badge-degraded { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .badge-loading { background: rgba(100,116,139,0.15); color: var(--muted); border: 1px solid rgba(100,116,139,0.3); }
+  .refresh-btn {
+    background: var(--border);
+    border: 1px solid #2e2e40;
+    color: var(--text);
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.15s;
+  }
+  .refresh-btn:hover { background: #1e1e2e; }
+  .refresh-btn.spinning .spin-icon { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Main ── */
+  main { padding: 32px; max-width: 1100px; margin: 0 auto; }
+
+  /* ── Stats row ── */
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--text); }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Services grid ── */
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px,1fr)); gap: 16px; margin-bottom: 36px; }
+  .service-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
+  }
+  .service-card.ok::before { background: var(--green); }
+  .service-card.error::before { background: var(--red); }
+  .service-card.warn::before { background: var(--yellow); }
+  .service-card.loading::before { background: var(--muted); }
+
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .card-name-row { display: flex; align-items: center; gap: 10px; }
+  .service-icon {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .si-gemini  { background: rgba(66,133,244,0.15); }
+  .si-groq    { background: rgba(255,140,0,0.15); }
+  .si-supabase{ background: rgba(62,207,142,0.15); }
+  .si-daily   { background: rgba(124,106,255,0.15); }
+  .si-simli   { background: rgba(255,100,150,0.15); }
+  .si-deepgram{ background: rgba(20,200,255,0.15); }
+  .si-xtts    { background: rgba(255,200,50,0.15); }
+  .si-razorpay{ background: rgba(0,160,220,0.15); }
+
+  .card-name { font-size: 15px; font-weight: 600; }
+  .card-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .status-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .pill-ok { background: rgba(34,197,94,0.1); color: var(--green); }
+  .pill-error { background: rgba(239,68,68,0.1); color: var(--red); }
+  .pill-warn { background: rgba(234,179,8,0.1); color: var(--yellow); }
+  .pill-loading { background: rgba(100,116,139,0.1); color: var(--muted); }
+
+  .card-meta { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .card-meta .meta-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .card-meta .meta-row:last-child { border-bottom: none; }
+  .meta-key { color: var(--muted); }
+  .meta-val { color: var(--text); font-weight: 500; }
+  .meta-val.err { color: var(--red); }
+  .meta-val.ok  { color: var(--green); }
+
+  .error-box {
+    background: rgba(239,68,68,0.07);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #fca5a5;
+    word-break: break-all;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  /* ── Log stream ── */
+  .log-section { }
+  .log-box {
+    background: #0d0d14;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    height: 280px;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #94a3b8;
+  }
+  .log-box::-webkit-scrollbar { width: 4px; }
+  .log-box::-webkit-scrollbar-track { background: transparent; }
+  .log-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .log-line { display: flex; gap: 12px; }
+  .log-ts { color: #334155; flex-shrink: 0; }
+  .log-msg.error { color: #fca5a5; }
+  .log-msg.warn  { color: #fde68a; }
+  .log-msg.ok    { color: #86efac; }
+  .log-msg.info  { color: #94a3b8; }
+
+  .ts-label { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: right; }
+
+  @media (max-width: 640px) {
+    main { padding: 16px; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    header { padding: 12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">⧖</div>
+    <div>
+      <div class="logo-text">Chronis <span class="logo-sub">Admin</span></div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="overall-badge" class="overall-badge badge-loading">Checking…</div>
+    <button class="refresh-btn" id="refresh-btn" onclick="loadAll()">
+      <span class="spin-icon">↻</span> Refresh
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Live Sessions</div>
+      <div class="stat-value" id="stat-live">—</div>
+      <div class="stat-sub">Active voice/avatar sessions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Waitlist Count</div>
+      <div class="stat-value" id="stat-waitlist">—</div>
+      <div class="stat-sub">Including baseline offset</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Services OK</div>
+      <div class="stat-value" id="stat-ok">—</div>
+      <div class="stat-sub" id="stat-ok-sub">of 8 services healthy</div>
+    </div>
+  </div>
+
+  <!-- Services -->
+  <div class="section-title">External Services</div>
+  <div class="services-grid" id="services-grid">
+    <!-- Cards injected by JS -->
+  </div>
+
+  <!-- Log stream -->
+  <div class="section-title">Live Log Stream</div>
+  <div class="log-section">
+    <div class="log-box" id="log-box">
+      <div class="log-line"><span class="log-ts">--:--:--</span><span class="log-msg info">Waiting for refresh…</span></div>
+    </div>
+    <div class="ts-label" id="last-refresh">Never refreshed</div>
+  </div>
+</main>
+
+<script>
+const SERVICE_META = {
+  gemini:   { icon: '🔮', label: 'Gemini',   role: 'Video analysis',         cls: 'si-gemini'  },
+  groq:     { icon: '⚡', label: 'Groq',     role: 'LLM + Whisper STT',      cls: 'si-groq'    },
+  supabase: { icon: '🗄️', label: 'Supabase', role: 'Database + Storage',     cls: 'si-supabase'},
+  daily:    { icon: '📞', label: 'Daily.co', role: 'Real-time voice rooms',   cls: 'si-daily'   },
+  simli:    { icon: '👤', label: 'Simli',    role: 'Avatar synthesis',        cls: 'si-simli'   },
+  deepgram: { icon: '🎙️', label: 'Deepgram', role: 'Speech-to-text (live)',   cls: 'si-deepgram'},
+  xtts:     { icon: '🔊', label: 'XTTS',     role: 'Voice cloning (TTS)',     cls: 'si-xtts'    },
+  razorpay: { icon: '💳', label: 'Razorpay', role: 'Payments',               cls: 'si-razorpay'},
+};
+
+const logs = [];
+
+function addLog(msg, level='info') {
+  const now = new Date();
+  const ts = now.toTimeString().slice(0,8);
+  logs.push({ ts, msg, level });
+  if (logs.length > 200) logs.shift();
+  renderLogs();
+}
+
+function renderLogs() {
+  const box = document.getElementById('log-box');
+  box.innerHTML = logs.map(l =>
+    `<div class="log-line"><span class="log-ts">${l.ts}</span><span class="log-msg ${l.level}">${escHtml(l.msg)}</span></div>`
+  ).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function getAdminSecret() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('admin_secret') || '';
+}
+
+function renderCard(name, data) {
+  const meta = SERVICE_META[name] || { icon: '⚙️', label: name, role: '', cls: '' };
+  const isOk = data.ok;
+  const isWarn = !isOk && (data.note || name === 'simli');
+  const cardCls = isOk ? 'ok' : (isWarn ? 'warn' : 'error');
+  const pillCls = isOk ? 'pill-ok' : (isWarn ? 'pill-warn' : 'pill-error');
+  const pillTxt = isOk ? 'Healthy' : (isWarn ? 'Warning' : 'Error');
+
+  const metaRows = [];
+  if (data.status) metaRows.push(['HTTP Status', data.status, isOk ? 'ok':'err']);
+  if (data.model_count != null) metaRows.push(['Models available', data.model_count, 'ok']);
+  if (data.waitlist_count != null) metaRows.push(['Waitlist total', data.waitlist_count, 'ok']);
+  if (data.key_len) metaRows.push(['Key length', data.key_len + ' chars', 'ok']);
+  if (data.note) metaRows.push(['Note', data.note, 'ok']);
+
+  const metaHtml = metaRows.map(([k,v,cls]) =>
+    `<div class="meta-row"><span class="meta-key">${escHtml(k)}</span><span class="meta-val ${cls}">${escHtml(v)}</span></div>`
+  ).join('');
+
+  const errHtml = data.error
+    ? `<div class="error-box">⚠ ${escHtml(data.error)}</div>`
+    : '';
+
+  return `
+  <div class="service-card ${cardCls}">
+    <div class="card-header">
+      <div class="card-name-row">
+        <div class="service-icon ${meta.cls}">${meta.icon}</div>
+        <div>
+          <div class="card-name">${meta.label}</div>
+          <div class="card-role">${meta.role}</div>
+        </div>
+      </div>
+      <span class="status-pill ${pillCls}">${pillTxt}</span>
+    </div>
+    <div class="card-meta">${metaHtml}</div>
+    ${errHtml}
+  </div>`;
+}
+
+function renderSkeleton() {
+  const grid = document.getElementById('services-grid');
+  grid.innerHTML = Object.keys(SERVICE_META).map(name => {
+    const m = SERVICE_META[name];
+    return `<div class="service-card loading">
+      <div class="card-header">
+        <div class="card-name-row">
+          <div class="service-icon ${m.cls}">${m.icon}</div>
+          <div><div class="card-name">${m.label}</div><div class="card-role">${m.role}</div></div>
+        </div>
+        <span class="status-pill pill-loading">Checking…</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadAll() {
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  renderSkeleton();
+  addLog('Refreshing service health…', 'info');
+
+  const secret = getAdminSecret();
+  try {
+    const r = await fetch(`/api/health/services?admin_secret=${encodeURIComponent(secret)}`);
+    if (!r.ok) {
+      const t = await r.text();
+      addLog(`Health API error ${r.status}: ${t}`, 'error');
+      document.getElementById('overall-badge').textContent = 'Error';
+      document.getElementById('overall-badge').className = 'overall-badge badge-degraded';
+      btn.classList.remove('spinning');
+      return;
+    }
+    const d = await r.json();
+
+    // Overall badge
+    const badge = document.getElementById('overall-badge');
+    badge.textContent = d.overall === 'ok' ? '✓ All Systems Operational' : '⚠ Degraded';
+    badge.className = 'overall-badge ' + (d.overall === 'ok' ? 'badge-ok' : 'badge-degraded');
+
+    // Stats
+    document.getElementById('stat-live').textContent = d.live_sessions ?? 0;
+    const wl = d.services?.supabase?.waitlist_count;
+    document.getElementById('stat-waitlist').textContent = wl != null ? wl.toLocaleString() : '—';
+    const okCount = Object.values(d.services).filter(v => v.ok).length;
+    const total = Object.keys(d.services).length;
+    document.getElementById('stat-ok').textContent = `${okCount} / ${total}`;
+
+    // Cards
+    const grid = document.getElementById('services-grid');
+    grid.innerHTML = Object.entries(d.services).map(([name, svc]) => renderCard(name, svc)).join('');
+
+    // Logs
+    Object.entries(d.services).forEach(([name, svc]) => {
+      const m = SERVICE_META[name] || {};
+      if (svc.ok) {
+        addLog(`[${name}] ${m.label || name} → OK${svc.status ? ' (HTTP '+svc.status+')' : ''}`, 'ok');
+      } else {
+        addLog(`[${name}] ${m.label || name} → FAIL: ${svc.error || 'unknown'}`, 'error');
+      }
+    });
+    addLog(`Refresh complete at ${new Date(d.ts).toLocaleTimeString()} · overall=${d.overall}`, 'info');
+
+    document.getElementById('last-refresh').textContent = `Last refreshed: ${new Date().toLocaleTimeString()}`;
+  } catch (e) {
+    addLog(`Network error: ${e.message}`, 'error');
+  }
+
+  btn.classList.remove('spinning');
+}
+
+// Also poll /api/count separately for waitlist
+async function pollWaitlist() {
+  try {
+    const r = await fetch('/api/count');
+    const d = await r.json();
+    document.getElementById('stat-waitlist').textContent = (d.count || 0).toLocaleString();
+  } catch {}
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadAll();
+  setInterval(loadAll, 60000);     // auto-refresh every 60s
+  setInterval(pollWaitlist, 15000); // waitlist every 15s
+});
+</script>
+</body>
+</html>
