@@ -1271,25 +1271,136 @@ async def api_waitlist(secret: str = ""):
 # ────────────────────────────────────────────────────────────────────────────
 
 def _analyze_video_gemini(file_path, filename, person_name):
+    """
+    Analyze a video using Gemini.
+    - Files < 15MB: inline base64 (fast, no extra API call)
+    - Files >= 15MB: Gemini File API (upload first, then reference)
+      Gemini inline data limit is 20MB — large phone videos always fail inline.
+    """
     if not GEMINI_API_KEY:
         return None, "GEMINI_API_KEY not set"
+
     mime_map = {"mp4": "video/mp4", "mov": "video/quicktime", "avi": "video/x-msvideo",
                 "webm": "video/webm", "mkv": "video/x-matroska"}
     ext  = filename.rsplit(".", 1)[-1].lower()
     mime = mime_map.get(ext, "video/mp4")
-    with open(file_path, "rb") as f:
-        b64_data = base64.b64encode(f.read()).decode()
-    prompt = f"Analyze this video to build a memory profile of {person_name}. Extract voice, personality, conversations, and memorable details. Write as if briefing someone to perfectly impersonate them."
-    url     = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-    payload = {"contents": [{"parts": [{"inline_data": {"mime_type": mime, "data": b64_data}},
-                                        {"text": prompt}]}],
-               "generationConfig": {"temperature": 0.85, "maxOutputTokens": 2048}}
+
+    prompt = (
+        f"Analyze this video to build a detailed memory profile of {person_name}. "
+        f"Extract their personality, speaking style, catchphrases, values, relationships, "
+        f"and memorable stories. Write in second person as if briefing someone to "
+        f"perfectly embody and converse as them."
+    )
+
+    file_size = os.path.getsize(file_path)
+    INLINE_LIMIT = 15 * 1024 * 1024  # 15MB
+
     try:
-        resp = requests.post(url, json=payload, timeout=180)
-        data = resp.json()
-        if resp.ok:
-            return data["candidates"][0]["content"]["parts"][0]["text"], None
-        return None, data.get("error", {}).get("message", "Gemini error")
+        if file_size < INLINE_LIMIT:
+            # ── Inline approach (small files) ─────────────────────────────
+            with open(file_path, "rb") as f:
+                b64_data = base64.b64encode(f.read()).decode()
+            payload = {
+                "contents": [{"parts": [
+                    {"inline_data": {"mime_type": mime, "data": b64_data}},
+                    {"text": prompt},
+                ]}],
+                "generationConfig": {"temperature": 0.85, "maxOutputTokens": 2048},
+            }
+            url  = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+            resp = requests.post(url, json=payload, timeout=180)
+            data = resp.json()
+            if resp.ok:
+                return data["candidates"][0]["content"]["parts"][0]["text"], None
+            return None, data.get("error", {}).get("message", "Gemini inline error")
+
+        else:
+            # ── File API approach (large files) ───────────────────────────
+            # Step 1: Upload file to Gemini File API
+            upload_url = f"https://generativelanguage.googleapis.com/upload/v1beta/files?key={GEMINI_API_KEY}"
+            with open(file_path, "rb") as f:
+                video_bytes = f.read()
+
+            # Resumable upload — initiate
+            init_resp = requests.post(
+                upload_url,
+                headers={
+                    "X-Goog-Upload-Protocol": "resumable",
+                    "X-Goog-Upload-Command":  "start",
+                    "X-Goog-Upload-Header-Content-Length": str(file_size),
+                    "X-Goog-Upload-Header-Content-Type":   mime,
+                    "Content-Type": "application/json",
+                },
+                json={"file": {"display_name": filename}},
+                timeout=30,
+            )
+            if not init_resp.ok:
+                return None, f"Gemini file upload init failed: {init_resp.status_code}"
+
+            upload_endpoint = init_resp.headers.get("X-Goog-Upload-URL")
+            if not upload_endpoint:
+                return None, "Gemini did not return upload URL"
+
+            # Step 2: Upload bytes
+            upload_resp = requests.post(
+                upload_endpoint,
+                headers={
+                    "Content-Length": str(file_size),
+                    "X-Goog-Upload-Offset": "0",
+                    "X-Goog-Upload-Command": "upload, finalize",
+                },
+                data=video_bytes,
+                timeout=300,
+            )
+            if not upload_resp.ok:
+                return None, f"Gemini file upload failed: {upload_resp.status_code}"
+
+            file_uri = upload_resp.json().get("file", {}).get("uri")
+            if not file_uri:
+                return None, "Gemini file upload returned no URI"
+
+            print(f"[Gemini] File uploaded: {file_uri}", flush=True)
+
+            # Step 3: Wait for file to be processed (state=ACTIVE)
+            file_name = upload_resp.json().get("file", {}).get("name", "")
+            for _ in range(30):
+                time.sleep(3)
+                status_resp = requests.get(
+                    f"https://generativelanguage.googleapis.com/v1beta/{file_name}?key={GEMINI_API_KEY}",
+                    timeout=10,
+                )
+                if status_resp.ok:
+                    state = status_resp.json().get("state", "")
+                    if state == "ACTIVE":
+                        break
+                    if state == "FAILED":
+                        return None, "Gemini file processing failed"
+
+            # Step 4: Generate content using file URI
+            gen_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+            gen_payload = {
+                "contents": [{"parts": [
+                    {"file_data": {"mime_type": mime, "file_uri": file_uri}},
+                    {"text": prompt},
+                ]}],
+                "generationConfig": {"temperature": 0.85, "maxOutputTokens": 2048},
+            }
+            gen_resp = requests.post(gen_url, json=gen_payload, timeout=180)
+            gen_data = gen_resp.json()
+
+            # Step 5: Clean up uploaded file from Gemini storage
+            try:
+                requests.delete(
+                    f"https://generativelanguage.googleapis.com/v1beta/{file_name}?key={GEMINI_API_KEY}",
+                    timeout=10,
+                )
+            except Exception:
+                pass
+
+            if gen_resp.ok:
+                return gen_data["candidates"][0]["content"]["parts"][0]["text"], None
+            return None, gen_data.get("error", {}).get("message", "Gemini generation error")
+
     except Exception as e:
         return None, str(e)
 
