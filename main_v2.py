@@ -947,6 +947,7 @@ async def test_page(admin_secret: str = ""):
     return FileResponse("static/test.html")
 
 @app.get("/health")
+@app.head("/health")
 async def health():
     return {"status": "ok", "ts": datetime.utcnow().isoformat(),
             "live_sessions": len(_live_sessions)}
