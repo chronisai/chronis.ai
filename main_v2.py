@@ -118,6 +118,27 @@ def get_xtts_client():
 
 # ── Startup / Shutdown ────────────────────────────────────────────────────────
 
+async def _self_keep_warm():
+    """
+    Pings our own /health endpoint every 10 minutes so Render never
+    spins down the instance — independent of UptimeRobot.
+    Render free tier spins down after 15 min of inactivity; 10-min
+    self-ping guarantees we stay warm even if UptimeRobot has a gap.
+    """
+    # Wait 30s after startup before first ping (let server fully init)
+    await asyncio.sleep(30)
+    port = int(os.environ.get("PORT", 8000))
+    url  = f"http://127.0.0.1:{port}/health"
+    while True:
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=10) as client:
+                r = await client.get(url)
+            print(f"[KeepWarm] self-ping → {r.status_code}", flush=True)
+        except Exception as e:
+            print(f"[KeepWarm] self-ping failed: {e}", flush=True)
+        await asyncio.sleep(10 * 60)   # ping every 10 minutes
+
 @app.on_event("startup")
 async def startup():
     """Initialize Supabase, start log worker, recover stale jobs."""
@@ -128,6 +149,8 @@ async def startup():
     count = await db.recover_stale_onboarding_jobs()
     if count:
         print(f"[Startup] Recovered {count} stale onboarding jobs", flush=True)
+    # Self-warming loop — keeps Render free tier alive independent of UptimeRobot
+    asyncio.create_task(_self_keep_warm())
     print("✅ Chronis V2 started", flush=True)
 
 @app.on_event("shutdown")
@@ -1423,9 +1446,13 @@ def _analyze_video_gemini(file_path, filename, person_name):
                 ]}],
                 "generationConfig": {"temperature": 0.85, "maxOutputTokens": 2048},
             }
-            url  = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-            resp = requests.post(url, json=payload, timeout=180)
+            url  = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+            resp = requests.post(url, json=payload, timeout=180,
+                                 headers={"x-goog-api-key": GEMINI_API_KEY,
+                                          "Content-Type": "application/json"})
             data = resp.json()
+            if not resp.ok:
+                print(f"[Gemini] inline generateContent error {resp.status_code}: {data}", flush=True)
             if resp.ok:
                 candidates = data.get("candidates", [])
                 if not candidates:
@@ -1453,11 +1480,13 @@ def _analyze_video_gemini(file_path, filename, person_name):
                     "X-Goog-Upload-Header-Content-Length": str(file_size),
                     "X-Goog-Upload-Header-Content-Type":   mime,
                     "Content-Type": "application/json",
+                    "x-goog-api-key": GEMINI_API_KEY,
                 },
                 json={"file": {"display_name": filename}},
                 timeout=30,
             )
             if not init_resp.ok:
+                print(f"[Gemini] upload init error {init_resp.status_code}: {init_resp.text[:300]}", flush=True)
                 return None, f"Gemini file upload init failed: {init_resp.status_code}"
 
             upload_endpoint = init_resp.headers.get("X-Goog-Upload-URL")
@@ -1491,6 +1520,7 @@ def _analyze_video_gemini(file_path, filename, person_name):
                 time.sleep(3)
                 status_resp = requests.get(
                     f"https://generativelanguage.googleapis.com/v1beta/{file_name}?key={GEMINI_API_KEY}",
+                    headers={"x-goog-api-key": GEMINI_API_KEY},
                     timeout=10,
                 )
                 if status_resp.ok:
@@ -1500,12 +1530,14 @@ def _analyze_video_gemini(file_path, filename, person_name):
                         break
                     if state == "FAILED":
                         return None, "Gemini file processing failed (state=FAILED)"
+                else:
+                    print(f"[Gemini] status poll error {status_resp.status_code}: {status_resp.text[:200]}", flush=True)
 
             if not file_active:
                 return None, "Gemini file processing timed out — file never became ACTIVE after 120s. Try a shorter clip."
 
             # Step 4: Generate content using file URI
-            gen_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+            gen_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
             gen_payload = {
                 "contents": [{"parts": [
                     {"file_data": {"mime_type": mime, "file_uri": file_uri}},
@@ -1513,8 +1545,12 @@ def _analyze_video_gemini(file_path, filename, person_name):
                 ]}],
                 "generationConfig": {"temperature": 0.85, "maxOutputTokens": 2048},
             }
-            gen_resp = requests.post(gen_url, json=gen_payload, timeout=180)
+            gen_resp = requests.post(gen_url, json=gen_payload, timeout=180,
+                                     headers={"x-goog-api-key": GEMINI_API_KEY,
+                                              "Content-Type": "application/json"})
             gen_data = gen_resp.json()
+            if not gen_resp.ok:
+                print(f"[Gemini] File API generateContent error {gen_resp.status_code}: {gen_data}", flush=True)
 
             # Step 5: Clean up uploaded file from Gemini storage
             try:
