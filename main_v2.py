@@ -1301,7 +1301,7 @@ async def api_analyze(
         f.write(content)
 
     print(f"📁 Analyzing {fn} as \"{person_name}\" ({session_id[:8]})", flush=True)
-
+    print(f"[Gemini] Key present: {bool(GEMINI_API_KEY)}, Key prefix: {GEMINI_API_KEY[:8] if GEMINI_API_KEY else 'EMPTY'}", flush=True)
     try:
         if is_video:
             profile, error = _analyze_video_gemini(file_path, safe_name, person_name)
