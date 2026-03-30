@@ -1328,7 +1328,22 @@ async def api_analyze(
     print(f"[Gemini] Key present: {bool(GEMINI_API_KEY)}, Key prefix: {GEMINI_API_KEY[:8] if GEMINI_API_KEY else 'EMPTY'}", flush=True)
     try:
         if is_video:
-            profile, error = _analyze_video_gemini(file_path, safe_name, person_name)
+            # ── Primary: Groq (free — transcribe audio + vision frames) ──────
+            profile, error = None, None
+            if GROQ_API_KEY:
+                print(f"[Analyze] Using Groq path (primary)", flush=True)
+                profile, error = _analyze_video_groq(file_path, safe_name, person_name)
+                if error:
+                    print(f"[Analyze] Groq path failed: {error}", flush=True)
+
+            # ── Fallback: Gemini (if Groq failed or key missing) ─────────────
+            if (profile is None) and GEMINI_API_KEY:
+                print(f"[Analyze] Falling back to Gemini", flush=True)
+                profile, error = _analyze_video_gemini(file_path, safe_name, person_name)
+
+            if profile is None and error is None:
+                error = "No analysis backend available. Set GROQ_API_KEY or GEMINI_API_KEY."
+
             voice_id = None
         else:
             transcript, error = transcribe_groq(file_path, safe_name)
@@ -1408,6 +1423,140 @@ async def api_waitlist(secret: str = ""):
 # ────────────────────────────────────────────────────────────────────────────
 # PRIVATE HELPERS (kept from app.py)
 # ────────────────────────────────────────────────────────────────────────────
+
+def _analyze_video_groq(file_path, filename, person_name):
+    """
+    Analyze a video using Groq — FREE, no quota issues.
+
+    Strategy:
+      1. Extract audio from the video → Groq Whisper transcription
+         (speech reveals personality, stories, catchphrases far better than vision)
+      2. Extract 4 evenly-spaced frames → Groq llama-3.2-90b-vision
+         (picks up visual personality cues, body language, setting, appearance)
+      3. Merge both signals → llama-3.3-70b-versatile builds the final profile
+
+    This is the PRIMARY path. _analyze_video_gemini() is the fallback.
+    Kept separate so Gemini path remains intact for future use.
+    """
+    from utils.ffmpeg_utils import convert_audio_to_wav_16k, extract_best_frames, cleanup_frames
+    import base64, tempfile, os
+
+    if not GROQ_API_KEY:
+        return None, "GROQ_API_KEY not set"
+
+    transcript_text  = ""
+    visual_context   = ""
+
+    # ── Step 1: Extract audio and transcribe ──────────────────────────────────
+    try:
+        fd, wav_path = tempfile.mkstemp(suffix="_analyze.wav")
+        os.close(fd)
+        out_path, err = convert_audio_to_wav_16k(file_path, wav_path)
+        if err:
+            print(f"[GroqAnalyze] Audio extract failed: {err} — continuing without transcript", flush=True)
+        else:
+            transcript_text, t_err = transcribe_groq(out_path, "analyze.wav")
+            if t_err:
+                print(f"[GroqAnalyze] Transcription failed: {t_err}", flush=True)
+                transcript_text = ""
+            else:
+                print(f"[GroqAnalyze] Transcribed {len(transcript_text)} chars", flush=True)
+        try:
+            os.unlink(wav_path)
+        except Exception:
+            pass
+    except Exception as e:
+        print(f"[GroqAnalyze] Audio step exception: {e}", flush=True)
+
+    # ── Step 2: Extract 4 frames and send to Groq vision ─────────────────────
+    frame_paths = []
+    try:
+        frame_paths, f_err = extract_best_frames(file_path, n_frames=4)
+        if f_err:
+            print(f"[GroqAnalyze] Frame extraction failed: {f_err}", flush=True)
+        elif frame_paths:
+            # Build vision messages — one image per frame
+            image_parts = []
+            for fp in frame_paths:
+                with open(fp, "rb") as img_f:
+                    b64 = base64.b64encode(img_f.read()).decode()
+                image_parts.append({
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
+                })
+            image_parts.append({
+                "type": "text",
+                "text": (
+                    f"These are frames from a video of {person_name}. "
+                    f"Describe their appearance, body language, emotional expression, "
+                    f"environment, and any visual personality cues. Be concise."
+                ),
+            })
+
+            vis_resp = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {GROQ_API_KEY}",
+                         "Content-Type": "application/json"},
+                json={
+                    "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+                    "messages": [{"role": "user", "content": image_parts}],
+                    "temperature": 0.5,
+                    "max_tokens": 512,
+                },
+                timeout=60,
+            )
+            if vis_resp.ok:
+                visual_context = vis_resp.json()["choices"][0]["message"]["content"]
+                print(f"[GroqAnalyze] Vision: {len(visual_context)} chars", flush=True)
+            else:
+                print(f"[GroqAnalyze] Vision call failed {vis_resp.status_code}: {vis_resp.text[:200]}", flush=True)
+    except Exception as e:
+        print(f"[GroqAnalyze] Vision step exception: {e}", flush=True)
+    finally:
+        if frame_paths:
+            cleanup_frames(frame_paths)
+
+    # ── Step 3: Bail out if we have nothing to work with ─────────────────────
+    if not transcript_text and not visual_context:
+        return None, "Groq analysis: could not extract transcript or visual context from video"
+
+    # ── Step 4: Build the full personality profile ────────────────────────────
+    profile_prompt = (
+        f"You are building a detailed memory profile of {person_name} "
+        f"from video evidence so someone can perfectly embody and converse as them.\n\n"
+    )
+    if transcript_text:
+        profile_prompt += f"TRANSCRIPT (what they said):\n{transcript_text[:3000]}\n\n"
+    if visual_context:
+        profile_prompt += f"VISUAL OBSERVATIONS (from video frames):\n{visual_context}\n\n"
+    profile_prompt += (
+        f"Extract and write: their speaking style, catchphrases, personality traits, "
+        f"values, relationships mentioned, memorable stories, and how they come across. "
+        f"Write in second person as if briefing someone to perfectly BE {person_name}. Be specific and vivid."
+    )
+
+    try:
+        profile_resp = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {GROQ_API_KEY}",
+                     "Content-Type": "application/json"},
+            json={
+                "model": "llama-3.3-70b-versatile",
+                "messages": [{"role": "user", "content": profile_prompt}],
+                "temperature": 0.8,
+                "max_tokens": 2048,
+            },
+            timeout=120,
+        )
+        if profile_resp.ok:
+            profile = profile_resp.json()["choices"][0]["message"]["content"]
+            print(f"[GroqAnalyze] Profile built: {len(profile)} chars", flush=True)
+            return profile, None
+        err_msg = profile_resp.json().get("error", {}).get("message", "Groq profile build failed")
+        return None, err_msg
+    except Exception as e:
+        return None, str(e)
+
 
 def _analyze_video_gemini(file_path, filename, person_name):
     """
