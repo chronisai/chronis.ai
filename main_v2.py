@@ -286,16 +286,22 @@ async def v2_session_start(request: Request):
     # ── Verify agent ───────────────────────────────────────────────────────
     agent = await db.get_agent(agent_id)
     if not agent:
+        print(f"[Session] agent_id={agent_id[:8]} NOT FOUND in DB", flush=True)
         raise HTTPException(404, "Agent not found")
+
+    print(f"[Session] Agent {agent_id[:8]} status={agent.get('status')} simli_id={str(agent.get('simli_agent_id',''))[:12] or 'MISSING'}", flush=True)
+
     if agent.get("status") != "ready":
         raise HTTPException(400, f"Agent not ready (status={agent.get('status')})")
 
     voices = agent.get("voices") or []
+    print(f"[Session] Voices: {len(voices)} found, statuses={[v.get('status') for v in voices]}", flush=True)
     if not voices or voices[0].get("status") != "ready":
         raise HTTPException(400, "Voice reference not ready")
 
     voice_ref = voices[0].get("modal_voice_ref", "")
     simli_face_id = agent.get("simli_agent_id", "")
+    print(f"[Session] voice_ref={'SET' if voice_ref else 'MISSING'} simli_face_id={'SET' if simli_face_id else 'MISSING'}", flush=True)
 
     if not simli_face_id:
         raise HTTPException(400, "Simli face model not created for this agent")
@@ -333,10 +339,13 @@ async def v2_session_start(request: Request):
     asyncio.create_task(_bridge_session_logs(ctrl, _global_log_q))
 
     # ── Open Simli WebSocket ───────────────────────────────────────────────
+    print(f"[Simli] Opening WebSocket — face_id={simli_face_id[:12]} room={daily_room_url}", flush=True)
     simli = SimliClient(face_id=simli_face_id, daily_room_url=daily_room_url)
     try:
         await simli.start()
+        print(f"[Simli] WebSocket open ✓", flush=True)
     except Exception as e:
+        print(f"[Simli] WebSocket FAILED: {type(e).__name__}: {e}", flush=True)
         await delete_daily_room(daily_room_url)
         raise HTTPException(500, f"Simli connection failed: {e}")
 
@@ -413,12 +422,14 @@ async def v2_session_start(request: Request):
     avatar_pipeline = AvatarPipeline(ctrl=ctrl, bus=bus, simli=simli)
 
     # ── Start background pipeline tasks ───────────────────────────────────
+    print(f"[Session] Starting pipelines — LLM, TTS, Avatar", flush=True)
     llm_pipeline.start()
     tts_pipeline.start()
     avatar_pipeline.start()
 
     # ── Transition to LISTENING ────────────────────────────────────────────
     await ctrl.transition(State.LISTENING)
+    print(f"[Session] State → LISTENING ✓", flush=True)
 
     # ── Start watchdog ─────────────────────────────────────────────────────
     watchdog_task = asyncio.create_task(

@@ -203,6 +203,8 @@ async def start_onboarding(
         _onboarding_progress.setdefault(agent_id, []).append(
             {"step": step, "message": message}
         )
+        # Print every step so Render logs show exactly what's happening
+        print(f"[Onboard:{agent_id[:8]}] [{step.upper()}] {message}", flush=True)
 
     # ── Run pipeline in background ────────────────────────────────────────
     async def run_pipeline():
