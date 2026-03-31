@@ -971,9 +971,9 @@ async def check_waitlist(email: str = "", admin_secret: str = ""):
     # Admin bypass
     if admin_secret and admin_secret == ADMIN_SECRET and ADMIN_SECRET:
         return {"on_waitlist": True, "admin": True, "email": email.strip().lower()}
-    on_list = is_on_waitlist(email.strip().lower())
+    on_list = email_exists(email.strip().lower())
     return {"on_waitlist": on_list, "admin": False, "email": email.strip().lower()}
-
+    
 @app.get("/test")
 async def test_page(admin_secret: str = ""):
     """Admin-only test page — bypasses waitlist. Requires ?admin_secret=SECRET."""
