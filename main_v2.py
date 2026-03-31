@@ -92,14 +92,15 @@ DEEPGRAM_API_KEY   = os.environ.get("DEEPGRAM_API_KEY", "")
 DAILY_API_KEY      = os.environ.get("DAILY_API_KEY", "")
 MODAL_XTTS_URL     = os.environ.get("MODAL_XTTS_URL", "")
 
-FREE_MSG_LIMIT = 9999  # Payments disabled — free access for all
-WATCHDOG_TIMEOUT_S = 90.0    # kill session after 90s of no audio + no heartbeat
+FREE_MSG_LIMIT     = 9999   # Payments disabled — free access for all
+WATCHDOG_TIMEOUT_S = 120.0  # kill session after 120s of no audio + no heartbeat
+                             # (bumped from 90s to give Render cold-start buffer)
 
-UPLOAD_FOLDER  = tempfile.gettempdir()
+UPLOAD_FOLDER = tempfile.gettempdir()
 
-# ── Live session registry ────────────────────────────────────────────────────
-# Maps session_id → dict of live pipeline objects
-# Only populated while a session is actively running
+# ── Live session registry ─────────────────────────────────────────────────────
+# Maps session_id → dict of live pipeline objects.
+# Only populated while a session is actively running.
 _live_sessions: Dict[str, dict] = {}
 
 # ── Old XTTS HuggingFace client (for demo /api/speak) ────────────────────────
@@ -116,6 +117,7 @@ def get_xtts_client():
         xtts_client_url = XTTS_SPACE_URL
     return xtts_client
 
+
 # ── Startup / Shutdown ────────────────────────────────────────────────────────
 
 async def _self_keep_warm():
@@ -131,7 +133,6 @@ async def _self_keep_warm():
     url  = f"http://127.0.0.1:{port}/health"
     while True:
         try:
-            import httpx
             async with httpx.AsyncClient(timeout=10) as client:
                 r = await client.get(url)
             print(f"[KeepWarm] self-ping → {r.status_code}", flush=True)
@@ -139,19 +140,21 @@ async def _self_keep_warm():
             print(f"[KeepWarm] self-ping failed: {e}", flush=True)
         await asyncio.sleep(10 * 60)   # ping every 10 minutes
 
+
 @app.on_event("startup")
 async def startup():
     """Initialize Supabase, start log worker, recover stale jobs."""
     db = init_supabase()
     # Start the fire-and-forget session_events log worker
     asyncio.create_task(_log_worker(db))
-    # Recover any stale onboarding jobs from previous crash (fix #6)
+    # Recover any stale onboarding jobs from previous crash
     count = await db.recover_stale_onboarding_jobs()
     if count:
         print(f"[Startup] Recovered {count} stale onboarding jobs", flush=True)
     # Self-warming loop — keeps Render free tier alive independent of UptimeRobot
     asyncio.create_task(_self_keep_warm())
     print("✅ Chronis V2 started", flush=True)
+
 
 @app.on_event("shutdown")
 async def shutdown():
@@ -163,11 +166,13 @@ async def shutdown():
             await ctrl.kill()
     await get_supabase().close()
 
+
 # ── Global log queue (filled by SessionControllers, drained here) ──────────────
 
-# Single shared log queue — all session controllers push here
-# The _log_worker drains this and writes to session_events table
+# Single shared log queue — all session controllers push here.
+# The _log_worker drains this and writes to session_events table.
 _global_log_q: asyncio.Queue = asyncio.Queue(maxsize=5000)
+
 
 async def _log_worker(db: SupabaseClient) -> None:
     """
@@ -210,6 +215,7 @@ async def _log_worker(db: SupabaseClient) -> None:
             print(f"[LogWorker] Fatal error: {e}", flush=True)
             await asyncio.sleep(1)
 
+
 # ────────────────────────────────────────────────────────────────────────────
 # DAILY.CO HELPERS
 # ────────────────────────────────────────────────────────────────────────────
@@ -236,9 +242,9 @@ async def create_daily_room(session_id: str) -> str:
                     "start_video_off": True,
                     # Enable Daily's built-in audio processing
                     "audio": {
-                        "echo_cancellation":      True,
-                        "noise_suppression":      True,
-                        "auto_gain_control":      True,
+                        "echo_cancellation":  True,
+                        "noise_suppression":  True,
+                        "auto_gain_control":  True,
                     },
                 },
             },
@@ -246,6 +252,7 @@ async def create_daily_room(session_id: str) -> str:
         if not r.is_success:
             raise RuntimeError(f"Daily room creation failed: {r.status_code} {r.text[:200]}")
         return r.json()["url"]
+
 
 async def delete_daily_room(room_url: str) -> None:
     """Delete a Daily.co room on session teardown."""
@@ -258,6 +265,7 @@ async def delete_daily_room(room_url: str) -> None:
             )
         except Exception as e:
             print(f"[Daily] Room delete error: {e}", flush=True)
+
 
 # ────────────────────────────────────────────────────────────────────────────
 # V2 LIVE SESSION ROUTES
@@ -276,7 +284,7 @@ async def v2_session_start(request: Request):
     6. Start watchdog
     7. Return room_url to frontend
     """
-    db = get_supabase()
+    db   = get_supabase()
     body = await request.json()
     agent_id = body.get("agent_id", "").strip()
 
@@ -289,19 +297,31 @@ async def v2_session_start(request: Request):
         print(f"[Session] agent_id={agent_id[:8]} NOT FOUND in DB", flush=True)
         raise HTTPException(404, "Agent not found")
 
-    print(f"[Session] Agent {agent_id[:8]} status={agent.get('status')} simli_id={str(agent.get('simli_agent_id',''))[:12] or 'MISSING'}", flush=True)
+    print(
+        f"[Session] Agent {agent_id[:8]} status={agent.get('status')} "
+        f"simli_id={str(agent.get('simli_agent_id',''))[:12] or 'MISSING'}",
+        flush=True,
+    )
 
     if agent.get("status") != "ready":
         raise HTTPException(400, f"Agent not ready (status={agent.get('status')})")
 
     voices = agent.get("voices") or []
-    print(f"[Session] Voices: {len(voices)} found, statuses={[v.get('status') for v in voices]}", flush=True)
+    print(
+        f"[Session] Voices: {len(voices)} found, "
+        f"statuses={[v.get('status') for v in voices]}",
+        flush=True,
+    )
     if not voices or voices[0].get("status") != "ready":
         raise HTTPException(400, "Voice reference not ready")
 
-    voice_ref = voices[0].get("modal_voice_ref", "")
+    voice_ref     = voices[0].get("modal_voice_ref", "")
     simli_face_id = agent.get("simli_agent_id", "")
-    print(f"[Session] voice_ref={'SET' if voice_ref else 'MISSING'} simli_face_id={'SET' if simli_face_id else 'MISSING'}", flush=True)
+    print(
+        f"[Session] voice_ref={'SET' if voice_ref else 'MISSING'} "
+        f"simli_face_id={'SET' if simli_face_id else 'MISSING'}",
+        flush=True,
+    )
 
     if not simli_face_id:
         raise HTTPException(400, "Simli face model not created for this agent")
@@ -333,17 +353,20 @@ async def v2_session_start(request: Request):
     ctrl.voice_ref      = voice_ref
     ctrl.simli_agent_id = simli_face_id
 
-    # Wire ctrl log queue to the global log queue
+    # Wire ctrl log queue to the global log queue.
     # (SessionController._enqueue_log pushes to ctrl._log_q;
-    #  we drain that into the global queue via the bridge task)
+    #  we drain that into the global queue via the bridge task.)
     asyncio.create_task(_bridge_session_logs(ctrl, _global_log_q))
 
     # ── Open Simli WebSocket ───────────────────────────────────────────────
-    print(f"[Simli] Opening WebSocket — face_id={simli_face_id[:12]} room={daily_room_url}", flush=True)
+    print(
+        f"[Simli] Opening WebSocket — face_id={simli_face_id[:12]} room={daily_room_url}",
+        flush=True,
+    )
     simli = SimliClient(face_id=simli_face_id, daily_room_url=daily_room_url)
     try:
         await simli.start()
-        print(f"[Simli] WebSocket open ✓", flush=True)
+        print("[Simli] WebSocket open ✓", flush=True)
     except Exception as e:
         print(f"[Simli] WebSocket FAILED: {type(e).__name__}: {e}", flush=True)
         await delete_daily_room(daily_room_url)
@@ -388,7 +411,7 @@ async def v2_session_start(request: Request):
     # ── Sentence chunker ───────────────────────────────────────────────────
     chunker = SentenceChunker(bus=bus, session_id=session_id)
 
-    # ── Deepgram client ─────────────────────────────────────────────────────
+    # ── Deepgram callbacks ─────────────────────────────────────────────────
     # on_final triggers the LLM pipeline via event bus
     async def _on_final(text: str):
         if text.strip() and ctrl.state == State.LISTENING:
@@ -400,13 +423,14 @@ async def v2_session_start(request: Request):
         if session_obj and session_obj.get("ws"):
             try:
                 await session_obj["ws"].send_json({
-                    "type":    "partial_transcript",
-                    "text":    text,
-                    "state":   ctrl.state.value,
+                    "type":  "partial_transcript",
+                    "text":  text,
+                    "state": ctrl.state.value,
                 })
             except Exception:
                 pass
 
+    # ── Deepgram client ─────────────────────────────────────────────────────
     deepgram = DeepgramClient(on_partial=_on_partial, on_final=_on_final)
     try:
         await deepgram.start()
@@ -422,14 +446,14 @@ async def v2_session_start(request: Request):
     avatar_pipeline = AvatarPipeline(ctrl=ctrl, bus=bus, simli=simli)
 
     # ── Start background pipeline tasks ───────────────────────────────────
-    print(f"[Session] Starting pipelines — LLM, TTS, Avatar", flush=True)
+    print("[Session] Starting pipelines — LLM, TTS, Avatar", flush=True)
     llm_pipeline.start()
     tts_pipeline.start()
     avatar_pipeline.start()
 
     # ── Transition to LISTENING ────────────────────────────────────────────
     await ctrl.transition(State.LISTENING)
-    print(f"[Session] State → LISTENING ✓", flush=True)
+    print("[Session] State → LISTENING ✓", flush=True)
 
     # ── Start watchdog ─────────────────────────────────────────────────────
     watchdog_task = asyncio.create_task(
@@ -438,18 +462,18 @@ async def v2_session_start(request: Request):
 
     # ── Register in live sessions ──────────────────────────────────────────
     _live_sessions[session_id] = {
-        "ctrl":           ctrl,
-        "bus":            bus,
-        "audio_pipeline": audio_pipeline,
-        "llm_pipeline":   llm_pipeline,
-        "tts_pipeline":   tts_pipeline,
+        "ctrl":            ctrl,
+        "bus":             bus,
+        "audio_pipeline":  audio_pipeline,
+        "llm_pipeline":    llm_pipeline,
+        "tts_pipeline":    tts_pipeline,
         "avatar_pipeline": avatar_pipeline,
-        "deepgram":       deepgram,
-        "simli":          simli,
-        "memory":         memory,
-        "daily_room_url": daily_room_url,
-        "watchdog_task":  watchdog_task,
-        "ws":             None,   # WebSocket reference, filled in /ws handler
+        "deepgram":        deepgram,
+        "simli":           simli,
+        "memory":          memory,
+        "daily_room_url":  daily_room_url,
+        "watchdog_task":   watchdog_task,
+        "ws":              None,   # WebSocket reference, filled in /ws handler
     }
 
     print(f"[Session] Started {session_id[:8]} — room: {daily_room_url}", flush=True)
@@ -479,7 +503,7 @@ async def v2_session_end(request: Request):
 async def v2_heartbeat(request: Request):
     """
     Frontend sends this every 30 seconds to reset the watchdog.
-    If the tab closes, the heartbeat stops — watchdog fires after 90s.
+    If the tab closes, the heartbeat stops — watchdog fires after 120s.
     """
     body       = await request.json()
     session_id = body.get("session_id", "")
@@ -498,29 +522,34 @@ async def ws_session(websocket: WebSocket, session_id: str):
     Main real-time channel for a live session.
 
     Binary messages:  16kHz mono PCM audio from Daily.co (via browser)
-    JSON messages:    {"type": "heartbeat"}
+    JSON messages:    {"type": "heartbeat"} | {"type": "end_session"}
 
     Server sends:
-      {"type": "state", "state": "listening"|"thinking"|"speaking"|...}
-      {"type": "partial_transcript", "text": "..."}
-      {"type": "error", "message": "..."}
+      {"type": "state",              "state": "listening"|"thinking"|"speaking"|...}
+      {"type": "partial_transcript", "text": "...", "state": "..."}
+      {"type": "error",              "source": "pipeline|simli|deepgram|...",
+                                     "message": "...", "state": "..."}
       {"type": "session_end"}
     """
     await websocket.accept()
 
     session = _live_sessions.get(session_id)
     if not session:
-        await websocket.send_json({"type": "error", "message": "Session not found or not started"})
+        await websocket.send_json({
+            "type":    "error",
+            "source":  "server",
+            "message": "Session not found or not started",
+        })
         await websocket.close()
         return
 
-    ctrl: SessionController        = session["ctrl"]
-    audio_pipeline: AudioPipeline  = session["audio_pipeline"]
+    ctrl: SessionController       = session["ctrl"]
+    audio_pipeline: AudioPipeline = session["audio_pipeline"]
 
-    # Register this WebSocket so other parts of the pipeline can send state updates
+    # Register this WebSocket so other parts of the pipeline can send updates
     session["ws"] = websocket
 
-    # Subscribe to state changes and relay them to the WebSocket
+    # Subscribe to state changes AND pipeline errors, relay both to client
     state_relay_task = asyncio.create_task(
         _state_relay(websocket, ctrl, session_id)
     )
@@ -547,7 +576,7 @@ async def ws_session(websocket: WebSocket, session_id: str):
             # ── JSON control message ───────────────────────────────────────
             elif "text" in message and message["text"]:
                 try:
-                    data = json.loads(message["text"])
+                    data     = json.loads(message["text"])
                     msg_type = data.get("type", "")
 
                     if msg_type == "heartbeat":
@@ -567,8 +596,8 @@ async def ws_session(websocket: WebSocket, session_id: str):
         state_relay_task.cancel()
         session["ws"] = None
         print(f"[WS] Client disconnected from session {session_id[:8]}", flush=True)
-        # Don't clean up the session — watchdog handles that if needed
-        # Frontend may reconnect (e.g. temporary network drop)
+        # Don't clean up session here — watchdog handles it if needed.
+        # Frontend may reconnect (e.g. temporary network drop).
 
 
 async def _state_relay(
@@ -577,20 +606,28 @@ async def _state_relay(
     session_id: str,
 ) -> None:
     """
-    Subscribe to state changes from the EventBus and forward them
-    to the WebSocket client.
-    Also sends periodic state pings so the frontend stays in sync.
-    """
-    bus = ctrl.bus
+    Relay both state changes AND pipeline errors to the WebSocket client.
 
-    # We relay state by polling ctrl.state rather than subscribing to events
-    # because transitions happen too fast to reliably capture via queue
+    State changes:  polls ctrl.state every 100ms — faster than event queue,
+                    guarantees client always reflects current server state.
+    Pipeline errors: drains the 'pipeline.error' EventBus topic so every
+                    error emitted by LLMPipeline / TTSPipeline / AvatarPipeline
+                    is forwarded to the browser for display.
+
+    Error payload emitted by pipelines should be:
+        {"source": "llm"|"tts"|"avatar"|"deepgram"|"simli", "message": "..."}
+    """
+    # Subscribe to pipeline errors so we can relay them
+    error_q: asyncio.Queue = asyncio.Queue()
+    ctrl.bus.subscribe("pipeline.error", error_q)
+
     last_state = None
 
     try:
         while not ctrl.dead.is_set():
             await asyncio.sleep(0.1)   # check every 100ms
 
+            # ── State changes ──────────────────────────────────────────────
             current = ctrl.state.value
             if current != last_state:
                 try:
@@ -602,8 +639,28 @@ async def _state_relay(
                 except Exception:
                     break
 
+            # ── Pipeline errors ────────────────────────────────────────────
+            # Drain all pending errors without blocking
+            while not error_q.empty():
+                try:
+                    payload = error_q.get_nowait()
+                    await websocket.send_json({
+                        "type":    "error",
+                        "source":  payload.get("source", "pipeline"),
+                        "message": payload.get("message", "Pipeline error"),
+                        "state":   ctrl.state.value,
+                    })
+                except Exception:
+                    break
+
     except asyncio.CancelledError:
         pass
+    finally:
+        # Always unsubscribe to avoid dangling queue references
+        try:
+            ctrl.bus.unsubscribe("pipeline.error", error_q)
+        except Exception:
+            pass
 
     # Notify frontend that session ended
     try:
@@ -620,11 +677,13 @@ async def _cleanup_session(session_id: str) -> None:
     """
     Full session teardown in the correct order:
     1. Kill controller (sets dead event, emits session.end)
-    2. Stop pipelines (avatar.stop() → simli.stop())
-    3. Stop Deepgram
-    4. Delete Daily room
-    5. Write ended_at to Supabase
-    6. Remove from live sessions registry
+    2. Stop pipelines (avatar → tts → llm)
+    3. Stop Deepgram WebSocket
+    4. Close memory service HTTP client
+    5. Delete Daily room
+    6. Cancel watchdog task
+    7. Write ended_at to Supabase
+    8. Unsubscribe all bus queues
     """
     session = _live_sessions.pop(session_id, None)
     if not session:
@@ -713,8 +772,10 @@ async def _watchdog(
                 break
             idle = ctrl.idle_seconds()
             if idle > WATCHDOG_TIMEOUT_S:
-                print(f"[Watchdog] Session {session_id[:8]} idle {idle:.0f}s — killing",
-                      flush=True)
+                print(
+                    f"[Watchdog] Session {session_id[:8]} idle {idle:.0f}s — killing",
+                    flush=True,
+                )
                 await _cleanup_session(session_id)
                 break
     except asyncio.CancelledError:
@@ -752,94 +813,120 @@ async def _bridge_session_logs(
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# SUPABASE HELPERS (migrated from app.py)
+# SUPABASE HELPERS
 # ────────────────────────────────────────────────────────────────────────────
 
 def _sb_headers(extra=None):
     h = {
-        "apikey": SUPABASE_KEY,
+        "apikey":        SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
-        "Content-Type": "application/json",
-        "Prefer": "return=representation",
+        "Content-Type":  "application/json",
+        "Prefer":        "return=representation",
     }
     if extra:
         h.update(extra)
     return h
 
+
 def sb_select(table, query=""):
     try:
-        r = requests.get(f"{SUPABASE_URL}/rest/v1/{table}?{query}",
-                         headers=_sb_headers(), timeout=10)
+        r = requests.get(
+            f"{SUPABASE_URL}/rest/v1/{table}?{query}",
+            headers=_sb_headers(),
+            timeout=10,
+        )
         return r.json() if r.ok else []
     except Exception as e:
         print(f"[SB select error] {e}", flush=True)
         return []
 
+
 def sb_insert(table, data):
     try:
-        r = requests.post(f"{SUPABASE_URL}/rest/v1/{table}",
-                          headers=_sb_headers(), json=data, timeout=10)
+        r = requests.post(
+            f"{SUPABASE_URL}/rest/v1/{table}",
+            headers=_sb_headers(),
+            json=data,
+            timeout=10,
+        )
         rows = r.json()
         return rows[0] if r.ok and rows else None
     except Exception as e:
         print(f"[SB insert error] {e}", flush=True)
         return None
 
+
 def sb_update(table, match_col, match_val, data):
     try:
         r = requests.patch(
             f"{SUPABASE_URL}/rest/v1/{table}?{match_col}=eq.{match_val}",
-            headers=_sb_headers(), json=data, timeout=10,
+            headers=_sb_headers(),
+            json=data,
+            timeout=10,
         )
         return r.ok
     except Exception as e:
         print(f"[SB update error] {e}", flush=True)
         return False
 
+
 def sb_count(table, query=""):
     try:
         r = requests.get(
             f"{SUPABASE_URL}/rest/v1/{table}?select=id&{query}",
-            headers=_sb_headers({"Prefer": "count=exact"}), timeout=10,
+            headers=_sb_headers({"Prefer": "count=exact"}),
+            timeout=10,
         )
         return int(r.headers.get("Content-Range", "0/0").split("/")[-1])
     except Exception as e:
         print(f"[SB count error] {e}", flush=True)
         return 0
 
+
+# WAITLIST_BASELINE represents signups collected before the current DB was set up.
+# The displayed count = actual DB rows + WAITLIST_BASELINE.
+# If Supabase is unreachable, we show at least WAITLIST_BASELINE.
 WAITLIST_BASELINE = 94
 
+
 def get_waitlist_count():
-    return max(sb_count("waitlist") + WAITLIST_BASELINE, WAITLIST_BASELINE)
+    db_count = sb_count("waitlist")
+    total    = db_count + WAITLIST_BASELINE
+    return max(total, WAITLIST_BASELINE)
+
 
 def email_exists(email):
     return len(sb_select("waitlist", f"email=eq.{requests.utils.quote(email)}&select=id")) > 0
+
 
 def get_session_v1(session_id):
     rows = sb_select("sessions", f"session_id=eq.{session_id}&select=*")
     return rows[0] if rows else None
 
+
 def update_session_messages(session_id, messages):
     sb_update("sessions", "session_id", session_id, {"messages": messages})
+
 
 def unlock_session_v1(session_id, unlock_type):
     sb_update("sessions", "session_id", session_id,
               {"unlocked": True, "unlock_type": unlock_type})
 
+
 # ────────────────────────────────────────────────────────────────────────────
-# GROQ HELPERS (migrated from app.py)
+# GROQ HELPERS
 # ────────────────────────────────────────────────────────────────────────────
 
 def transcribe_groq(file_path, filename):
     if not GROQ_API_KEY:
         return None, "GROQ_API_KEY not set"
     mime_map = {
-        "mp4": "video/mp4", "mov": "video/quicktime", "avi": "video/x-msvideo",
+        "mp4": "video/mp4",   "mov": "video/quicktime",  "avi": "video/x-msvideo",
         "webm": "video/webm", "mkv": "video/x-matroska",
-        "mp3": "audio/mpeg", "wav": "audio/wav", "m4a": "audio/mp4",
-        "ogg": "audio/ogg", "flac": "audio/flac", "aac": "audio/aac",
+        "mp3": "audio/mpeg",  "wav": "audio/wav",         "m4a": "audio/mp4",
+        "ogg": "audio/ogg",   "flac": "audio/flac",       "aac": "audio/aac",
     }
-    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    ext  = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
     mime = mime_map.get(ext, "application/octet-stream")
     try:
         with open(file_path, "rb") as f:
@@ -847,8 +934,11 @@ def transcribe_groq(file_path, filename):
                 "https://api.groq.com/openai/v1/audio/transcriptions",
                 headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
                 files={"file": (filename, f, mime)},
-                data={"model": "whisper-large-v3", "response_format": "verbose_json",
-                      "language": "en"},
+                data={
+                    "model": "whisper-large-v3",
+                    "response_format": "verbose_json",
+                    "language": "en",
+                },
                 timeout=180,
             )
         data = resp.json()
@@ -858,17 +948,20 @@ def transcribe_groq(file_path, filename):
     except Exception as e:
         return None, str(e)
 
+
 def chat_as_persona_groq(history, person_name, persona):
     if not GROQ_API_KEY:
         return None, "GROQ_API_KEY not set"
-    system_prompt = f"""You ARE {person_name}. Not an AI. Not a simulation.
-{persona}
-RULES: Speak ONLY in first person. Never say you're an AI or simulation.
-Keep responses conversational and short. Use their actual speech patterns."""
+    system_prompt = (
+        f"You ARE {person_name}. Not an AI. Not a simulation.\n"
+        f"{persona}\n"
+        f"RULES: Speak ONLY in first person. Never say you're an AI or simulation.\n"
+        f"Keep responses conversational and short. Use their actual speech patterns."
+    )
     messages = [{"role": "system", "content": system_prompt}]
     for msg in history[-20:]:
         messages.append({
-            "role": "user" if msg["role"] == "user" else "assistant",
+            "role":    "user" if msg["role"] == "user" else "assistant",
             "content": msg["content"],
         })
     try:
@@ -887,13 +980,16 @@ Keep responses conversational and short. Use their actual speech patterns."""
     except Exception as e:
         return None, str(e)
 
+
 def build_profile_from_transcript(transcript, person_name):
     if not GROQ_API_KEY:
         return None, "GROQ_API_KEY not set"
-    prompt = f"""You are analyzing a transcript to build a memory profile of {person_name}.
-TRANSCRIPT: \"\"\"{transcript}\"\"\"
-Extract: voice/speech patterns, personality, memories, memorable details.
-Write as if briefing someone who needs to perfectly impersonate {person_name}. Be specific."""
+    prompt = (
+        f"You are analyzing a transcript to build a memory profile of {person_name}.\n"
+        f"TRANSCRIPT: \"\"\"{transcript}\"\"\"\n"
+        f"Extract: voice/speech patterns, personality, memories, memorable details.\n"
+        f"Write as if briefing someone who needs to perfectly impersonate {person_name}. Be specific."
+    )
     try:
         resp = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
@@ -911,22 +1007,29 @@ Write as if briefing someone who needs to perfectly impersonate {person_name}. B
     except Exception as e:
         return None, str(e)
 
+
 def build_persona(person_name, profile):
-    return f"""You ARE {person_name}. Not an AI. Not a simulation.
-{profile}
-RULES: Speak ONLY in first person. Never say you're an AI or Chronis.
-Keep responses conversational, natural, and short."""
+    return (
+        f"You ARE {person_name}. Not an AI. Not a simulation.\n"
+        f"{profile}\n"
+        f"RULES: Speak ONLY in first person. Never say you're an AI or Chronis.\n"
+        f"Keep responses conversational, natural, and short."
+    )
+
 
 def _clean_for_xtts(text):
-    for bad, good in {"\u2018": "'", "\u2019": "'", "\u201c": '"',
-                      "\u201d": '"', "\u2013": "-", "\u2014": "-",
-                      "\u2026": "..."}.items():
+    for bad, good in {
+        "\u2018": "'", "\u2019": "'", "\u201c": '"',
+        "\u201d": '"', "\u2013": "-", "\u2014": "-",
+        "\u2026": "...",
+    }.items():
         text = text.replace(bad, good)
     text = re.sub(r"[^\x00-\x7F]+", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
     if len(text) > 200:
         text = text[:200]
     return text if len(text) > 3 else "I am here with you."
+
 
 # ────────────────────────────────────────────────────────────────────────────
 # STATIC FILES
@@ -937,21 +1040,26 @@ try:
 except Exception:
     pass   # static dir may not exist in test environments
 
+
 @app.get("/")
 async def index():
     return FileResponse("static/index.html")
+
 
 @app.get("/demo")
 async def demo():
     return FileResponse("static/demo.html")
 
+
 @app.get("/thankyou")
 async def thankyou():
     return FileResponse("static/thankyou.html")
 
+
 @app.get("/admin")
 async def admin():
     return FileResponse("static/admin.html")
+
 
 @app.get("/live")
 async def live(email: str = ""):
@@ -962,10 +1070,13 @@ async def live(email: str = ""):
     """
     return FileResponse("static/live.html")
 
+
 @app.get("/api/v2/waitlist/check")
 async def check_waitlist(email: str = "", admin_secret: str = ""):
-    """Check if an email is on the waitlist. Used by live.html gate.
-    Admin bypass: pass admin_secret=ADMIN_SECRET to skip waitlist check."""
+    """
+    Check if an email is on the waitlist. Used by live.html gate.
+    Admin bypass: pass admin_secret=ADMIN_SECRET to skip waitlist check.
+    """
     if not email:
         return {"on_waitlist": False, "admin": False}
     # Admin bypass
@@ -973,7 +1084,8 @@ async def check_waitlist(email: str = "", admin_secret: str = ""):
         return {"on_waitlist": True, "admin": True, "email": email.strip().lower()}
     on_list = email_exists(email.strip().lower())
     return {"on_waitlist": on_list, "admin": False, "email": email.strip().lower()}
-    
+
+
 @app.get("/test")
 async def test_page(admin_secret: str = ""):
     """Admin-only test page — bypasses waitlist. Requires ?admin_secret=SECRET."""
@@ -981,11 +1093,16 @@ async def test_page(admin_secret: str = ""):
         raise HTTPException(403, "Invalid admin secret. Use /test?admin_secret=YOUR_SECRET")
     return FileResponse("static/test.html")
 
+
 @app.get("/health")
 @app.head("/health")
 async def health():
-    return {"status": "ok", "ts": datetime.utcnow().isoformat(),
-            "live_sessions": len(_live_sessions)}
+    return {
+        "status":       "ok",
+        "ts":           datetime.utcnow().isoformat(),
+        "live_sessions": len(_live_sessions),
+    }
+
 
 @app.get("/admin-dash")
 async def admin_dash(request: Request, admin_secret: str = ""):
@@ -993,6 +1110,7 @@ async def admin_dash(request: Request, admin_secret: str = ""):
     if not admin_secret or admin_secret != ADMIN_SECRET:
         raise HTTPException(403, "Admin secret required. Add ?admin_secret=YOUR_SECRET")
     return FileResponse("static/dashboard.html")
+
 
 @app.get("/api/health/services")
 async def health_services(admin_secret: str = ""):
@@ -1007,55 +1125,73 @@ async def health_services(admin_secret: str = ""):
             result = fn()
             return name, result
         except Exception as e:
-            return name, {"ok": False, "error": str(e), "detail": traceback.format_exc(limit=3)}
+            return name, {"ok": False, "error": str(e),
+                          "detail": traceback.format_exc(limit=3)}
 
     def chk_gemini():
         if not GEMINI_API_KEY:
             return {"ok": False, "error": "GEMINI_API_KEY not set"}
         r = requests.get(
             f"https://generativelanguage.googleapis.com/v1beta/models?key={GEMINI_API_KEY}",
-            timeout=8)
-        return {"ok": r.ok, "status": r.status_code,
-                "model_count": len(r.json().get("models", [])) if r.ok else None,
-                "error": r.text[:200] if not r.ok else None}
+            timeout=8,
+        )
+        return {
+            "ok": r.ok, "status": r.status_code,
+            "model_count": len(r.json().get("models", [])) if r.ok else None,
+            "error": r.text[:200] if not r.ok else None,
+        }
 
     def chk_groq():
         if not GROQ_API_KEY:
             return {"ok": False, "error": "GROQ_API_KEY not set"}
-        r = requests.get("https://api.groq.com/openai/v1/models",
-                         headers={"Authorization": f"Bearer {GROQ_API_KEY}"}, timeout=8)
+        r = requests.get(
+            "https://api.groq.com/openai/v1/models",
+            headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
+            timeout=8,
+        )
         return {"ok": r.ok, "status": r.status_code,
                 "error": r.text[:200] if not r.ok else None}
 
     def chk_supabase():
         if not SUPABASE_URL or not SUPABASE_KEY:
             return {"ok": False, "error": "SUPABASE_URL or SUPABASE_SERVICE_KEY not set"}
-        r = requests.get(f"{SUPABASE_URL}/rest/v1/",
-                         headers={"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"},
-                         timeout=8)
-        return {"ok": r.ok, "status": r.status_code,
-                "error": r.text[:200] if not r.ok else None,
-                "waitlist_count": get_waitlist_count()}
+        r = requests.get(
+            f"{SUPABASE_URL}/rest/v1/",
+            headers={"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"},
+            timeout=8,
+        )
+        return {
+            "ok": r.ok, "status": r.status_code,
+            "error": r.text[:200] if not r.ok else None,
+            "waitlist_count": get_waitlist_count(),
+        }
 
     def chk_daily():
         if not DAILY_API_KEY:
             return {"ok": False, "error": "DAILY_API_KEY not set"}
-        r = requests.get("https://api.daily.co/v1/rooms",
-                         headers={"Authorization": f"Bearer {DAILY_API_KEY}"}, timeout=8)
+        r = requests.get(
+            "https://api.daily.co/v1/rooms",
+            headers={"Authorization": f"Bearer {DAILY_API_KEY}"},
+            timeout=8,
+        )
         return {"ok": r.ok, "status": r.status_code,
                 "error": r.text[:200] if not r.ok else None}
 
     def chk_simli():
         if not SIMLI_API_KEY:
             return {"ok": False, "error": "SIMLI_API_KEY not set"}
-        # Simli doesn't have a free ping endpoint; just validate key format
-        return {"ok": True, "note": "key configured (no free ping endpoint)", "key_len": len(SIMLI_API_KEY)}
+        # Simli doesn't have a free ping endpoint; just validate key is configured
+        return {"ok": True, "note": "key configured (no free ping endpoint)",
+                "key_len": len(SIMLI_API_KEY)}
 
     def chk_deepgram():
         if not DEEPGRAM_API_KEY:
             return {"ok": False, "error": "DEEPGRAM_API_KEY not set"}
-        r = requests.get("https://api.deepgram.com/v1/projects",
-                         headers={"Authorization": f"Token {DEEPGRAM_API_KEY}"}, timeout=8)
+        r = requests.get(
+            "https://api.deepgram.com/v1/projects",
+            headers={"Authorization": f"Token {DEEPGRAM_API_KEY}"},
+            timeout=8,
+        )
         return {"ok": r.ok, "status": r.status_code,
                 "error": r.text[:200] if not r.ok else None}
 
@@ -1071,19 +1207,21 @@ async def health_services(admin_secret: str = ""):
 
     def chk_razorpay():
         configured = bool(_RZP_KEY_CONFIGURED)
-        return {"ok": configured,
-                "error": "RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET not set" if not configured else None,
-                "note": "key present" if configured else None}
+        return {
+            "ok":    configured,
+            "error": "RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET not set" if not configured else None,
+            "note":  "key present" if configured else None,
+        }
 
     checks = [
-        ("gemini",    chk_gemini),
-        ("groq",      chk_groq),
-        ("supabase",  chk_supabase),
-        ("daily",     chk_daily),
-        ("simli",     chk_simli),
-        ("deepgram",  chk_deepgram),
-        ("xtts",      chk_xtts),
-        ("razorpay",  chk_razorpay),
+        ("gemini",   chk_gemini),
+        ("groq",     chk_groq),
+        ("supabase", chk_supabase),
+        ("daily",    chk_daily),
+        ("simli",    chk_simli),
+        ("deepgram", chk_deepgram),
+        ("xtts",     chk_xtts),
+        ("razorpay", chk_razorpay),
     ]
 
     loop = asyncio.get_event_loop()
@@ -1092,23 +1230,23 @@ async def health_services(admin_secret: str = ""):
         results = await asyncio.gather(*futures)
 
     services = {name: res for name, res in results}
-    all_ok = all(v.get("ok") for v in services.values())
+    all_ok   = all(v.get("ok") for v in services.values())
     return {
-        "ts": datetime.utcnow().isoformat(),
-        "overall": "ok" if all_ok else "degraded",
+        "ts":            datetime.utcnow().isoformat(),
+        "overall":       "ok" if all_ok else "degraded",
         "live_sessions": len(_live_sessions),
-        "services": services,
+        "services":      services,
     }
 
 
-
 # ────────────────────────────────────────────────────────────────────────────
-# WAITLIST ROUTES (migrated from app.py)
+# WAITLIST ROUTES
 # ────────────────────────────────────────────────────────────────────────────
 
 @app.get("/api/count")
 async def api_count():
     return {"count": get_waitlist_count()}
+
 
 @app.post("/api/join")
 async def api_join(request: Request):
@@ -1125,25 +1263,40 @@ async def api_join(request: Request):
         raise HTTPException(400, "This email is already on the waitlist.")
 
     position = get_waitlist_count() + 1
-    sb_insert("waitlist", {"name": name, "email": email,
-                            "country": country, "position": position})
+    sb_insert("waitlist", {
+        "name": name, "email": email,
+        "country": country, "position": position,
+    })
     try:
         _send_welcome_email(name, email, position)
     except Exception as e:
         print(f"Email send error: {e}", flush=True)
     return {"success": True, "count": position}
 
+
+# ── Aliases for frontend which uses /api/waitlist/* prefix ───────────────────
+
+@app.get("/api/waitlist/count")
+async def api_waitlist_count():
+    return {"count": get_waitlist_count()}
+
+
+@app.post("/api/waitlist/join")
+async def api_waitlist_join(request: Request):
+    return await api_join(request)
+
+
 # ────────────────────────────────────────────────────────────────────────────
-# RAZORPAY ROUTES (migrated from Stripe)
+# RAZORPAY ROUTES
 # ────────────────────────────────────────────────────────────────────────────
 
 @app.post("/api/create-checkout")
 async def create_checkout(request: Request):
     if not _RZP_KEY_CONFIGURED:
         raise HTTPException(500, "Payments not configured.")
-    data          = await request.json()
-    session_id    = data.get("session_id", "")
-    checkout_type = data.get("type", "chat")
+    data           = await request.json()
+    session_id     = data.get("session_id", "")
+    checkout_type  = data.get("type", "chat")
     csession_param = session_id if checkout_type == "chat" else ""
 
     try:
@@ -1152,16 +1305,17 @@ async def create_checkout(request: Request):
     except Exception as e:
         raise HTTPException(500, str(e))
 
+
 @app.post("/api/verify-checkout")
 async def verify_checkout(request: Request):
     if not _RZP_KEY_CONFIGURED:
         raise HTTPException(500, "Payments not configured.")
-    data                 = await request.json()
-    razorpay_order_id    = data.get("razorpay_order_id", "")
-    razorpay_payment_id  = data.get("razorpay_payment_id", "")
-    razorpay_signature   = data.get("razorpay_signature", "")
-    chronis_session      = data.get("chronis_session", "")
-    checkout_type        = data.get("type", "chat")
+    data                = await request.json()
+    razorpay_order_id   = data.get("razorpay_order_id", "")
+    razorpay_payment_id = data.get("razorpay_payment_id", "")
+    razorpay_signature  = data.get("razorpay_signature", "")
+    chronis_session     = data.get("chronis_session", "")
+    checkout_type       = data.get("type", "chat")
 
     if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature]):
         raise HTTPException(400, "Missing Razorpay payment fields.")
@@ -1173,9 +1327,12 @@ async def verify_checkout(request: Request):
         if checkout_type == "video":
             video_token = uuid.uuid4().hex
             sb_insert("payment_tokens", {
-                "token": video_token, "razorpay_order_id": razorpay_order_id,
+                "token":               video_token,
+                "razorpay_order_id":   razorpay_order_id,
                 "razorpay_payment_id": razorpay_payment_id,
-                "chronis_session_id": None, "type": "video", "used": False,
+                "chronis_session_id":  None,
+                "type":                "video",
+                "used":                False,
             })
             return {"success": True, "type": "video", "video_token": video_token}
         else:
@@ -1188,8 +1345,9 @@ async def verify_checkout(request: Request):
     except Exception as e:
         raise HTTPException(400, f"Verification failed: {e}")
 
+
 # ────────────────────────────────────────────────────────────────────────────
-# SESSION + CHAT ROUTES (migrated from app.py — v1 demo)
+# SESSION + CHAT ROUTES (v1 demo)
 # ────────────────────────────────────────────────────────────────────────────
 
 @app.get("/api/session/{session_id}")
@@ -1203,10 +1361,14 @@ async def restore_session(session_id: str):
         raise HTTPException(400, "Session expired.")
     messages = session.get("messages") or []
     return {
-        "person_name": session["person_name"], "profile": session["profile"],
-        "messages": messages, "unlocked": session.get("unlocked", False),
-        "unlock_type": session.get("unlock_type"), "has_voice": bool(session.get("voice_id")),
+        "person_name": session["person_name"],
+        "profile":     session["profile"],
+        "messages":    messages,
+        "unlocked":    session.get("unlocked", False),
+        "unlock_type": session.get("unlock_type"),
+        "has_voice":   bool(session.get("voice_id")),
     }
+
 
 @app.post("/api/chat")
 async def api_chat(request: Request):
@@ -1229,36 +1391,41 @@ async def api_chat(request: Request):
     if not is_admin and datetime.now(timezone.utc) - created > timedelta(hours=6):
         raise HTTPException(400, "Session expired.")
 
-    history    = session.get("messages") or []
-    unlocked   = session.get("unlocked", False) or is_admin
-    exchanges  = len([m for m in history if m["role"] == "user"])
+    history   = session.get("messages") or []
+    unlocked  = session.get("unlocked", False) or is_admin
+    exchanges = len([m for m in history if m["role"] == "user"])
 
-    # Payments disabled — no limit check
-    # if not unlocked and exchanges >= FREE_MSG_LIMIT: (disabled)
-
-    history.append({"role": "user", "content": user_msg,
-                    "ts": datetime.utcnow().isoformat()})
-    reply, error = chat_as_persona_groq(history, session["person_name"],
-                                        session["persona"])
+    history.append({
+        "role":    "user",
+        "content": user_msg,
+        "ts":      datetime.utcnow().isoformat(),
+    })
+    reply, error = chat_as_persona_groq(history, session["person_name"], session["persona"])
     if error:
         raise HTTPException(500, f"AI error: {error}")
 
-    history.append({"role": "assistant", "content": reply,
-                    "ts": datetime.utcnow().isoformat()})
+    history.append({
+        "role":    "assistant",
+        "content": reply,
+        "ts":      datetime.utcnow().isoformat(),
+    })
     update_session_messages(session_id, history)
 
     exchanges_after = exchanges + 1
     return {
-        "reply": reply, "person_name": session["person_name"],
-        "has_voice": bool(session.get("voice_id")),
-        "messages_used": exchanges_after, "free_limit": FREE_MSG_LIMIT,
+        "reply":         reply,
+        "person_name":   session["person_name"],
+        "has_voice":     bool(session.get("voice_id")),
+        "messages_used": exchanges_after,
+        "free_limit":    FREE_MSG_LIMIT,
         "limit_reached": (not unlocked) and (exchanges_after >= FREE_MSG_LIMIT),
-        "unlocked": unlocked,
+        "unlocked":      unlocked,
     }
+
 
 @app.post("/api/analyze-text")
 async def api_analyze_text(request: Request):
-    """Analyze written memory text — migrated from app.py"""
+    """Analyze written memory text to build a persona."""
     data        = await request.json()
     person_name = (data.get("person_name") or "this person").strip()
     memory_text = (data.get("memory_text") or "").strip()
@@ -1270,6 +1437,7 @@ async def api_analyze_text(request: Request):
         raise HTTPException(400, "Text too long. Max 10,000 characters.")
     if not GROQ_API_KEY:
         raise HTTPException(500, "GROQ_API_KEY not set")
+
     prompt = (
         f"Build a memory profile of {person_name} from this written description:\n\n"
         f"{memory_text}\n\n"
@@ -1279,7 +1447,8 @@ async def api_analyze_text(request: Request):
     try:
         resp = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
-            headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
+            headers={"Authorization": f"Bearer {GROQ_API_KEY}",
+                     "Content-Type": "application/json"},
             json={"model": "llama-3.3-70b-versatile",
                   "messages": [{"role": "user", "content": prompt}],
                   "temperature": 0.85, "max_tokens": 2048},
@@ -1293,13 +1462,19 @@ async def api_analyze_text(request: Request):
         raise
     except Exception as e:
         raise HTTPException(500, str(e))
+
     session_id = str(uuid.uuid4())
     persona    = build_persona(person_name, profile)
     sb_insert("sessions", {
-        "session_id": session_id, "person_name": person_name,
-        "profile": profile, "persona": persona,
-        "filename": "text_memory", "voice_id": None,
-        "messages": [], "unlocked": False, "unlock_type": None,
+        "session_id":  session_id,
+        "person_name": person_name,
+        "profile":     profile,
+        "persona":     persona,
+        "filename":    "text_memory",
+        "voice_id":    None,
+        "messages":    [],
+        "unlocked":    False,
+        "unlock_type": None,
     })
     return {"session_id": session_id, "person_name": person_name,
             "profile": profile, "has_voice": False}
@@ -1313,20 +1488,17 @@ async def api_analyze(
     admin_secret: str = Form(""),
     unlock_token: str = Form(""),
 ):
-    """File analysis — migrated from Flask app.py"""
-    ALLOWED = {"mp4","mov","avi","webm","mkv","mp3","wav","m4a","ogg","flac","aac"}
-    VIDEO_EXT = {"mp4","mov","avi","webm","mkv"}
+    """Analyze an audio or video file to build a persona."""
+    ALLOWED   = {"mp4", "mov", "avi", "webm", "mkv", "mp3", "wav", "m4a", "ogg", "flac", "aac"}
+    VIDEO_EXT = {"mp4", "mov", "avi", "webm", "mkv"}
 
     fn  = file.filename or ""
     ext = fn.rsplit(".", 1)[-1].lower() if "." in fn else ""
     if ext not in ALLOWED:
         raise HTTPException(400, "Unsupported file type.")
 
-    is_admin   = (admin_secret == ADMIN_SECRET and bool(ADMIN_SECRET))
-    is_video   = ext in VIDEO_EXT
-
-    # Payments disabled — video analysis free for all
-    # if is_video and not is_admin: (payment gate disabled)
+    is_admin = (admin_secret == ADMIN_SECRET and bool(ADMIN_SECRET))
+    is_video = ext in VIDEO_EXT
 
     session_id = str(uuid.uuid4())
     safe_name  = f"{session_id}.{ext}"
@@ -1337,20 +1509,25 @@ async def api_analyze(
         f.write(content)
 
     print(f"📁 Analyzing {fn} as \"{person_name}\" ({session_id[:8]})", flush=True)
-    print(f"[Gemini] Key present: {bool(GEMINI_API_KEY)}, Key prefix: {GEMINI_API_KEY[:8] if GEMINI_API_KEY else 'EMPTY'}", flush=True)
+    print(
+        f"[Gemini] Key present: {bool(GEMINI_API_KEY)}, "
+        f"Key prefix: {GEMINI_API_KEY[:8] if GEMINI_API_KEY else 'EMPTY'}",
+        flush=True,
+    )
+
     try:
         if is_video:
             # ── Primary: Groq (free — transcribe audio + vision frames) ──────
             profile, error = None, None
             if GROQ_API_KEY:
-                print(f"[Analyze] Using Groq path (primary)", flush=True)
+                print("[Analyze] Using Groq path (primary)", flush=True)
                 profile, error = _analyze_video_groq(file_path, safe_name, person_name)
                 if error:
                     print(f"[Analyze] Groq path failed: {error}", flush=True)
 
             # ── Fallback: Gemini (if Groq failed or key missing) ─────────────
             if (profile is None) and GEMINI_API_KEY:
-                print(f"[Analyze] Falling back to Gemini", flush=True)
+                print("[Analyze] Falling back to Gemini", flush=True)
                 profile, error = _analyze_video_gemini(file_path, safe_name, person_name)
 
             if profile is None and error is None:
@@ -1367,6 +1544,7 @@ async def api_analyze(
                 voice_id, v_err = _store_voice_reference(file_path, session_id)
                 if v_err:
                     print(f"⚠️  Voice ref storage failed: {v_err}", flush=True)
+
         if error:
             raise HTTPException(500, f"Analysis failed: {error}")
     finally:
@@ -1377,14 +1555,24 @@ async def api_analyze(
 
     persona = build_persona(person_name, profile)
     sb_insert("sessions", {
-        "session_id": session_id, "person_name": person_name,
-        "profile": profile, "persona": persona,
-        "filename": fn, "voice_id": voice_id,
-        "messages": [], "unlocked": False, "unlock_type": None,
+        "session_id":  session_id,
+        "person_name": person_name,
+        "profile":     profile,
+        "persona":     persona,
+        "filename":    fn,
+        "voice_id":    voice_id,
+        "messages":    [],
+        "unlocked":    False,
+        "unlock_type": None,
     })
 
-    return {"session_id": session_id, "person_name": person_name,
-            "profile": profile, "has_voice": voice_id is not None}
+    return {
+        "session_id":  session_id,
+        "person_name": person_name,
+        "profile":     profile,
+        "has_voice":   voice_id is not None,
+    }
+
 
 @app.post("/api/speak")
 async def api_speak(request: Request):
@@ -1404,26 +1592,37 @@ async def api_speak(request: Request):
         raise HTTPException(500, error)
     return {"audio": audio_b64, "format": "wav"}
 
+
 # ── Admin ─────────────────────────────────────────────────────────────────────
 
 @app.get("/api/sessions")
 async def api_sessions(secret: str = ""):
     if not ADMIN_SECRET or secret != ADMIN_SECRET:
         raise HTTPException(401, "Unauthorized")
-    rows = sb_select("sessions",
-        "select=session_id,person_name,created_at,filename,voice_id,messages,unlocked,unlock_type&order=created_at.desc&limit=200")
+    rows = sb_select(
+        "sessions",
+        "select=session_id,person_name,created_at,filename,voice_id,"
+        "messages,unlocked,unlock_type&order=created_at.desc&limit=200",
+    )
     summary = []
     for s in rows:
         msgs = s.get("messages") or []
         summary.append({
-            "session_id": s["session_id"][:8], "person_name": s.get("person_name"),
-            "created_at": s.get("created_at"), "messages": len(msgs),
-            "filename": s.get("filename"), "has_voice": bool(s.get("voice_id")),
-            "unlocked": s.get("unlocked", False), "unlock_type": s.get("unlock_type"),
+            "session_id":  s["session_id"][:8],
+            "person_name": s.get("person_name"),
+            "created_at":  s.get("created_at"),
+            "messages":    len(msgs),
+            "filename":    s.get("filename"),
+            "has_voice":   bool(s.get("voice_id")),
+            "unlocked":    s.get("unlocked", False),
+            "unlock_type": s.get("unlock_type"),
         })
-    live = [{"session_id": sid[:8], "state": sess["ctrl"].state.value}
-            for sid, sess in _live_sessions.items()]
+    live = [
+        {"session_id": sid[:8], "state": sess["ctrl"].state.value}
+        for sid, sess in _live_sessions.items()
+    ]
     return {"sessions": summary, "total": len(summary), "live_sessions": live}
+
 
 @app.get("/api/waitlist")
 async def api_waitlist(secret: str = ""):
@@ -1432,8 +1631,9 @@ async def api_waitlist(secret: str = ""):
     rows = sb_select("waitlist", "select=*&order=created_at.asc")
     return {"entries": rows, "total": len(rows)}
 
+
 # ────────────────────────────────────────────────────────────────────────────
-# PRIVATE HELPERS (kept from app.py)
+# PRIVATE HELPERS
 # ────────────────────────────────────────────────────────────────────────────
 
 def _analyze_video_groq(file_path, filename, person_name):
@@ -1443,21 +1643,20 @@ def _analyze_video_groq(file_path, filename, person_name):
     Strategy:
       1. Extract audio from the video → Groq Whisper transcription
          (speech reveals personality, stories, catchphrases far better than vision)
-      2. Extract 4 evenly-spaced frames → Groq llama-3.2-90b-vision
+      2. Extract 4 evenly-spaced frames → Groq llama-4-scout vision
          (picks up visual personality cues, body language, setting, appearance)
       3. Merge both signals → llama-3.3-70b-versatile builds the final profile
 
     This is the PRIMARY path. _analyze_video_gemini() is the fallback.
-    Kept separate so Gemini path remains intact for future use.
     """
     from utils.ffmpeg_utils import convert_audio_to_wav_16k, extract_best_frames, cleanup_frames
-    import base64, tempfile, os
+    import base64 as _b64
 
     if not GROQ_API_KEY:
         return None, "GROQ_API_KEY not set"
 
-    transcript_text  = ""
-    visual_context   = ""
+    transcript_text = ""
+    visual_context  = ""
 
     # ── Step 1: Extract audio and transcribe ──────────────────────────────────
     try:
@@ -1465,7 +1664,8 @@ def _analyze_video_groq(file_path, filename, person_name):
         os.close(fd)
         out_path, err = convert_audio_to_wav_16k(file_path, wav_path)
         if err:
-            print(f"[GroqAnalyze] Audio extract failed: {err} — continuing without transcript", flush=True)
+            print(f"[GroqAnalyze] Audio extract failed: {err} — continuing without transcript",
+                  flush=True)
         else:
             transcript_text, t_err = transcribe_groq(out_path, "analyze.wav")
             if t_err:
@@ -1487,13 +1687,12 @@ def _analyze_video_groq(file_path, filename, person_name):
         if f_err:
             print(f"[GroqAnalyze] Frame extraction failed: {f_err}", flush=True)
         elif frame_paths:
-            # Build vision messages — one image per frame
             image_parts = []
             for fp in frame_paths:
                 with open(fp, "rb") as img_f:
-                    b64 = base64.b64encode(img_f.read()).decode()
+                    b64 = _b64.b64encode(img_f.read()).decode()
                 image_parts.append({
-                    "type": "image_url",
+                    "type":      "image_url",
                     "image_url": {"url": f"data:image/jpeg;base64,{b64}"},
                 })
             image_parts.append({
@@ -1510,10 +1709,10 @@ def _analyze_video_groq(file_path, filename, person_name):
                 headers={"Authorization": f"Bearer {GROQ_API_KEY}",
                          "Content-Type": "application/json"},
                 json={
-                    "model": "meta-llama/llama-4-scout-17b-16e-instruct",
-                    "messages": [{"role": "user", "content": image_parts}],
+                    "model":       "meta-llama/llama-4-scout-17b-16e-instruct",
+                    "messages":    [{"role": "user", "content": image_parts}],
                     "temperature": 0.5,
-                    "max_tokens": 512,
+                    "max_tokens":  512,
                 },
                 timeout=60,
             )
@@ -1521,7 +1720,11 @@ def _analyze_video_groq(file_path, filename, person_name):
                 visual_context = vis_resp.json()["choices"][0]["message"]["content"]
                 print(f"[GroqAnalyze] Vision: {len(visual_context)} chars", flush=True)
             else:
-                print(f"[GroqAnalyze] Vision call failed {vis_resp.status_code}: {vis_resp.text[:200]}", flush=True)
+                print(
+                    f"[GroqAnalyze] Vision call failed {vis_resp.status_code}: "
+                    f"{vis_resp.text[:200]}",
+                    flush=True,
+                )
     except Exception as e:
         print(f"[GroqAnalyze] Vision step exception: {e}", flush=True)
     finally:
@@ -1544,7 +1747,8 @@ def _analyze_video_groq(file_path, filename, person_name):
     profile_prompt += (
         f"Extract and write: their speaking style, catchphrases, personality traits, "
         f"values, relationships mentioned, memorable stories, and how they come across. "
-        f"Write in second person as if briefing someone to perfectly BE {person_name}. Be specific and vivid."
+        f"Write in second person as if briefing someone to perfectly BE {person_name}. "
+        f"Be specific and vivid."
     )
 
     try:
@@ -1553,10 +1757,10 @@ def _analyze_video_groq(file_path, filename, person_name):
             headers={"Authorization": f"Bearer {GROQ_API_KEY}",
                      "Content-Type": "application/json"},
             json={
-                "model": "llama-3.3-70b-versatile",
-                "messages": [{"role": "user", "content": profile_prompt}],
+                "model":       "llama-3.3-70b-versatile",
+                "messages":    [{"role": "user", "content": profile_prompt}],
                 "temperature": 0.8,
-                "max_tokens": 2048,
+                "max_tokens":  2048,
             },
             timeout=120,
         )
@@ -1575,13 +1779,14 @@ def _analyze_video_gemini(file_path, filename, person_name):
     Analyze a video using Gemini.
     - Files < 15MB: inline base64 (fast, no extra API call)
     - Files >= 15MB: Gemini File API (upload first, then reference)
-      Gemini inline data limit is 20MB — large phone videos always fail inline.
     """
     if not GEMINI_API_KEY:
         return None, "GEMINI_API_KEY not set"
 
-    mime_map = {"mp4": "video/mp4", "mov": "video/quicktime", "avi": "video/x-msvideo",
-                "webm": "video/webm", "mkv": "video/x-matroska"}
+    mime_map = {
+        "mp4": "video/mp4", "mov": "video/quicktime", "avi": "video/x-msvideo",
+        "webm": "video/webm", "mkv": "video/x-matroska",
+    }
     ext  = filename.rsplit(".", 1)[-1].lower()
     mime = mime_map.get(ext, "video/mp4")
 
@@ -1592,8 +1797,8 @@ def _analyze_video_gemini(file_path, filename, person_name):
         f"perfectly embody and converse as them."
     )
 
-    file_size = os.path.getsize(file_path)
-    INLINE_LIMIT = 15 * 1024 * 1024  # 15MB
+    file_size    = os.path.getsize(file_path)
+    INLINE_LIMIT = 15 * 1024 * 1024  # 15 MB
 
     try:
         if file_size < INLINE_LIMIT:
@@ -1607,13 +1812,19 @@ def _analyze_video_gemini(file_path, filename, person_name):
                 ]}],
                 "generationConfig": {"temperature": 0.85, "maxOutputTokens": 2048},
             }
-            url  = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-            resp = requests.post(url, json=payload, timeout=180,
-                                 headers={"x-goog-api-key": GEMINI_API_KEY,
-                                          "Content-Type": "application/json"})
+            url  = (
+                f"https://generativelanguage.googleapis.com/v1beta/"
+                f"models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+            )
+            resp = requests.post(
+                url, json=payload, timeout=180,
+                headers={"x-goog-api-key": GEMINI_API_KEY,
+                         "Content-Type": "application/json"},
+            )
             data = resp.json()
             if not resp.ok:
-                print(f"[Gemini] inline generateContent error {resp.status_code}: {data}", flush=True)
+                print(f"[Gemini] inline generateContent error {resp.status_code}: {data}",
+                      flush=True)
             if resp.ok:
                 candidates = data.get("candidates", [])
                 if not candidates:
@@ -1627,8 +1838,10 @@ def _analyze_video_gemini(file_path, filename, person_name):
 
         else:
             # ── File API approach (large files) ───────────────────────────
-            # Step 1: Upload file to Gemini File API
-            upload_url = f"https://generativelanguage.googleapis.com/upload/v1beta/files?key={GEMINI_API_KEY}"
+            upload_url = (
+                f"https://generativelanguage.googleapis.com/upload/v1beta/"
+                f"files?key={GEMINI_API_KEY}"
+            )
             with open(file_path, "rb") as f:
                 video_bytes = f.read()
 
@@ -1636,30 +1849,33 @@ def _analyze_video_gemini(file_path, filename, person_name):
             init_resp = requests.post(
                 upload_url,
                 headers={
-                    "X-Goog-Upload-Protocol": "resumable",
-                    "X-Goog-Upload-Command":  "start",
+                    "X-Goog-Upload-Protocol":             "resumable",
+                    "X-Goog-Upload-Command":              "start",
                     "X-Goog-Upload-Header-Content-Length": str(file_size),
                     "X-Goog-Upload-Header-Content-Type":   mime,
-                    "Content-Type": "application/json",
-                    "x-goog-api-key": GEMINI_API_KEY,
+                    "Content-Type":                        "application/json",
+                    "x-goog-api-key":                      GEMINI_API_KEY,
                 },
                 json={"file": {"display_name": filename}},
                 timeout=30,
             )
             if not init_resp.ok:
-                print(f"[Gemini] upload init error {init_resp.status_code}: {init_resp.text[:300]}", flush=True)
+                print(
+                    f"[Gemini] upload init error {init_resp.status_code}: {init_resp.text[:300]}",
+                    flush=True,
+                )
                 return None, f"Gemini file upload init failed: {init_resp.status_code}"
 
             upload_endpoint = init_resp.headers.get("X-Goog-Upload-URL")
             if not upload_endpoint:
                 return None, "Gemini did not return upload URL"
 
-            # Step 2: Upload bytes
+            # Upload bytes
             upload_resp = requests.post(
                 upload_endpoint,
                 headers={
-                    "Content-Length": str(file_size),
-                    "X-Goog-Upload-Offset": "0",
+                    "Content-Length":        str(file_size),
+                    "X-Goog-Upload-Offset":  "0",
                     "X-Goog-Upload-Command": "upload, finalize",
                 },
                 data=video_bytes,
@@ -1674,13 +1890,14 @@ def _analyze_video_gemini(file_path, filename, person_name):
 
             print(f"[Gemini] File uploaded: {file_uri}", flush=True)
 
-            # Step 3: Wait for file to be processed (state=ACTIVE)
-            file_name = upload_resp.json().get("file", {}).get("name", "")
+            # Wait for file to be processed (state=ACTIVE)
+            file_name   = upload_resp.json().get("file", {}).get("name", "")
             file_active = False
             for _ in range(40):  # up to 120s
                 time.sleep(3)
                 status_resp = requests.get(
-                    f"https://generativelanguage.googleapis.com/v1beta/{file_name}?key={GEMINI_API_KEY}",
+                    f"https://generativelanguage.googleapis.com/v1beta/"
+                    f"{file_name}?key={GEMINI_API_KEY}",
                     headers={"x-goog-api-key": GEMINI_API_KEY},
                     timeout=10,
                 )
@@ -1692,13 +1909,23 @@ def _analyze_video_gemini(file_path, filename, person_name):
                     if state == "FAILED":
                         return None, "Gemini file processing failed (state=FAILED)"
                 else:
-                    print(f"[Gemini] status poll error {status_resp.status_code}: {status_resp.text[:200]}", flush=True)
+                    print(
+                        f"[Gemini] status poll error {status_resp.status_code}: "
+                        f"{status_resp.text[:200]}",
+                        flush=True,
+                    )
 
             if not file_active:
-                return None, "Gemini file processing timed out — file never became ACTIVE after 120s. Try a shorter clip."
+                return None, (
+                    "Gemini file processing timed out — file never became ACTIVE after 120s. "
+                    "Try a shorter clip."
+                )
 
-            # Step 4: Generate content using file URI
-            gen_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+            # Generate content using file URI
+            gen_url = (
+                f"https://generativelanguage.googleapis.com/v1beta/"
+                f"models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+            )
             gen_payload = {
                 "contents": [{"parts": [
                     {"file_data": {"mime_type": mime, "file_uri": file_uri}},
@@ -1706,17 +1933,23 @@ def _analyze_video_gemini(file_path, filename, person_name):
                 ]}],
                 "generationConfig": {"temperature": 0.85, "maxOutputTokens": 2048},
             }
-            gen_resp = requests.post(gen_url, json=gen_payload, timeout=180,
-                                     headers={"x-goog-api-key": GEMINI_API_KEY,
-                                              "Content-Type": "application/json"})
+            gen_resp = requests.post(
+                gen_url, json=gen_payload, timeout=180,
+                headers={"x-goog-api-key": GEMINI_API_KEY,
+                         "Content-Type": "application/json"},
+            )
             gen_data = gen_resp.json()
             if not gen_resp.ok:
-                print(f"[Gemini] File API generateContent error {gen_resp.status_code}: {gen_data}", flush=True)
+                print(
+                    f"[Gemini] File API generateContent error {gen_resp.status_code}: {gen_data}",
+                    flush=True,
+                )
 
-            # Step 5: Clean up uploaded file from Gemini storage
+            # Clean up uploaded file from Gemini storage
             try:
                 requests.delete(
-                    f"https://generativelanguage.googleapis.com/v1beta/{file_name}?key={GEMINI_API_KEY}",
+                    f"https://generativelanguage.googleapis.com/v1beta/"
+                    f"{file_name}?key={GEMINI_API_KEY}",
                     timeout=10,
                 )
             except Exception:
@@ -1726,7 +1959,10 @@ def _analyze_video_gemini(file_path, filename, person_name):
                 candidates = gen_data.get("candidates", [])
                 if not candidates:
                     block_reason = gen_data.get("promptFeedback", {}).get("blockReason", "unknown")
-                    return None, f"Gemini returned no candidates (blockReason={block_reason}). Try a different video."
+                    return None, (
+                        f"Gemini returned no candidates (blockReason={block_reason}). "
+                        f"Try a different video."
+                    )
                 try:
                     return candidates[0]["content"]["parts"][0]["text"], None
                 except (KeyError, IndexError) as e:
@@ -1735,6 +1971,7 @@ def _analyze_video_gemini(file_path, filename, person_name):
 
     except Exception as e:
         return None, str(e)
+
 
 def _store_voice_reference(audio_path, session_id):
     if not SUPABASE_URL or not SUPABASE_KEY:
@@ -1745,13 +1982,19 @@ def _store_voice_reference(audio_path, session_id):
         filename = f"{session_id}_ref.mp3"
         r = requests.post(
             f"{SUPABASE_URL}/storage/v1/object/voice-refs/{filename}",
-            headers={"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}",
-                     "Content-Type": "audio/mpeg", "x-upsert": "true"},
-            data=audio_bytes, timeout=30,
+            headers={
+                "apikey":        SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}",
+                "Content-Type":  "audio/mpeg",
+                "x-upsert":      "true",
+            },
+            data=audio_bytes,
+            timeout=30,
         )
         return (filename, None) if r.ok else (None, f"Storage error: {r.status_code}")
     except Exception as e:
         return None, str(e)
+
 
 def _synthesize_xtts(text, voice_ref_filename):
     if not XTTS_SPACE_URL:
@@ -1789,18 +2032,24 @@ def _synthesize_xtts(text, voice_ref_filename):
             except Exception:
                 pass
 
+
 def _send_welcome_email(name, email, position):
     if not RESEND_API_KEY:
         return
     first = name.split()[0]
     try:
-        requests.post("https://api.resend.com/emails",
+        requests.post(
+            "https://api.resend.com/emails",
             headers={"Authorization": f"Bearer {RESEND_API_KEY}",
                      "Content-Type": "application/json"},
-            json={"from": "Chronis <hello@chronis.in>", "to": email,
-                  "subject": f"You're on the list, {first} — Chronis",
-                  "html": f"<p>Welcome to Chronis, {first}! You're #{position} on the waitlist.</p>"},
-            timeout=10)
+            json={
+                "from":    "Chronis <hello@chronis.in>",
+                "to":      email,
+                "subject": f"You're on the list, {first} — Chronis",
+                "html":    f"<p>Welcome to Chronis, {first}! You're #{position} on the waitlist.</p>",
+            },
+            timeout=10,
+        )
     except Exception as e:
         print(f"Welcome email error: {e}", flush=True)
 
