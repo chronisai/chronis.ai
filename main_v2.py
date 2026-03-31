@@ -446,6 +446,7 @@ async def v2_session_start(request: Request):
     return {
         "session_id":     session_id,
         "daily_room_url": daily_room_url,
+        "room_url":       daily_room_url,   # alias — live.html reads d.room_url
         "state":          ctrl.state.value,
     }
 
