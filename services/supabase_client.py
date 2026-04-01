@@ -22,7 +22,6 @@ class SupabaseClient:
         self.url     = url.rstrip("/")
         self.key     = key
         # Shared async HTTP client with connection pooling
-        # timeout=15 for DB ops; storage ops may need more
         self._client = httpx.AsyncClient(
             base_url=f"{self.url}/rest/v1",
             headers={
@@ -53,7 +52,11 @@ class SupabaseClient:
     async def select(self, table: str, query: str = "") -> List[Dict]:
         try:
             r = await self._client.get(f"/{table}?{query}")
-            return r.json() if r.is_success else []
+            if not r.is_success:
+                print(f"[SB select error] {table}: HTTP {r.status_code}: {r.text[:300]}",
+                      flush=True)
+                return []
+            return r.json()
         except Exception as e:
             print(f"[SB select error] {table}: {e}", flush=True)
             return []
@@ -61,8 +64,15 @@ class SupabaseClient:
     async def insert(self, table: str, data: Dict) -> Optional[Dict]:
         try:
             r = await self._client.post(f"/{table}", json=data)
+            if not r.is_success:
+                # Log the FULL error so we can diagnose FK violations, type errors, etc.
+                print(
+                    f"[SB insert error] {table}: HTTP {r.status_code}: {r.text[:500]}",
+                    flush=True,
+                )
+                return None
             rows = r.json()
-            return rows[0] if r.is_success and isinstance(rows, list) and rows else None
+            return rows[0] if isinstance(rows, list) and rows else None
         except Exception as e:
             print(f"[SB insert error] {table}: {e}", flush=True)
             return None
@@ -73,7 +83,13 @@ class SupabaseClient:
             r = await self._client.patch(
                 f"/{table}?{match_col}=eq.{match_val}", json=data
             )
-            return r.is_success
+            if not r.is_success:
+                print(
+                    f"[SB update error] {table}: HTTP {r.status_code}: {r.text[:300]}",
+                    flush=True,
+                )
+                return False
+            return True
         except Exception as e:
             print(f"[SB update error] {table}: {e}", flush=True)
             return False
@@ -81,7 +97,13 @@ class SupabaseClient:
     async def delete(self, table: str, query: str) -> bool:
         try:
             r = await self._client.delete(f"/{table}?{query}")
-            return r.is_success
+            if not r.is_success:
+                print(
+                    f"[SB delete error] {table}: HTTP {r.status_code}: {r.text[:300]}",
+                    flush=True,
+                )
+                return False
+            return True
         except Exception as e:
             print(f"[SB delete error] {table}: {e}", flush=True)
             return False
@@ -101,9 +123,8 @@ class SupabaseClient:
         )
         if not rows:
             return None
-        agent = rows[0]
+        agent  = rows[0]
         voices = agent.get("voices") or []
-        # Sort: ready first, then by any other status — safe even if list is empty
         voices.sort(key=lambda v: (0 if v.get("status") == "ready" else 1))
         agent["voices"] = voices
         return agent
@@ -155,7 +176,7 @@ class SupabaseClient:
                         pipeline: str = "", payload: dict = None) -> None:
         """
         Write one row to session_events table.
-        This is called by the background log worker, never inline.
+        Called by the background log worker, never inline.
         """
         await self.insert("session_events", {
             "session_id": session_id,
@@ -165,19 +186,18 @@ class SupabaseClient:
         })
 
     # ────────────────────────────────────────────────────────────────────────
-    # Stale-job recovery (fix #6 from code review)
+    # Stale-job recovery
     # ────────────────────────────────────────────────────────────────────────
 
     async def recover_stale_onboarding_jobs(self) -> int:
         """
         Mark any 'creating' agent/voice rows older than 10 minutes as 'failed'.
-        Call this on startup and periodically (e.g. every 5 minutes).
+        Call this on startup and periodically.
         Returns count of rows recovered.
         """
         cutoff = "now() - interval '10 minutes'"
-        count = 0
+        count  = 0
 
-        # Stale agents stuck in 'creating'
         r_agents = await self._client.patch(
             f"/agents?status=eq.creating&created_at=lt.{cutoff}",
             json={"status": "failed"},
@@ -190,7 +210,6 @@ class SupabaseClient:
                 print(f"[SB recovery] Marked {len(recovered)} stale agents as failed",
                       flush=True)
 
-        # Stale voices stuck in 'processing'
         r_voices = await self._client.patch(
             f"/voices?status=eq.processing&created_at=lt.{cutoff}",
             json={"status": "failed"},
@@ -206,9 +225,7 @@ class SupabaseClient:
         return count
 
 
-# ── Module-level singleton ───────────────────────────────────────────────────
-# Instantiated once in main_v2.py and passed to all pipelines.
-# Defined here so services can import it if needed.
+# ── Module-level singleton ────────────────────────────────────────────────────
 
 _instance: Optional[SupabaseClient] = None
 

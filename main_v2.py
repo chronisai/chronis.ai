@@ -617,9 +617,9 @@ async def _state_relay(
     Error payload emitted by pipelines should be:
         {"source": "llm"|"tts"|"avatar"|"deepgram"|"simli", "message": "..."}
     """
-    # Subscribe to pipeline errors so we can relay them
-    error_q: asyncio.Queue = asyncio.Queue()
-    ctrl.bus.subscribe("pipeline.error", error_q)
+    # Subscribe to pipeline errors so we can relay them.
+    # EventBus.subscribe() takes only the event_type and RETURNS the new queue.
+    error_q: asyncio.Queue = ctrl.bus.subscribe("pipeline.error")
 
     last_state = None
 

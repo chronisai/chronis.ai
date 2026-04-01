@@ -14,6 +14,12 @@ Input: VIDEO FILE ONLY
     - Audio track    → voice reference for XTTS
 
   This replaces the old photo + audio two-file flow.
+
+Fix applied:
+  user_id FK issue — agents.user_id was a hard FK to auth.users, meaning
+  any non-Supabase-auth user_id would cause a silent 500.
+  We now accept ANY string as user_id (email, UUID, anything) and store it
+  as-is. Schema migration (schema_migration.sql) removes the FK constraint.
 """
 
 import asyncio
@@ -57,9 +63,9 @@ def _extract_photo_and_audio_from_video(
         return None, None, f"Could not extract frames from video: {err or 'no frames found'}"
 
     # ── Pick best frame with face detection ───────────────────────────────
-    validator   = get_photo_validator()
-    best_bytes  = None
-    best_score  = -1.0
+    validator  = get_photo_validator()
+    best_bytes = None
+    best_score = -1.0
 
     for frame_path in frame_paths:
         try:
@@ -110,7 +116,6 @@ async def validate_inputs(video: UploadFile = File(...)):
     if len(video_bytes) > 500 * 1024 * 1024:   # 500MB limit
         raise HTTPException(400, "Video too large. Maximum 500MB.")
 
-    # Write to temp file
     suffix = "." + (video.filename or "video.mp4").rsplit(".", 1)[-1].lower()
     fd, video_path = tempfile.mkstemp(suffix=suffix)
     try:
@@ -121,14 +126,12 @@ async def validate_inputs(video: UploadFile = File(...)):
         if err:
             return {"valid": False, "failed_step": "video", "reason": err}
 
-        # Clean up extracted audio
         try:
             os.unlink(audio_path)
         except Exception:
             pass
 
-        # Validate the extracted photo one more time for stats
-        validator = get_photo_validator()
+        validator    = get_photo_validator()
         photo_result = validator.validate(photo_bytes)
 
         return {
@@ -160,8 +163,18 @@ async def start_onboarding(
     Start full onboarding from a video file.
     Returns immediately with agent_id + status='creating'.
     Poll GET /status/{agent_id} every 5 seconds.
+
+    user_id can be any string — email, UUID, or arbitrary identifier.
+    No Supabase auth required (schema migration removes the FK constraint).
     """
     db = get_supabase()
+
+    # ── Sanitise user_id ──────────────────────────────────────────────────
+    # Accept any string identifier from the frontend (email, UUID, anything).
+    # We store it as plain text after removing the FK constraint via migration.
+    user_id = (user_id or "").strip()
+    if not user_id:
+        raise HTTPException(400, "user_id is required")
 
     # ── Idempotency ────────────────────────────────────────────────────────
     existing = await db.select(
@@ -183,18 +196,29 @@ async def start_onboarding(
     os.close(fd)
 
     # ── Create agent record ───────────────────────────────────────────────
+    # user_id is stored as text (no FK — see schema_migration.sql).
+    # This means ANY user_id string works: email, UUID, anonymous ID.
     agent_row = await db.insert("agents", {
         "user_id":     user_id,
         "name":        agent_name,
         "personality": personality,
         "status":      "creating",
     })
+
     if not agent_row:
         try:
             os.unlink(video_path)
         except Exception:
             pass
-        raise HTTPException(500, "Failed to create agent record")
+        # The actual Supabase error is already logged in supabase_client.insert().
+        # Most common cause: agents.user_id still has FK constraint.
+        # Fix: run schema_migration.sql in your Supabase SQL editor.
+        raise HTTPException(
+            500,
+            "Failed to create agent record. "
+            "If this is a new deployment, run schema_migration.sql in Supabase SQL editor "
+            "to remove the user_id foreign key constraint."
+        )
 
     agent_id = agent_row["id"]
     _onboarding_progress[agent_id] = []
@@ -203,7 +227,6 @@ async def start_onboarding(
         _onboarding_progress.setdefault(agent_id, []).append(
             {"step": step, "message": message}
         )
-        # Print every step so Render logs show exactly what's happening
         print(f"[Onboard:{agent_id[:8]}] [{step.upper()}] {message}", flush=True)
 
     # ── Run pipeline in background ────────────────────────────────────────
@@ -213,7 +236,6 @@ async def start_onboarding(
         try:
             on_progress("extract", "Extracting face and voice from video...")
 
-            # Run blocking extraction in executor so we don't block the event loop
             loop = asyncio.get_running_loop()
             photo_bytes, audio_path, err = await loop.run_in_executor(
                 None, _extract_photo_and_audio_from_video, video_path
@@ -291,7 +313,7 @@ async def get_onboarding_status(agent_id: str):
     elif status == "failed":
         failure_msg = next(
             (p["message"] for p in reversed(progress) if p["step"] == "failed"),
-            "Onboarding failed — check logs",
+            "Onboarding failed — check server logs",
         )
         return {
             "status":   "failed",

@@ -25,6 +25,7 @@ Events emitted in this system:
   avatar.render_complete  — Simli has drained its buffer
   session.interrupt       — Kill signal to all pipelines (from interrupt())
   session.end             — Graceful teardown signal
+  pipeline.error          — Error from any pipeline, forwarded to WS client
 """
 
 import asyncio
@@ -33,16 +34,12 @@ from typing import Dict, List
 
 
 # Maximum queue depth for high-frequency VAD events.
-# If a consumer falls behind, oldest frames are dropped.
-_VAD_QUEUE_MAXSIZE   = 100
+_VAD_QUEUE_MAXSIZE    = 100
 
 # All other events — generous but bounded to catch bugs
 _DEFAULT_QUEUE_MAXSIZE = 50
 
 # High-frequency events that use drop-policy instead of blocking.
-# user.speech_start/end: VAD frames at ~50/s
-# tts.chunk_ready: audio chunks streaming to avatar — if avatar falls behind,
-#   drop oldest rather than buffering and exploding latency.
 _HIGH_FREQ_EVENTS = {"user.speech_start", "user.speech_end", "tts.chunk_ready"}
 
 
@@ -70,6 +67,26 @@ class EventBus:
         self._queues[event_type].append(q)
         return q
 
+    def unsubscribe(self, event_type: str, queue: asyncio.Queue) -> None:
+        """
+        Remove a specific queue from the subscribers list for event_type.
+        Call this in finally blocks to prevent dangling queue references
+        that would block emit() after the subscriber has exited.
+
+        Usage:
+            q = bus.subscribe("pipeline.error")
+            try:
+                ...
+            finally:
+                bus.unsubscribe("pipeline.error", q)
+        """
+        queues = self._queues.get(event_type)
+        if queues:
+            try:
+                queues.remove(queue)
+            except ValueError:
+                pass  # already removed or never subscribed — safe to ignore
+
     async def emit(self, event_type: str, payload: dict = None) -> None:
         """
         Broadcast event_type to all subscribers.
@@ -87,7 +104,6 @@ class EventBus:
                 try:
                     q.put_nowait(payload)
                 except asyncio.QueueFull:
-                    # Consumer is too slow — drop the oldest entry and push new one
                     try:
                         q.get_nowait()       # discard oldest
                         q.put_nowait(payload)
@@ -98,7 +114,6 @@ class EventBus:
                 try:
                     await asyncio.wait_for(q.put(payload), timeout=0.1)
                 except asyncio.TimeoutError:
-                    # Subscriber is stuck — log would go here; skip for now
                     pass
 
     def unsubscribe_all(self) -> None:
