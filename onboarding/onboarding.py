@@ -26,7 +26,7 @@ Stale job recovery (fix #6):
   SupabaseClient.recover_stale_onboarding_jobs() handles rows stuck in
   'creating' from Railway restarts or crashed background tasks.
 """
-import base64
+
 import asyncio
 import os
 import uuid
@@ -295,21 +295,32 @@ class OnboardingPipeline:
         Returns (face_id, error).
         """
         # ── Submit creation request ────────────────────────────────────────
+        # Simli expects multipart/form-data with the image as a file field.
+        # Do NOT set Content-Type manually — httpx sets it automatically
+        # for multipart uploads and must include the boundary string.
         try:
             r = await self._http.post(
                 f"{SIMLI_BASE_URL}/generateFaceID",
-                headers={
-                    "x-simli-api-key": SIMLI_API_KEY,
-                    "Content-Type":    "application/json",
-                },
-                json={"image": base64.b64encode(photo_bytes).decode("utf-8")},
+                headers={"x-simli-api-key": SIMLI_API_KEY},
+                files={"image": ("photo.jpg", photo_bytes, "image/jpeg")},
                 timeout=30.0,
             )
+            print(f"[Onboarding] Simli generateFaceID → {r.status_code}: {r.text[:300]}",
+                  flush=True)
+
             if not r.is_success:
                 return None, f"Simli API error {r.status_code}: {r.text[:300]}"
 
             data   = r.json()
-            job_id = data.get("jobId") or data.get("requestId") or data.get("request_id")
+            # Log full response so we can see exact field names
+            print(f"[Onboarding] Simli generateFaceID data: {data}", flush=True)
+
+            job_id = (
+                data.get("jobId")
+                or data.get("requestId")
+                or data.get("request_id")
+                or data.get("id")
+            )
             if not job_id:
                 return None, f"No job ID in Simli response: {data}"
 
@@ -335,12 +346,21 @@ class OnboardingPipeline:
                     json={"requestId": job_id},
                     timeout=10.0,
                 )
-                status_data   = status_r.json()
-                status        = status_data.get("status", "")
+                status_data = status_r.json()
+                # Log full poll response on first 3 polls so we can see field names
+                if poll_num <= 3:
+                    print(f"[Onboarding] Simli poll #{poll_num}: {status_data}",
+                          flush=True)
+
+                status = status_data.get("status", "")
+
+                # Simli may return the face ID directly or nested — check all variants
                 simli_face_id = (
                     status_data.get("faceId")
                     or status_data.get("face_id")
                     or status_data.get("faceID")
+                    or status_data.get("result", {}).get("faceId")
+                    or status_data.get("result", {}).get("face_id")
                 )
 
                 if on_progress:
@@ -350,6 +370,13 @@ class OnboardingPipeline:
                     )
 
                 if status == "completed" and simli_face_id:
+                    return simli_face_id, None
+
+                # Some Simli responses return face ID without a status field —
+                # if we got a face ID at all, consider it done
+                if simli_face_id and not status:
+                    print(f"[Onboarding] Simli returned faceId without status — treating as complete",
+                          flush=True)
                     return simli_face_id, None
 
                 elif status == "failed":
