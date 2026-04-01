@@ -145,7 +145,7 @@ class OnboardingPipeline:
             )
 
         if existing:
-            row = existing[0]
+            row      = existing[0]
             agent_id = agent_id or row["id"]
 
             # Skip Simli if face already submitted (simli_agent_id present)
@@ -154,7 +154,7 @@ class OnboardingPipeline:
                 simli_agent_id = row["simli_agent_id"]
                 progress("idempotency", "Simli agent already exists — skipping creation")
 
-            voices = row.get("voices") or []
+            voices       = row.get("voices") or []
             ready_voices = [v for v in voices if v.get("status") == "ready"]
             if ready_voices:
                 skip_voice = True
@@ -222,8 +222,8 @@ class OnboardingPipeline:
 
             # Store voice reference in DB
             await self.db.insert("voices", {
-                "agent_id":        agent_id,
-                "modal_voice_ref": voice_ref,
+                "agent_id":         agent_id,
+                "modal_voice_ref":  voice_ref,
                 "duration_seconds": audio_result["duration_s"],
                 "snr_db":           audio_result["snr_db"],
                 "speech_ratio":     audio_result["speech_ratio"],
@@ -292,27 +292,24 @@ class OnboardingPipeline:
         """
         Submit photo to Simli for face model creation.
         Polls for completion every SIMLI_POLL_INTERVAL_S seconds.
-        Returns (simli_agent_id, error).
+        Returns (face_id, error).
         """
         # ── Submit creation request ────────────────────────────────────────
         try:
             r = await self._http.post(
-                f"{SIMLI_BASE_URL}/createFaceAgent",
+                f"{SIMLI_BASE_URL}/generateFaceID",
                 headers={
-                    "Authorization": f"Bearer {SIMLI_API_KEY}",
-                    "Content-Type":  "application/json",
+                    "x-simli-api-key": SIMLI_API_KEY,
+                    "Content-Type":    "application/json",
                 },
-                json={
-                    "agentId":    agent_id,
-                    "imageData":  photo_bytes.hex(),   # Simli accepts hex-encoded image
-                },
+                json={"imageData": photo_bytes.hex()},
                 timeout=30.0,
             )
             if not r.is_success:
                 return None, f"Simli API error {r.status_code}: {r.text[:300]}"
 
-            data     = r.json()
-            job_id   = data.get("jobId") or data.get("job_id")
+            data   = r.json()
+            job_id = data.get("jobId") or data.get("requestId") or data.get("request_id")
             if not job_id:
                 return None, f"No job ID in Simli response: {data}"
 
@@ -320,27 +317,37 @@ class OnboardingPipeline:
             return None, f"Simli submission error: {e}"
 
         # ── Poll for completion ────────────────────────────────────────────
-        elapsed = 0.0
+        elapsed  = 0.0
         poll_num = 0
 
         while elapsed < SIMLI_MAX_WAIT_S:
             await asyncio.sleep(SIMLI_POLL_INTERVAL_S)
-            elapsed += SIMLI_POLL_INTERVAL_S
+            elapsed  += SIMLI_POLL_INTERVAL_S
             poll_num += 1
 
             try:
-                status_r = await self._http.get(
-                    f"{SIMLI_BASE_URL}/faceAgentStatus/{job_id}",
-                    headers={"Authorization": f"Bearer {SIMLI_API_KEY}"},
+                status_r = await self._http.post(
+                    f"{SIMLI_BASE_URL}/getRequestStatus",
+                    headers={
+                        "x-simli-api-key": SIMLI_API_KEY,
+                        "Content-Type":    "application/json",
+                    },
+                    json={"requestId": job_id},
                     timeout=10.0,
                 )
-                status_data  = status_r.json()
-                status       = status_data.get("status", "")
-                simli_face_id = status_data.get("faceId") or status_data.get("face_id")
+                status_data   = status_r.json()
+                status        = status_data.get("status", "")
+                simli_face_id = (
+                    status_data.get("faceId")
+                    or status_data.get("face_id")
+                    or status_data.get("faceID")
+                )
 
                 if on_progress:
-                    on_progress("simli_poll",
-                                f"Simli status: {status} ({elapsed:.0f}s elapsed)")
+                    on_progress(
+                        "simli_poll",
+                        f"Simli status: {status} ({elapsed:.0f}s elapsed)",
+                    )
 
                 if status == "completed" and simli_face_id:
                     return simli_face_id, None
@@ -390,14 +397,14 @@ class OnboardingPipeline:
                 upload_url,
                 content=audio_bytes,
                 headers={
-                    "Content-Type":         "audio/wav",
-                    "X-Volume-Path":        volume_path,
+                    "Content-Type":  "audio/wav",
+                    "X-Volume-Path": volume_path,
                 },
                 timeout=60.0,
             )
 
             if r.is_success:
-                data = r.json()
+                data        = r.json()
                 stored_path = data.get("path", volume_path)
                 return stored_path, None
             else:
