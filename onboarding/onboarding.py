@@ -316,7 +316,8 @@ class OnboardingPipeline:
             print(f"[Onboarding] Simli generateFaceID data: {data}", flush=True)
 
             job_id = (
-                data.get("jobId")
+                data.get("character_uid")
+                or data.get("jobId")
                 or data.get("requestId")
                 or data.get("request_id")
                 or data.get("id")
@@ -343,7 +344,7 @@ class OnboardingPipeline:
                         "x-simli-api-key": SIMLI_API_KEY,
                         "Content-Type":    "application/json",
                     },
-                    json={"requestId": job_id},
+                    json={"character_uid": job_id},
                     timeout=10.0,
                 )
                 status_data = status_r.json()
