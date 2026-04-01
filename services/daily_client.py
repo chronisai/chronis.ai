@@ -64,6 +64,10 @@ class DailyClient:
 
         EC/NS/AGC are CRITICAL. Never disable them. They're what separates
         a usable voice pipeline from an echo-chamber disaster.
+
+        NOTE: audio_constraints is a browser-side WebRTC property — NOT a
+        valid Daily.co room creation property (causes 400 invalid-request-error).
+        Daily applies EC/NS/AGC automatically server-side; no override needed.
         """
         room_name = f"chronis-{session_id[:12]}"
 
@@ -74,24 +78,14 @@ class DailyClient:
                 "properties": {
                     "exp": int(time.time()) + ROOM_EXPIRY_SECONDS,
 
-                    # Audio processing — all enabled, none optional
+                    # Audio processing — Daily applies EC/NS/AGC automatically.
                     "enable_noise_cancellation_ui": True,
-                    "start_audio_off":  False,
-                    "start_video_off":  True,  # We don't need browser camera
-
-                    # Explicit audio constraints (belt and suspenders)
-                    # Daily applies EC/NS/AGC by default, but explicit is safer
-                    "audio_constraints": {
-                        "echoCancellation":   {"exact": True},
-                        "noiseSuppression":   {"exact": True},
-                        "autoGainControl":    {"exact": True},
-                        "sampleRate":         {"ideal": 16000},
-                        "channelCount":       {"exact": 1},
-                    },
+                    "start_audio_off": False,
+                    "start_video_off": True,   # We don't need browser camera
 
                     # Prevent random people from joining — token required
                     "enable_people_ui": False,
-                    "max_participants": 2,  # user + Simli avatar stream
+                    "max_participants": 2,     # user + Simli avatar stream
                 },
             },
         )
