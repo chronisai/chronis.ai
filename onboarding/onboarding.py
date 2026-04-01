@@ -26,7 +26,7 @@ Stale job recovery (fix #6):
   SupabaseClient.recover_stale_onboarding_jobs() handles rows stuck in
   'creating' from Railway restarts or crashed background tasks.
 """
-
+import base64
 import asyncio
 import os
 import uuid
@@ -302,7 +302,7 @@ class OnboardingPipeline:
                     "x-simli-api-key": SIMLI_API_KEY,
                     "Content-Type":    "application/json",
                 },
-                json={"imageData": photo_bytes.hex()},
+                json={"image": base64.b64encode(photo_bytes).decode("utf-8")},
                 timeout=30.0,
             )
             if not r.is_success:
