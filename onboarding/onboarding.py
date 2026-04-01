@@ -209,12 +209,20 @@ class OnboardingPipeline:
             voice_ref, voice_err = await self._upload_voice_to_modal(
                 converted_audio_path, agent_id
             )
-            if voice_err:
+
+            # FIX 1: treat None voice_ref as an error even if voice_err is empty.
+            # _upload_voice_to_modal can return (None, None) if Modal responds with
+            # a non-JSON body that gets swallowed — guard against that here so we
+            # never hit voice_ref[:60] on a None value further down.
+            if voice_err or not voice_ref:
                 await self.db.insert("voices", {
                     "agent_id": agent_id,
                     "status":   "failed",
                 })
-                return {"error": f"Voice upload failed: {voice_err}", "step": "voice_upload"}
+                return {
+                    "error": f"Voice upload failed: {voice_err or 'Modal returned no path'}",
+                    "step":  "voice_upload",
+                }
 
             # Delete any stale voice rows before inserting fresh one.
             # Prevents get_agent() from reading a failed/old row on retry.
@@ -311,8 +319,7 @@ class OnboardingPipeline:
             if not r.is_success:
                 return None, f"Simli API error {r.status_code}: {r.text[:300]}"
 
-            data   = r.json()
-            # Log full response so we can see exact field names
+            data = r.json()
             print(f"[Onboarding] Simli generateFaceID data: {data}", flush=True)
 
             job_id = (
@@ -376,8 +383,10 @@ class OnboardingPipeline:
                 # Some Simli responses return face ID without a status field —
                 # if we got a face ID at all, consider it done
                 if simli_face_id and not status:
-                    print(f"[Onboarding] Simli returned faceId without status — treating as complete",
-                          flush=True)
+                    print(
+                        "[Onboarding] Simli returned faceId without status — treating as complete",
+                        flush=True,
+                    )
                     return simli_face_id, None
 
                 elif status == "failed":
@@ -432,8 +441,19 @@ class OnboardingPipeline:
             )
 
             if r.is_success:
-                data        = r.json()
-                stored_path = data.get("path", volume_path)
+                # FIX 2: Modal may return plain text or an empty body instead of JSON.
+                # Wrap r.json() in a try/except and fall back to the path we computed
+                # ourselves — we know it's correct regardless of what Modal echoes back.
+                try:
+                    data        = r.json()
+                    print(f"[Onboarding] Modal upload response: {data}", flush=True)
+                    stored_path = data.get("path") or data.get("volume_path") or volume_path
+                except Exception:
+                    print(
+                        f"[Onboarding] Modal upload non-JSON response: {r.text[:200]}",
+                        flush=True,
+                    )
+                    stored_path = volume_path   # safe fallback — path is correct
                 return stored_path, None
             else:
                 return None, f"Modal upload error {r.status_code}: {r.text[:200]}"
