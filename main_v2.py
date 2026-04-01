@@ -339,6 +339,7 @@ async def v2_session_start(request: Request):
     # ── Write session to DB ────────────────────────────────────────────────
     await db.create_session({
         "id":             session_id,
+        "session_id":     session_id,
         "user_id":        body.get("user_id"),
         "agent_id":       agent_id,
         "daily_room_url": daily_room_url,

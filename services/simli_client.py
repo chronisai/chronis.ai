@@ -11,6 +11,11 @@ Key facts confirmed from live API test (per blueprint):
 
 Opening per-turn adds 300ms+ connection overhead and causes random avatar resets.
 The WebSocket is opened once in session_start and torn down in cleanup.
+
+Fix applied:
+  - _get_session_token: old /getSessionToken endpoint returned 404.
+    Correct endpoint is POST /startAudioToVideoSession (REST, not WS).
+    Auth header changed from "Authorization: Bearer" to "x-simli-api-key".
 """
 
 import asyncio
@@ -34,7 +39,7 @@ class SimliClient:
     Manages one persistent WebSocket connection to Simli for a single session.
 
     Usage:
-        client = SimliClient(face_id="abc123", session_token="tok_xxx")
+        client = SimliClient(face_id="abc123", daily_room_url="https://...")
         await client.start()            # open WS, handshake
         await client.send(audio_bytes)  # send 16kHz PCM chunks
         await client.clear_buffer()     # on interrupt
@@ -67,7 +72,7 @@ class SimliClient:
         session_token = await self._get_session_token()
 
         # ── Step 2: Open the WebSocket ────────────────────────────────────────
-        extra_headers = {"Authorization": f"Bearer {SIMLI_API_KEY}"}
+        extra_headers = {"x-simli-api-key": SIMLI_API_KEY}
 
         self._ws = await websockets.connect(
             SIMLI_WS_URL,
@@ -198,21 +203,35 @@ class SimliClient:
         """
         Call Simli's REST API to get a short-lived session token.
         Token is used in the WebSocket handshake.
+
+        Endpoint: POST /startAudioToVideoSession (REST — not WS)
+        Auth: x-simli-api-key header (NOT Authorization: Bearer)
+        Old /getSessionToken endpoint no longer exists — returns 404.
         """
         import httpx
         async with httpx.AsyncClient(timeout=10.0) as client:
             r = await client.post(
-                f"{SIMLI_BASE_URL}/getSessionToken",
+                f"{SIMLI_BASE_URL}/startAudioToVideoSession",
                 headers={
-                    "Authorization": f"Bearer {SIMLI_API_KEY}",
-                    "Content-Type": "application/json",
+                    "x-simli-api-key": SIMLI_API_KEY,
+                    "Content-Type":    "application/json",
                 },
-                json={"faceId": self.face_id},
+                json={
+                    "faceId":           self.face_id,
+                    "handleSilence":    True,
+                    "maxSessionLength": 3600,
+                    "maxIdleTime":      300,
+                },
             )
+            print(f"[Simli] Token response {r.status_code}: {r.text[:300]}", flush=True)
             if not r.is_success:
                 raise RuntimeError(f"Simli token error: {r.status_code} {r.text[:200]}")
-            data = r.json()
-            token = data.get("session_token") or data.get("sessionToken")
+            data  = r.json()
+            token = (
+                data.get("session_token")
+                or data.get("sessionToken")
+                or data.get("token")
+            )
             if not token:
                 raise RuntimeError(f"No session token in Simli response: {data}")
             return token
@@ -231,7 +250,7 @@ class SimliClient:
             async for message in self._ws:
                 if isinstance(message, str):
                     try:
-                        data = json.loads(message)
+                        data     = json.loads(message)
                         msg_type = data.get("type", "")
                         if msg_type == "error":
                             print(f"[Simli] Error from server: {data}", flush=True)
