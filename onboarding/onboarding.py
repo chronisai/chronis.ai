@@ -48,7 +48,7 @@ SUPABASE_KEY   = os.environ.get("SUPABASE_SERVICE_KEY", "")
 # How long to wait between Simli status polls
 SIMLI_POLL_INTERVAL_S = 5.0
 # Maximum time to wait for Simli agent creation before marking failed
-SIMLI_MAX_WAIT_S      = 180.0
+SIMLI_MAX_WAIT_S      = 700.0
 
 
 class OnboardingPipeline:
