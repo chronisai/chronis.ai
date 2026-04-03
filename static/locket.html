@@ -29,8 +29,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
 .nc{background:var(--tx);color:#000;font-size:12px;font-weight:600;padding:7px 16px;border-radius:7px;text-decoration:none;letter-spacing:.2px}
 
 /* HERO */
-#hero{position:relative;width:100%;height:100svh;overflow:hidden;background:var(--bg)}
-#c3{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;touch-action:none}
+#hero{position:relative;width:100%;height:100svh;overflow:hidden;background:var(--bg);cursor:grab}
+#hero:active{cursor:grabbing}
+/* Canvas is non-interactive — lets scroll and cursor pass through to the hero div */
+#c3{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;pointer-events:none}
+
 #rui{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:9svh;transition:opacity .85s ease;pointer-events:none}
 #rui.g{opacity:0}
 #rui.gx{display:none}
@@ -50,6 +53,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
 @keyframes sp{0%,100%{transform:scaleY(1);opacity:.45}50%{transform:scaleY(1.35);opacity:1}}
 .hcl{position:absolute;top:72px;left:24px;z-index:10;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(236,232,226,.16);animation:rUp .8s 1.4s ease both;pointer-events:none}
 
+/* Interaction hint */
+#ihint{position:absolute;top:72px;right:24px;z-index:10;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(236,232,226,.12);animation:rUp .8s 1.8s ease both;pointer-events:none;transition:opacity .6s}
+#ihint.gone{opacity:0}
+
 /* CONTENT */
 .pw{max-width:640px;margin:0 auto;padding:0 22px}
 .sec{padding:80px 0;border-top:1px solid var(--bd)}
@@ -67,8 +74,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
 /* Metal body CSS visual */
 .v-metal-wrap{position:relative;display:flex;align-items:center;justify-content:center}
 .v-metal-glow{position:absolute;width:180px;height:280px;background:radial-gradient(ellipse,rgba(124,58,237,.12) 0%,transparent 68%);pointer-events:none}
-.v-metal{width:62px;height:240px;border-radius:31px;background:linear-gradient(162deg,#f0f0ee 0%,#d8d8d6 18%,#b8b8bc 40%,#9a9a9e 70%,#7e7e84 100%);border:1px solid rgba(255,255,255,.28);box-shadow:4px 6px 28px rgba(0,0,0,.55),inset 2px 0 0 rgba(255,255,255,.22),inset -1px 0 0 rgba(0,0,0,.08);position:relative;overflow:visible}
-.v-metal-shine{position:absolute;top:6%;left:9%;width:26%;height:72%;background:linear-gradient(162deg,rgba(255,255,255,.32) 0%,transparent 55%);border-radius:4px;pointer-events:none}
+.v-metal{width:62px;height:240px;border-radius:31px;background:linear-gradient(162deg,#f8f8f6 0%,#e8e8e6 18%,#d0d0ce 40%,#b8b8bc 70%,#9e9ea4 100%);border:1px solid rgba(255,255,255,.38);box-shadow:4px 6px 28px rgba(0,0,0,.55),inset 2px 0 0 rgba(255,255,255,.32),inset -1px 0 0 rgba(0,0,0,.06);position:relative;overflow:visible}
+.v-metal-shine{position:absolute;top:6%;left:9%;width:26%;height:72%;background:linear-gradient(162deg,rgba(255,255,255,.45) 0%,transparent 55%);border-radius:4px;pointer-events:none}
 
 /* Included grid */
 .ig{display:flex;flex-direction:column;gap:12px;margin-top:40px}
@@ -87,23 +94,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:cen
 .ph em{font-style:italic;color:var(--mu2)}
 .psub{font-size:14px;color:var(--mu);line-height:1.78;margin-bottom:44px;font-weight:300}
 
-/* Liquid cursor glow border */
 .pcard{background:var(--bg2);border:1px solid var(--bd);border-radius:20px;overflow:hidden;position:relative;--gx:50%;--gy:-30%}
 .pcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ne2),transparent);z-index:2;pointer-events:none}
-.pcard-glow{
-  position:absolute;inset:-1px;border-radius:20px;
-  pointer-events:none;z-index:1;
-  opacity:0;transition:opacity .45s ease;
-}
-.pcard-glow::before{
-  content:'';position:absolute;inset:0;border-radius:20px;
-  border:1px solid transparent;
-  background:radial-gradient(500px circle at var(--gx,50%) var(--gy,-30%),rgba(167,139,250,.68),rgba(124,58,237,.28) 28%,transparent 58%) border-box;
-  -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
-  mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:destination-out;
-  mask-composite:exclude;
-}
+.pcard-glow{position:absolute;inset:-1px;border-radius:20px;pointer-events:none;z-index:1;opacity:0;transition:opacity .45s ease}
+.pcard-glow::before{content:'';position:absolute;inset:0;border-radius:20px;border:1px solid transparent;background:radial-gradient(500px circle at var(--gx,50%) var(--gy,-30%),rgba(167,139,250,.68),rgba(124,58,237,.28) 28%,transparent 58%) border-box;-webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude}
 .pcard:hover .pcard-glow{opacity:1}
 
 .ph2{padding:28px 24px 22px;border-bottom:1px solid var(--bd);position:relative;z-index:2}
@@ -158,6 +152,7 @@ footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-con
 <section id="hero">
   <canvas id="c3"></canvas>
   <div class="hcl">Physical Object · Memory Interface</div>
+  <div id="ihint">Drag to explore</div>
   <div id="rui">
     <div class="rtb">
       <div class="rle">The Chronis Locket</div>
@@ -197,7 +192,7 @@ footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-con
   </div>
 </section>
 
-<!-- THE RITUAL — replaces old slider section -->
+<!-- THE RITUAL -->
 <section class="sec rv">
   <div class="pw">
     <div class="ftxt">
@@ -206,7 +201,6 @@ footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-con
       <p>Every other presence on a screen is algorithmically summoned. This one is yours to initiate. A single gesture on the side of the locket opens the connection — deliberate, physical, irreplaceable in its intentionality.</p>
       <p>We made it physically closed on purpose. The locket sits quiet against your chest. When you are ready, you open it.</p>
     </div>
-
     <div class="sl" style="margin-top:28px">
       <div class="si"><div class="sd"></div>Side control to open — one intentional gesture</div>
       <div class="si"><div class="sd"></div>Screen completely dormant when closed — no idle glow</div>
@@ -277,7 +271,7 @@ footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-con
     <div class="fqi"><button class="fqq" onclick="tf(this)">How does setup work?<span class="fqic">+</span></button><div class="fqa">Upload any video through our app. Replica creation: 45–90 minutes. First conversation typically live within 48 hours. Team available by email or call — your choice.</div></div>
     <div class="fqi"><button class="fqq" onclick="tf(this)">I only have short or low-quality video?<span class="fqic">+</span></button><div class="fqa">Even 30 seconds works. WhatsApp clips, old footage, birthday videos — all fine. Longer video gives richer results. Get in touch before ordering if uncertain about what you have.</div></div>
     <div class="fqi"><button class="fqq" onclick="tf(this)">What happens after 12 months?<span class="fqic">+</span></button><div class="fqa">Renewal pricing communicated before year one ends. We will never delete a replica without explicit advance notice and a migration path. Your memories are yours.</div></div>
-    <div class="fqi"><button class="fqq" onclick="tf(this)">Can I return it?<span class="fqic">+</span></button><div class="fqa">30-day returns from delivery, original condition. support@chronis.in — no friction, handled with care.</div></div>
+    <div class="fqi"><button class="fqq" onclick="tf(this)">Can I return it?<span class="fqic">+</span></button><div class="fqa">30-day returns from delivery, original condition. <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4e3d3b3e3e213c3a0e2d263c2120273d602720">[email&#160;protected]</a> — no friction, handled with care.</div></div>
   </div>
 </div>
 
@@ -290,12 +284,13 @@ footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-con
   <span class="fc">© 2026 Chronis</span>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   BRUSHED SILVER TEXTURE GENERATOR
-   Creates a canvas-based roughnessMap simulating circular grain
-   (characteristic of flat-disc machining + fine random scratches)
+   PLATINUM WHITE BRUSHED TEXTURE GENERATOR
+   Platinum-white base with intentional aesthetic scratches —
+   fine circular grain + deliberate wear marks that read as
+   character, not damage. Every line has a reason.
 ═══════════════════════════════════════════════════════════════ */
 function makeBrushedTexture(size) {
   size = size || 512;
@@ -304,78 +299,126 @@ function makeBrushedTexture(size) {
   var g = c.getContext('2d');
   var cx = size / 2, cy = size / 2;
 
-  // Neutral mid-roughness base
-  g.fillStyle = '#7a7a7a';
+  // Bright platinum-white roughness base (low roughness = high shine)
+  g.fillStyle = '#c8c8c8';
   g.fillRect(0, 0, size, size);
 
-  // Circular grain — tight arcs at varying radii, low alpha
-  for (var i = 0; i < 195; i++) {
-    var r  = Math.random() * size * 0.53;
+  // ── Circular grain — fine arcs, characteristic of face-milling a disc ──
+  for (var i = 0; i < 220; i++) {
+    var r  = 8 + Math.random() * size * 0.56;
     var a0 = Math.random() * Math.PI * 2;
-    var sp = 0.022 + Math.random() * 0.27;
-    var al = 0.035 + Math.random() * 0.095;
-    var dk = Math.random() > 0.38;
+    var sp = 0.018 + Math.random() * 0.22;
+    var al = 0.028 + Math.random() * 0.072;
+    var dk = Math.random() > 0.42;
     g.strokeStyle = dk
       ? 'rgba(0,0,0,' + al + ')'
-      : 'rgba(255,255,255,' + (al * 0.48) + ')';
-    g.lineWidth = 0.32 + Math.random() * 1.15;
+      : 'rgba(255,255,255,' + (al * 0.55) + ')';
+    g.lineWidth = 0.28 + Math.random() * 0.90;
     g.beginPath();
     g.arc(cx, cy, r, a0, a0 + sp);
     g.stroke();
   }
-  // Fine radial scratches — very subtle
-  for (var j = 0; j < 52; j++) {
+
+  // ── Intentional wear scratches — 6–9 deliberate lines, aesthetic placement ──
+  // These are the marks of a life lived. Shallow, refined, not random damage.
+  var wearMarks = [
+    { x0: 0.18, y0: 0.31, x1: 0.62, y1: 0.29, al: 0.038, w: 0.55 },
+    { x0: 0.22, y0: 0.44, x1: 0.78, y1: 0.41, al: 0.028, w: 0.38 },
+    { x0: 0.38, y0: 0.58, x1: 0.82, y1: 0.55, al: 0.032, w: 0.45 },
+    { x0: 0.14, y0: 0.67, x1: 0.54, y1: 0.64, al: 0.022, w: 0.32 },
+    { x0: 0.52, y0: 0.22, x1: 0.88, y1: 0.20, al: 0.018, w: 0.28 },
+    { x0: 0.28, y0: 0.76, x1: 0.66, y1: 0.74, al: 0.026, w: 0.40 },
+    { x0: 0.60, y0: 0.35, x1: 0.94, y1: 0.33, al: 0.014, w: 0.22 },
+  ];
+  for (var wi = 0; wi < wearMarks.length; wi++) {
+    var wm = wearMarks[wi];
+    // Shadow pass (depth)
+    g.strokeStyle = 'rgba(0,0,0,' + wm.al + ')';
+    g.lineWidth   = wm.w;
+    g.beginPath();
+    g.moveTo(wm.x0 * size, wm.y0 * size);
+    g.lineTo(wm.x1 * size, wm.y1 * size);
+    g.stroke();
+    // Highlight pass (light catching the groove edge — platinum gleam)
+    g.strokeStyle = 'rgba(255,255,255,' + (wm.al * 0.60) + ')';
+    g.lineWidth   = wm.w * 0.5;
+    g.beginPath();
+    g.moveTo(wm.x0 * size, wm.y0 * size - 0.5);
+    g.lineTo(wm.x1 * size, wm.y1 * size - 0.5);
+    g.stroke();
+  }
+
+  // ── Micro-scratches — fine field noise, very subtle ──
+  for (var j = 0; j < 48; j++) {
     var x  = Math.random() * size;
     var y  = Math.random() * size;
     var a  = Math.random() * Math.PI;
-    var ln = 7 + Math.random() * 58;
-    g.strokeStyle = 'rgba(0,0,0,' + (0.010 + Math.random() * 0.026) + ')';
-    g.lineWidth   = 0.28;
+    var ln = 4 + Math.random() * 44;
+    g.strokeStyle = 'rgba(0,0,0,' + (0.006 + Math.random() * 0.018) + ')';
+    g.lineWidth   = 0.22;
     g.beginPath();
     g.moveTo(x, y);
     g.lineTo(x + Math.cos(a) * ln, y + Math.sin(a) * ln);
     g.stroke();
   }
+
   return new THREE.CanvasTexture(c);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   OLED STAR FIELD (precomputed, stable positions)
+   OLED STAR FIELD — intentional, hand-placed minimal constellation
+   ───────────────────────────────────────────────────────────────
+   18 stars. Hand-positioned so they feel considered, not random.
+   Sizes and twinkle frequencies are unique per star.
+   Two "anchor" stars (sz≥1.8) give the field a natural focal weight.
+   All dots — no crosses — keeps it disciplined and quiet.
+   Opacity is driven by the locket's facing angle so stars literally
+   "wake up" as the screen turns toward you.
 ═══════════════════════════════════════════════════════════════ */
-var oledStars = (function() {
-  var s = [];
-  for (var i = 0; i < 40; i++) {
-    s.push({
-      x:    Math.random(),
-      y:    Math.random(),
-      phase:Math.random() * Math.PI * 2,
-      freq: 0.65 + Math.random() * 2.5,
-      size: 0.75 + Math.random() * 1.55,
-      type: Math.random() > 0.52 ? 'cross' : 'dot'
-    });
-  }
-  return s;
-}());
+var oledStars = [
+  // x, y are 0-1 on the disc face (will be mapped to canvas coords)
+  // phase offsets are spread manually so no two stars pulse together
+  // freq: slow (0.28–0.9) — barely perceptible flicker, not a rave
+  // sz: 0.55–2.0 px at 512px canvas — very fine
+  { x:0.22, y:0.19, phase:0.00, freq:0.38, sz:1.10 }, // upper-left cluster anchor
+  { x:0.31, y:0.14, phase:1.80, freq:0.62, sz:0.65 },
+  { x:0.18, y:0.30, phase:3.40, freq:0.44, sz:0.55 },
+  { x:0.74, y:0.18, phase:0.90, freq:0.30, sz:0.80 }, // upper-right
+  { x:0.84, y:0.28, phase:2.20, freq:0.52, sz:1.90 }, // right anchor — brightest
+  { x:0.78, y:0.38, phase:4.10, freq:0.36, sz:0.60 },
+  { x:0.13, y:0.52, phase:1.10, freq:0.68, sz:0.70 }, // left mid
+  { x:0.08, y:0.64, phase:3.70, freq:0.40, sz:0.55 },
+  { x:0.88, y:0.55, phase:0.50, freq:0.58, sz:0.65 }, // right mid
+  { x:0.64, y:0.64, phase:2.60, freq:0.34, sz:2.00 }, // lower-right anchor — largest
+  { x:0.76, y:0.72, phase:4.90, freq:0.48, sz:0.58 },
+  { x:0.20, y:0.74, phase:1.50, freq:0.72, sz:0.75 }, // lower-left
+  { x:0.30, y:0.82, phase:3.10, freq:0.42, sz:0.55 },
+  { x:0.50, y:0.82, phase:0.30, freq:0.60, sz:0.65 }, // bottom center
+  { x:0.44, y:0.20, phase:2.80, freq:0.50, sz:0.60 }, // top center-left
+  { x:0.58, y:0.12, phase:5.20, freq:0.32, sz:0.70 }, // top center-right
+  { x:0.42, y:0.48, phase:1.70, freq:0.88, sz:0.55 }, // center scatter — slow pulse
+  { x:0.56, y:0.42, phase:4.30, freq:0.56, sz:0.55 }, // center scatter
+];
 
 /* ═══════════════════════════════════════════════════════════════
-   BACK FACE CANVAS — white brushed silver + deep engraving
+   BACK FACE CANVAS — platinum white brushed silver + engraving
 ═══════════════════════════════════════════════════════════════ */
 var backCanvas  = document.createElement('canvas');
 backCanvas.width = 512; backCanvas.height = 512;
 var bCtx = backCanvas.getContext('2d');
 var bW = 512, bH = 512, bcx = bW / 2, bcy = bH / 2;
-var backTexture; // assigned after scene setup
+var backTexture;
 
 function drawBack(t) {
   var ctx = bCtx;
   ctx.clearRect(0, 0, bW, bH);
 
-  // White-silver radial gradient (matches the 3D body color)
-  var bgrd = ctx.createRadialGradient(bcx * 0.60, bcy * 0.50, 0, bcx, bcy, bcx * 1.02);
-  bgrd.addColorStop(0,    '#eaeaee');
-  bgrd.addColorStop(0.38, '#d5d5d9');
-  bgrd.addColorStop(0.72, '#bebebc');
-  bgrd.addColorStop(1,    '#a5a5aa');
+  // Platinum-white radial gradient — very light, high key
+  var bgrd = ctx.createRadialGradient(bcx * 0.55, bcy * 0.46, 0, bcx, bcy, bcx * 1.02);
+  bgrd.addColorStop(0,    '#f4f4f2');
+  bgrd.addColorStop(0.32, '#e8e8e6');
+  bgrd.addColorStop(0.65, '#d4d4d2');
+  bgrd.addColorStop(1,    '#b8b8bc');
   ctx.beginPath();
   ctx.arc(bcx, bcy, bcx, 0, Math.PI * 2);
   ctx.fillStyle = bgrd;
@@ -386,73 +429,83 @@ function drawBack(t) {
   ctx.arc(bcx, bcy, bcx, 0, Math.PI * 2);
   ctx.clip();
 
-  // Circular grain rings
-  for (var i = 0; i < 14; i++) {
+  // Circular grain rings — light, platinum-appropriate
+  for (var i = 0; i < 18; i++) {
     ctx.beginPath();
-    ctx.arc(bcx, bcy, 20 + i * 37, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(0,0,0,' + (0.024 - i * 0.0012) + ')';
-    ctx.lineWidth = 0.42;
+    ctx.arc(bcx, bcy, 14 + i * 29, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,0,0,' + (0.018 - i * 0.0006) + ')';
+    ctx.lineWidth = 0.38;
     ctx.stroke();
   }
 
-  // Top-left specular highlight
-  var shGrd = ctx.createRadialGradient(bcx * 0.42, bcy * 0.38, 0, bcx * 0.56, bcy * 0.46, bcx * 0.88);
-  shGrd.addColorStop(0, 'rgba(255,255,255,0.28)');
+  // Back-face wear scratches (2 subtle ones — character, not damage)
+  var bwm = [
+    { x0: 0.20, y0: 0.38, x1: 0.72, y1: 0.36, al: 0.030, w: 0.50 },
+    { x0: 0.34, y0: 0.62, x1: 0.78, y1: 0.60, al: 0.020, w: 0.34 },
+  ];
+  for (var bi = 0; bi < bwm.length; bi++) {
+    var bw = bwm[bi];
+    ctx.strokeStyle = 'rgba(0,0,0,' + bw.al + ')';
+    ctx.lineWidth   = bw.w;
+    ctx.beginPath();
+    ctx.moveTo(bw.x0 * bW, bw.y0 * bH);
+    ctx.lineTo(bw.x1 * bW, bw.y1 * bH);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,' + (bw.al * 0.5) + ')';
+    ctx.lineWidth   = bw.w * 0.4;
+    ctx.beginPath();
+    ctx.moveTo(bw.x0 * bW, bw.y0 * bH - 0.5);
+    ctx.lineTo(bw.x1 * bW, bw.y1 * bH - 0.5);
+    ctx.stroke();
+  }
+
+  // Specular highlight — top-left, crisp platinum glare
+  var shGrd = ctx.createRadialGradient(bcx * 0.38, bcy * 0.34, 0, bcx * 0.52, bcy * 0.44, bcx * 0.82);
+  shGrd.addColorStop(0, 'rgba(255,255,255,0.36)');
   shGrd.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = shGrd;
   ctx.fillRect(0, 0, bW, bH);
 
-  /* ──────────────────────────────────────
-     ENGRAVED "CHRONIS"
-     Technique: stamped-in depth using
-     layered shadow/highlight offsets on
-     a lighter-than-surface ground.
-  ────────────────────────────────────── */
+  /* ── ENGRAVED "CHRONIS" ── */
   ctx.font = '300 50px "Cormorant Garamond", Georgia, serif';
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
   var ty = bcy + 2;
 
-  // Layer 1 — deep groove shadow (bottom-right, simulates recessed depth)
-  ctx.fillStyle = 'rgba(0,0,0,0.56)';
+  ctx.fillStyle = 'rgba(0,0,0,0.52)';
   ctx.fillText('CHRONIS', bcx + 1.9, ty + 1.9);
-  // Layer 2 — secondary shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.30)';
+  ctx.fillStyle = 'rgba(0,0,0,0.28)';
   ctx.fillText('CHRONIS', bcx + 1.0, ty + 1.0);
-  // Layer 3 — groove floor (darker than surface, like a cut channel)
-  ctx.fillStyle = 'rgba(58,58,68,0.52)';
+  ctx.fillStyle = 'rgba(72,72,82,0.46)';
   ctx.fillText('CHRONIS', bcx, ty);
-  // Layer 4 — top-left highlight (light catching the beveled groove edge)
-  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.fillStyle = 'rgba(255,255,255,0.28)';
   ctx.fillText('CHRONIS', bcx - 0.75, ty - 0.75);
 
-  // Fine decorative rule (engraved line below text)
-  ctx.strokeStyle = 'rgba(0,0,0,0.22)';
-  ctx.lineWidth   = 0.75;
+  // Engraved rule
+  ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+  ctx.lineWidth   = 0.65;
   ctx.beginPath();
   ctx.moveTo(bcx - 56, ty + 38);
   ctx.lineTo(bcx + 56, ty + 38);
   ctx.stroke();
-  ctx.strokeStyle = 'rgba(255,255,255,0.14)';
-  ctx.lineWidth   = 0.45;
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.lineWidth   = 0.40;
   ctx.beginPath();
   ctx.moveTo(bcx - 56, ty + 39.2);
   ctx.lineTo(bcx + 56, ty + 39.2);
   ctx.stroke();
 
-  /* ────────────────────────────────────
-     NEON ARC — bottom of back face
-  ──────────────────────────────────── */
+  /* ── NEON ARC ── */
   var arcRadius = 208;
   var arcStart  = 205 * Math.PI / 180;
   var arcEnd    = 335 * Math.PI / 180;
   var f = 0.72 + Math.sin(t * 4.3) * 0.10 + Math.cos(t * 7.1) * 0.06 + Math.sin(t * 2.9) * 0.04;
 
   ctx.save();
-  ctx.strokeStyle = 'rgba(124,58,237,' + (f * 0.20) + ')';
+  ctx.strokeStyle = 'rgba(124,58,237,' + (f * 0.22) + ')';
   ctx.lineWidth   = 9;
-  ctx.shadowColor = 'rgba(167,139,250,' + (f * 0.48) + ')';
-  ctx.shadowBlur  = 13;
+  ctx.shadowColor = 'rgba(167,139,250,' + (f * 0.52) + ')';
+  ctx.shadowBlur  = 14;
   ctx.beginPath();
   ctx.arc(bcx, bcy, arcRadius, arcStart, arcEnd);
   ctx.stroke();
@@ -463,9 +516,9 @@ function drawBack(t) {
     bcx + Math.cos(arcEnd)   * arcRadius, bcy + Math.sin(arcEnd)   * arcRadius
   );
   arcGrad.addColorStop(0,    'rgba(124,58,237,0)');
-  arcGrad.addColorStop(0.18, 'rgba(167,139,250,' + (f * 0.75) + ')');
+  arcGrad.addColorStop(0.18, 'rgba(167,139,250,' + (f * 0.78) + ')');
   arcGrad.addColorStop(0.50, 'rgba(196,181,253,' + f + ')');
-  arcGrad.addColorStop(0.82, 'rgba(167,139,250,' + (f * 0.75) + ')');
+  arcGrad.addColorStop(0.82, 'rgba(167,139,250,' + (f * 0.78) + ')');
   arcGrad.addColorStop(1,    'rgba(124,58,237,0)');
   ctx.save();
   ctx.strokeStyle = arcGrad;
@@ -475,7 +528,7 @@ function drawBack(t) {
   ctx.stroke();
   ctx.restore();
 
-  ctx.restore(); // end clip
+  ctx.restore();
 
   if (backTexture) backTexture.needsUpdate = true;
 }
@@ -491,7 +544,7 @@ renderer.setClearColor(0x050505, 1);
 renderer.physicallyCorrectLights = true;
 renderer.outputEncoding          = THREE.sRGBEncoding;
 renderer.toneMapping             = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure     = 1.06;
+renderer.toneMappingExposure     = 1.08;
 
 var scene  = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
@@ -513,32 +566,39 @@ var scratchTex = makeBrushedTexture(512);
 scratchTex.wrapS = scratchTex.wrapT = THREE.RepeatWrapping;
 
 /* ════════════════════════════════════
-   MATERIALS — White brushed silver
+   MATERIALS — Platinum White
+   The whole palette shifts to a brighter,
+   cooler white-platinum register.
+   Scratches on roughnessMap catch light
+   differently than the smooth field.
 ════════════════════════════════════ */
-// Main body: near-white silver with brushed roughness map
+// Main body: near-white platinum with brushed roughness
 var mPlat = new THREE.MeshStandardMaterial({
-  color:        0xeeeeed,
-  metalness:    0.97,
-  roughness:    0.15,
-  roughnessMap: scratchTex
+  color:        0xf0f0ee,   // warm platinum white
+  metalness:    0.98,
+  roughness:    0.12,       // lower = more mirror-like base
+  roughnessMap: scratchTex  // scratches break the shine selectively
 });
-// Groove / dark accents (slightly lower, catches shadow)
+
+// Edge / groove accents — slightly greyer than body
 var mPlatDark = new THREE.MeshStandardMaterial({
-  color:     0xb2b2b6,
-  metalness: 0.93,
-  roughness: 0.24
+  color:     0x9a9aa0,      // medium grey accent
+  metalness: 0.92,
+  roughness: 0.28
 });
-// Chrome bezel — mirror polished
+
+// Chrome bezel — mirror-polished platinum edge
 var mChrome = new THREE.MeshStandardMaterial({
-  color:     0xfafaf8,
+  color:     0xffffff,
   metalness: 1.0,
-  roughness: 0.018
+  roughness: 0.010          // near-perfect mirror
 });
-// Chain — fine-link silver
+
+// Chain — bright silver links
 var mChain = new THREE.MeshStandardMaterial({
-  color:     0xe0e0e4,
+  color:     0xeaeaee,
   metalness: 0.98,
-  roughness: 0.045
+  roughness: 0.038
 });
 
 /* ── OLED SCREEN TEXTURE CANVAS ── */
@@ -547,124 +607,179 @@ oledCanvasT.width = 512; oledCanvasT.height = 512;
 var oledTexture3 = new THREE.CanvasTexture(oledCanvasT);
 var oledTCtx     = oledCanvasT.getContext('2d');
 
-/* ────────────────────────────────────────────────────────────
-   OLED DRAW — animated gradient fill + star field
-   The word CHRONIS reveals left→right with a sweeping
-   silver-white gradient, then breathes gently.
-   Subtle 4-point stars twinkle independently in the bg.
-──────────────────────────────────────────────────────────── */
 function drawOledTexture(t) {
   var ctx = oledTCtx;
   var W = 512, H = 512, cx = W / 2, cy = H / 2;
   ctx.clearRect(0, 0, W, H);
 
-  // Black disc base
+  /* ── Facing factor ─────────────────────────────────────────────
+     curRotY is the live Y-rotation of the locket group (outer scope).
+     cos(curRotY) = 1 when front faces camera, -1 when back faces camera.
+     We clamp to [0,1] and apply smoothstep so the transition is
+     silky — not linear. This single value drives EVERYTHING below.
+  ──────────────────────────────────────────────────────────────── */
+  var raw   = Math.max(0, Math.min(1, Math.cos(curRotY)));
+  // smoothstep — cubic ease, eliminates the abrupt start at edge-on
+  var face  = raw * raw * (3 - 2 * raw);
+  // Slightly more aggressive curve for text fill (hold off until well-turned)
+  var fillP = Math.max(0, Math.min(1, (face - 0.18) / 0.72));
+  fillP     = fillP * fillP * (3 - 2 * fillP); // double smooth
+
+  /* ── Pure black disc base ── */
   ctx.beginPath();
   ctx.arc(cx, cy, cx, 0, Math.PI * 2);
-  ctx.fillStyle = '#000000';
+  ctx.fillStyle = '#000';
   ctx.fill();
 
+  /* ── Clip everything inside the disc ── */
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, cx, 0, Math.PI * 2);
   ctx.clip();
 
-  // Very faint inner purple atmosphere
-  var bg = ctx.createRadialGradient(cx, cy, cx * 0.15, cx, cy, cx * 0.97);
-  bg.addColorStop(0, 'rgba(20,7,42,0.58)');
-  bg.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-
-  // ── Star field ──
-  for (var si = 0; si < oledStars.length; si++) {
-    var s  = oledStars[si];
-    var a  = Math.pow((Math.sin(t * s.freq + s.phase) + 1) / 2, 2.5);
-    if (a < 0.04) continue;
-    var sx = cx + (s.x - 0.5) * cx * 1.65;
-    var sy = cy + (s.y - 0.5) * cy * 1.65;
-    if (Math.sqrt((sx - cx) * (sx - cx) + (sy - cy) * (sy - cy)) > cx * 0.91) continue;
-    ctx.save();
-    ctx.globalAlpha = a * 0.50;
-    ctx.fillStyle   = '#ffffff';
-    ctx.translate(sx, sy);
-    var sz = s.size * 1.35;
-    if (s.type === 'cross') {
-      // 4-point star — thin cross
-      ctx.fillRect(-sz * 0.15, -sz * 1.22, sz * 0.30, sz * 2.44);
-      ctx.fillRect(-sz * 1.22, -sz * 0.15, sz * 2.44, sz * 0.30);
-    } else {
-      ctx.beginPath();
-      ctx.arc(0, 0, sz, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
+  /* ── Very faint deep-violet atmosphere — only visible when screen faces you ── */
+  if (face > 0.05) {
+    var bg = ctx.createRadialGradient(cx, cy, cx * 0.08, cx, cy, cx * 0.96);
+    bg.addColorStop(0, 'rgba(14,5,30,' + (face * 0.52) + ')');
+    bg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
   }
 
-  /* ── CHRONIS — animated gradient fill ──
-     Period: 5.5s
-     Phase 0→1.8s : fill sweeps left→right
-     Phase 1.8s+   : full text breathes gently
-  */
+  /* ══════════════════════════════════════════════════════════════
+     INTENTIONAL STAR FIELD
+     ──────────────────────────────────────────────────────────────
+     Stars have two opacity layers:
+       1. Base presence:  driven by `face` — they exist as the
+          screen turns toward you, black when turned away.
+       2. Individual twinkle: very slow sine, low amplitude.
+          The twinkle is additive but capped so no star ever blows
+          out — they breathe, they don't shout.
+
+     All dots. Clean. Considered. The two anchor stars (sz≥1.8)
+     get a tiny soft glow halo to give the field depth without
+     adding complexity.
+  ══════════════════════════════════════════════════════════════ */
+  if (face > 0.04) {
+    for (var si = 0; si < oledStars.length; si++) {
+      var st = oledStars[si];
+
+      // Twinkle: sine wave, amplitude only 18% of base — almost imperceptible
+      var twinkle = (Math.sin(t * st.freq * Math.PI * 2 + st.phase) + 1) * 0.5;
+      twinkle     = twinkle * twinkle; // square for sharper but still smooth blink
+
+      // Base opacity: face drives it, twinkle modulates gently on top
+      var starBase  = face * 0.30;             // max base = 0.30 when fully facing
+      var starAlpha = starBase + twinkle * face * 0.14; // twinkle adds up to 0.14
+      starAlpha     = Math.min(starAlpha, 0.44); // hard cap — no blown-out stars
+
+      if (starAlpha < 0.02) continue;
+
+      // Map [0,1] coords to disc, keeping them within the circle boundary
+      var sx = cx + (st.x - 0.5) * W * 0.84;
+      var sy = cy + (st.y - 0.5) * H * 0.84;
+      // Reject if outside disc radius (with 8% margin inside edge)
+      var dist = Math.sqrt((sx - cx) * (sx - cx) + (sy - cy) * (sy - cy));
+      if (dist > cx * 0.88) continue;
+
+      ctx.save();
+      ctx.translate(sx, sy);
+
+      // Anchor stars (sz≥1.8) get a soft halo — very subtle, 1px feather
+      if (st.sz >= 1.8) {
+        var halo = ctx.createRadialGradient(0, 0, 0, 0, 0, st.sz * 3.5);
+        halo.addColorStop(0, 'rgba(255,255,255,' + (starAlpha * 0.28) + ')');
+        halo.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(0, 0, st.sz * 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Core dot — crisp, round
+      ctx.globalAlpha = starAlpha;
+      ctx.fillStyle   = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, st.sz, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     CHRONIS — white gradient fill driven by facing angle
+     ──────────────────────────────────────────────────────────────
+     fillP maps the rotation to a 0→1 fill progress.
+     Clip rect sweeps left→right (C to S) as fillP increases.
+     A leading-edge shimmer rides the fill boundary.
+     The rule below the text fades in with the fill.
+     Everything fades back out when locket turns away.
+  ══════════════════════════════════════════════════════════════ */
   ctx.font         = '300 66px "Cormorant Garamond", Georgia, serif';
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
   var textY   = cy - 10;
-  var textHW  = 130; // approx half-width of CHRONIS at 66px Cormorant
+  // Half-width of "CHRONIS" at 66px Cormorant ≈ 132px; measured conservatively
+  var textHW  = 132;
+  var textFull = textHW * 2 + 8; // full clip span
 
-  var period  = 5.5;
-  var ph      = t % period;
-  var fillDur = 1.8;
-  var fillP   = ph < fillDur ? ph / fillDur : 1.0;
-  var bright  = fillP < 1
-    ? (0.12 + fillP * 0.64)
-    : (0.76 + Math.sin(t * 0.88) * 0.068);
-
-  // Ghost base (always present, very dim — like unlit substrate)
-  ctx.fillStyle = 'rgba(255,255,255,' + Math.min(bright * 0.26, 0.20) + ')';
-  ctx.fillText('CHRONIS', cx, textY);
-
-  // Gradient fill revealed progressively via clip
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(cx - textHW - 22, textY - 58, (textHW * 2 + 44) * fillP, 116);
-  ctx.clip();
-
-  var tGrad = ctx.createLinearGradient(cx - textHW, 0, cx + textHW, 0);
-  tGrad.addColorStop(0,    'rgba(200,200,215,' + bright + ')');
-  tGrad.addColorStop(0.40, 'rgba(255,255,255,' + Math.min(bright * 1.14, 1) + ')');
-  tGrad.addColorStop(0.75, 'rgba(228,228,238,' + (bright * 0.96) + ')');
-  tGrad.addColorStop(1,    'rgba(195,195,210,' + (bright * 0.88) + ')');
-  ctx.fillStyle = tGrad;
-  ctx.fillText('CHRONIS', cx, textY);
-
-  // Leading-edge shine (only while fill is in progress)
-  if (fillP < 0.97) {
-    var edgeX = cx - textHW + fillP * (textHW * 2);
-    var eGrad = ctx.createLinearGradient(edgeX - 24, 0, edgeX + 10, 0);
-    eGrad.addColorStop(0, 'rgba(255,255,255,0)');
-    eGrad.addColorStop(1, 'rgba(255,255,255,0.55)');
-    ctx.fillStyle = eGrad;
+  // Ghost substrate — very dim, always present when even slightly facing
+  if (face > 0.05) {
+    ctx.fillStyle = 'rgba(255,255,255,' + (face * 0.08) + ')';
     ctx.fillText('CHRONIS', cx, textY);
   }
-  ctx.restore();
 
-  // Thin rule below — fades in with the fill
-  var rOpacity = 0.05 + fillP * 0.16;
-  ctx.strokeStyle = 'rgba(255,255,255,' + rOpacity + ')';
-  ctx.lineWidth   = 1.1;
-  ctx.beginPath();
-  ctx.moveTo(cx - 74, textY + 36);
-  ctx.lineTo(cx + 74, textY + 36);
-  ctx.stroke();
+  // Bright fill — revealed left→right by clip
+  if (fillP > 0.001) {
+    var bright = fillP * (0.82 + Math.sin(t * 0.72) * 0.03 * fillP); // subtle breathe at full reveal
 
-  ctx.restore(); // end circle clip
+    ctx.save();
+    // Clip rect: starts at C (left edge), sweeps to S (right edge)
+    var clipW = textFull * fillP;
+    ctx.beginPath();
+    ctx.rect(cx - textHW - 4, textY - 56, clipW, 112);
+    ctx.clip();
 
-  // Subtle purple edge ring
+    // White gradient: slightly cooler at left (C), brightest at centre, cool again at S
+    var tGrad = ctx.createLinearGradient(cx - textHW, 0, cx + textHW, 0);
+    tGrad.addColorStop(0,    'rgba(210,212,220,' + bright + ')');
+    tGrad.addColorStop(0.35, 'rgba(255,255,255,' + Math.min(bright * 1.08, 1) + ')');
+    tGrad.addColorStop(0.62, 'rgba(240,240,248,' + (bright * 0.98) + ')');
+    tGrad.addColorStop(1,    'rgba(205,208,218,' + (bright * 0.90) + ')');
+    ctx.fillStyle = tGrad;
+    ctx.fillText('CHRONIS', cx, textY);
+
+    // Leading-edge shimmer — a narrow bright sliver riding the fill front
+    if (fillP < 0.96) {
+      var edgeX = (cx - textHW - 4) + clipW;
+      var shimW  = 18 + fillP * 10; // shimmer widens slightly as fill progresses
+      var eGrad  = ctx.createLinearGradient(edgeX - shimW, 0, edgeX, 0);
+      eGrad.addColorStop(0, 'rgba(255,255,255,0)');
+      eGrad.addColorStop(1, 'rgba(255,255,255,' + (bright * 0.60) + ')');
+      ctx.fillStyle = eGrad;
+      ctx.fillText('CHRONIS', cx, textY);
+    }
+
+    ctx.restore();
+
+    // Fine rule — fades in beneath the text as fill completes
+    var rAlpha = fillP * 0.20;
+    ctx.strokeStyle = 'rgba(255,255,255,' + rAlpha + ')';
+    ctx.lineWidth   = 0.85;
+    ctx.beginPath();
+    ctx.moveTo(cx - 68, textY + 36);
+    ctx.lineTo(cx + 68, textY + 36);
+    ctx.stroke();
+  }
+
+  ctx.restore(); // end disc clip
+
+  // Subtle purple edge ring — always at fixed opacity (it's the bezel, not the screen)
   ctx.beginPath();
   ctx.arc(cx, cy, cx - 1.5, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(167,139,250,0.18)';
-  ctx.lineWidth   = 2.5;
+  ctx.strokeStyle = 'rgba(167,139,250,0.16)';
+  ctx.lineWidth   = 2.2;
   ctx.stroke();
 
   oledTexture3.needsUpdate = true;
@@ -681,12 +796,12 @@ var mScreen = new THREE.MeshStandardMaterial({
   emissiveIntensity:0.28
 });
 
-/* ── BACK MATERIAL (white silver, canvas map) ── */
+/* ── BACK MATERIAL ── */
 backTexture = new THREE.CanvasTexture(backCanvas);
 var mBack = new THREE.MeshStandardMaterial({
-  color:        0xcacace,
-  metalness:    0.91,
-  roughness:    0.20,
+  color:        0xd8d8dc,
+  metalness:    0.94,
+  roughness:    0.16,
   map:          backTexture,
   roughnessMap: scratchTex
 });
@@ -716,7 +831,6 @@ var mArc = new THREE.MeshStandardMaterial({
 var G = new THREE.Group();
 scene.add(G);
 
-// Main disc body — CylinderGeometry, rotated so caps face ±Z
 var body = new THREE.Mesh(
   new THREE.CylinderGeometry(1.42, 1.42, 0.285, 128, 1, false),
   mPlat
@@ -724,41 +838,33 @@ var body = new THREE.Mesh(
 body.rotation.x = Math.PI / 2;
 G.add(body);
 
-// Equator groove
 G.add(Object.assign(new THREE.Mesh(new THREE.TorusGeometry(1.42, 0.0095, 8, 128), mPlatDark), {}));
 
-// Inner accent ring (front face, slight z offset)
 var inner = new THREE.Mesh(new THREE.TorusGeometry(1.305, 0.0075, 8, 128), mPlatDark);
 inner.position.z = 0.125;
 G.add(inner);
 
-// Chrome bezel (front)
 var bezel = new THREE.Mesh(new THREE.TorusGeometry(1.295, 0.088, 20, 128), mChrome);
 bezel.position.z = 0.144;
 G.add(bezel);
 
-// OLED screen disc (front face)
 var scrn = new THREE.Mesh(new THREE.CircleGeometry(1.20, 128), mScreen);
 scrn.position.z = 0.143;
 G.add(scrn);
 
-// Purple emissive ring at screen border
 var sEdge = new THREE.Mesh(new THREE.TorusGeometry(1.20, 0.015, 8, 128), mAccent);
 sEdge.position.z = 0.144;
 G.add(sEdge);
 
-// Back disc
 var backDisc = new THREE.Mesh(new THREE.CircleGeometry(1.20, 128), mBack);
 backDisc.position.z = -0.143;
 backDisc.rotation.y = Math.PI;
 G.add(backDisc);
 
-// Chrome bezel (back, mirrored)
 var bezelBack = new THREE.Mesh(new THREE.TorusGeometry(1.295, 0.088, 20, 128), mChrome);
 bezelBack.position.z = -0.144;
 G.add(bezelBack);
 
-// Neon arc on back (partial torus, 130°, centered at bottom)
 var arcMesh = new THREE.Mesh(
   new THREE.TorusGeometry(1.18, 0.010, 8, 64, Math.PI * 130 / 180),
   mArc
@@ -767,23 +873,15 @@ arcMesh.position.z = -0.145;
 arcMesh.rotation.z = 205 * Math.PI / 180;
 G.add(arcMesh);
 
-// Hinge knuckle (top center)
 var hinge = new THREE.Mesh(new THREE.CylinderGeometry(0.054, 0.054, 0.275, 18), mPlat);
 hinge.position.set(0, 1.43, 0);
 G.add(hinge);
 
-// Central bail ring — both chain strands thread through here
 var bail = new THREE.Mesh(new THREE.TorusGeometry(0.110, 0.034, 12, 32), mChain);
 bail.position.set(0, 1.62, 0);
 bail.rotation.x = Math.PI / 2;
 G.add(bail);
 
-/* ══════════════════════════════════════════════════════
-   TWO-STRAND CHAIN
-   Each side starts at the bail, diverges outward with
-   alternating flat/standing links (interlocked visual).
-   Standing links are tilted to follow the diverging path.
-══════════════════════════════════════════════════════ */
 (function buildChains() {
   var cR     = 0.060;
   var cTube  = 0.015;
@@ -800,7 +898,6 @@ G.add(bail);
       if (i % 2 === 0) {
         lk.rotation.x = Math.PI / 2;
       } else {
-        // Tilt to naturally follow the diverging direction
         lk.rotation.z = Math.atan2(0.034, cStep) * side * 0.48;
       }
       G.add(lk);
@@ -808,22 +905,13 @@ G.add(bail);
   }
 }());
 
-/* ══════════════════════════════════════
-   MINIMAL SIDE CONTROL
-   A barely-visible groove arc pressed into
-   the right equator edge, with a hair-thin
-   capacitive pip — nearly flush, intentional.
-══════════════════════════════════════ */
-// Groove: thin partial torus arc on right side of disc edge
 var ctrlGroove = new THREE.Mesh(
   new THREE.TorusGeometry(1.424, 0.0042, 8, 80, Math.PI * 0.38),
   mPlatDark
 );
-// Center the arc on the positive-X side
 ctrlGroove.rotation.z = -Math.PI * 0.19;
 G.add(ctrlGroove);
 
-// Tactile pip — tiny accent dot, nearly flush
 var pip = new THREE.Mesh(
   new THREE.CylinderGeometry(0.010, 0.010, 0.006, 14),
   mAccent
@@ -847,19 +935,22 @@ scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({
 })));
 
 /* ══════════════════════════════════
-   LIGHTING
-   Key (warm, upper-right front)   → bright highlights on silver
-   Fill (cool blue, left)          → depth in shadows
-   Rim (purple, behind/below)      → signature purple edge bloom
-   Hemisphere + ambient            → fills the scene
+   LIGHTING — tuned for platinum white
+   Key is warmer and brighter to create
+   the characteristic hot-white specular
+   that platinum is known for.
+   Fill is cool blue-grey for contrast.
+   Rim stays purple for brand identity.
 ══════════════════════════════════ */
-scene.add(new THREE.AmbientLight(0xffffff, 0.16));
-scene.add(new THREE.HemisphereLight(0xdde8ff, 0x553377, 0.58));
-var keyL  = new THREE.PointLight(0xfff8f0, 6.4, 26); keyL.position.set(4.5, 5.5, 5.0);  scene.add(keyL);
-var fillL = new THREE.PointLight(0xd0e0ff, 1.7, 20); fillL.position.set(-5.0, 2.0, 3.0);scene.add(fillL);
+scene.add(new THREE.AmbientLight(0xffffff, 0.20));
+scene.add(new THREE.HemisphereLight(0xe8eeff, 0x553377, 0.62));
+var keyL  = new THREE.PointLight(0xfff6e8, 7.8, 26); keyL.position.set(4.5, 5.5, 5.0);  scene.add(keyL);
+var fillL = new THREE.PointLight(0xc8d8f8, 2.0, 20); fillL.position.set(-5.0, 2.0, 3.0);scene.add(fillL);
 var rimL  = new THREE.PointLight(0x7c3aed, 9.2, 20); rimL.position.set(0.5, -4.5, -6.0); scene.add(rimL);
-var topL  = new THREE.PointLight(0xffffff, 1.5, 14); topL.position.set(0, 6.5, 2.0);    scene.add(topL);
-var sideL = new THREE.PointLight(0xaaaacc, 1.0, 14); sideL.position.set(-3, -2, 3);     scene.add(sideL);
+var topL  = new THREE.PointLight(0xffffff, 2.2, 14); topL.position.set(0, 6.5, 2.0);    scene.add(topL);
+var sideL = new THREE.PointLight(0xc0c8e0, 1.2, 14); sideL.position.set(-3, -2, 3);     scene.add(sideL);
+// Extra top-right fill to make scratches readable as light-catching grooves
+var hlL   = new THREE.PointLight(0xffffff, 1.4, 10); hlL.position.set(3.5, 3.0, 4.5);  scene.add(hlL);
 
 /* ── RESPONSIVE SCALE ── */
 function applyScale() {
@@ -869,6 +960,59 @@ function applyScale() {
   G.scale.setScalar(s);
 }
 applyScale();
+
+/* ════════════════════════════════════════════════════════════
+   MOUSE / TOUCH INTERACTION
+   ─────────────────────────────────────────────────────────
+   Pointer over the hero tilts the locket toward the cursor,
+   like holding a real object in your hand and turning it to
+   catch the light. Smooth lerp so it never snaps.
+
+   On touch: passive listeners so the browser can scroll
+   freely at any time — the locket interaction is secondary
+   to navigation, never blocking it.
+════════════════════════════════════════════════════════════ */
+var mx = 0, my = 0;          // normalized mouse [-1 … 1]
+var isPointer = false;        // mouse currently inside hero
+
+// Current smoothed rotation state
+var curRotX = 0, curRotY = 0;
+// Auto-rotation accumulator (keeps incrementing independent of interaction)
+var autoRotY = 0;
+
+hero.addEventListener('mousemove', function(e) {
+  var r = hero.getBoundingClientRect();
+  mx = ((e.clientX - r.left) / r.width  - 0.5) * 2;
+  my = ((e.clientY - r.top)  / r.height - 0.5) * 2;
+  isPointer = true;
+  // Hide the hint once user interacts
+  document.getElementById('ihint').classList.add('gone');
+});
+hero.addEventListener('mouseleave', function() {
+  isPointer = false;
+});
+
+// Touch — passive so scroll is NEVER blocked
+hero.addEventListener('touchstart', function(e) {
+  var r = hero.getBoundingClientRect();
+  var t = e.touches[0];
+  mx = ((t.clientX - r.left) / r.width  - 0.5) * 2;
+  my = ((t.clientY - r.top)  / r.height - 0.5) * 2;
+  isPointer = true;
+  document.getElementById('ihint').classList.add('gone');
+}, { passive: true });
+
+hero.addEventListener('touchmove', function(e) {
+  var r = hero.getBoundingClientRect();
+  var t = e.touches[0];
+  mx = ((t.clientX - r.left) / r.width  - 0.5) * 2;
+  my = ((t.clientY - r.top)  / r.height - 0.5) * 2;
+  isPointer = true;
+}, { passive: true });  // passive:true = browser handles scroll, we just read coords
+
+hero.addEventListener('touchend', function() {
+  isPointer = false;
+}, { passive: true });
 
 /* ── REVEAL ── */
 var revealed = false;
@@ -893,7 +1037,6 @@ function animate() {
   drawOledTexture(t);
   drawBack(t);
 
-  // Arc flicker
   mArc.emissiveIntensity = 0.62 + Math.sin(t * 4.3) * 0.12 + Math.cos(t * 7.1) * 0.07 + Math.sin(t * 2.8) * 0.05;
   mArc.opacity           = 0.72 + Math.sin(t * 3.7) * 0.10 + Math.cos(t * 5.9) * 0.06;
 
@@ -902,48 +1045,68 @@ function animate() {
   var scrollP = Math.max(0, Math.min(1, -hero.getBoundingClientRect().top / heroH));
   scrollLerp += (scrollP * 2.2 - scrollLerp) * 0.055;
 
-  // Float + rotation
+  // Auto-rotation accumulator
+  var autoSpeed = revealed ? 0.0034 : 0.0062;
+  autoRotY += autoSpeed;
+
+  /* ─── Rotation blending ─────────────────────────────────
+     When pointer is active: locket tilts toward cursor,
+     using autoRotY as the Y base so it keeps the
+     accumulated spin and just adds tilt on top of it.
+     When idle: gentle sine wave on X, drift back to autoRotY on Y.
+     Lerp factor 0.055–0.065 = ~60fps smoothing at 16ms frame.
+  ─────────────────────────────────────────────────────────── */
+  var targetX, targetY;
+  if (isPointer) {
+    // Parallax tilt — X axis flipped so locket tilts *toward* cursor naturally
+    targetX = -my * 0.48;
+    // Y follows horizontal cursor displacement from auto-spin base
+    targetY = autoRotY + mx * 0.72;
+  } else {
+    // Idle: breathe on X, track auto on Y
+    targetX = Math.sin(t * 0.36) * (revealed ? 0.055 : 0.092);
+    targetY = autoRotY;
+  }
+
+  var lerpF = isPointer ? 0.065 : 0.038;
+  curRotX  += (targetX - curRotX) * lerpF;
+  curRotY  += (targetY - curRotY) * lerpF;
+
+  G.rotation.x  = curRotX;
+  G.rotation.y  = curRotY;
   G.position.y  = Math.sin(t * 0.50) * 0.09 + scrollLerp;
-  G.rotation.y += revealed ? 0.0034 : 0.0062;
-  G.rotation.x  = Math.sin(t * 0.36) * (revealed ? 0.055 : 0.092);
 
   // Gentle camera drift
   camera.position.x = Math.sin(t * 0.16) * 0.18;
   camera.position.y = 0.10 + Math.cos(t * 0.24) * 0.12;
   camera.lookAt(0, 0.06, 0);
 
-  // Rim light breathe
   rimL.intensity = 9.2 + Math.sin(t * 0.62) * 1.8;
 
   renderer.render(scene, camera);
 }
 
-// Wait for fonts so Cormorant renders correctly in canvas
 document.fonts.ready.then(function() { animate(); drawBack(0); });
 
-/* ════════════════════════════════════════════════════
-   LIQUID CURSOR GLOW — price card border
-   The neon border flows toward wherever the cursor
-   is hovering, like mercury finding its level.
-════════════════════════════════════════════════════ */
+/* ── LIQUID CURSOR GLOW — price card border ── */
 (function initCardGlow() {
   var card = document.getElementById('pcard');
   var glow = document.getElementById('pcardGlow');
   if (!card || !glow) return;
 
-  var mx = 0.5, my = -0.3;
+  var cmx = 0.5, cmy = -0.3;
   var lx = 0.5, ly = -0.3;
 
-  card.addEventListener('mouseleave', function() { mx = 0.5; my = -0.3; });
+  card.addEventListener('mouseleave', function() { cmx = 0.5; cmy = -0.3; });
   card.addEventListener('mousemove', function(e) {
     var r = card.getBoundingClientRect();
-    mx = (e.clientX - r.left)  / r.width;
-    my = (e.clientY - r.top)   / r.height;
+    cmx = (e.clientX - r.left)  / r.width;
+    cmy = (e.clientY - r.top)   / r.height;
   });
 
   function loop() {
-    lx += (mx - lx) * 0.062;
-    ly += (my - ly) * 0.062;
+    lx += (cmx - lx) * 0.062;
+    ly += (cmy - ly) * 0.062;
     glow.style.setProperty('--gx', (lx * 100).toFixed(1) + '%');
     glow.style.setProperty('--gy', (ly * 100).toFixed(1) + '%');
     requestAnimationFrame(loop);
@@ -953,7 +1116,7 @@ document.fonts.ready.then(function() { animate(); drawBack(0); });
 
 /* ── BUY BUTTON ── */
 document.getElementById('buybtn').addEventListener('click', function() {
-  this.textContent  = 'Coming soon — join the waitlist';
+  this.textContent       = 'Coming soon — join the waitlist';
   this.style.background  = 'rgba(124,58,237,.22)';
   this.style.boxShadow   = 'none';
   this.style.cursor      = 'default';
@@ -963,7 +1126,7 @@ document.getElementById('buybtn').addEventListener('click', function() {
 /* ── FAQ ── */
 function tf(btn){ btn.closest('.fqi').classList.toggle('open'); }
 
-/* Scroll reveal for content sections */
+/* Scroll reveal */
 const obs = new IntersectionObserver(es=>{
   es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vs'); });
 },{threshold:.07, rootMargin:'0px 0px -30px 0px'});
