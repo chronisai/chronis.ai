@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Chronis Locket — A Physical Memory Interface</title>
+<meta name="description" content="The Chronis Locket. Precision-machined platinum. OLED face. Carry their presence with you.">
+<link rel="canonical" href="https://chronis.in/static/locket.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050505;--bg2:#0b0b0b;--bg3:#111;
+  --sf:rgba(255,255,255,.024);--sf2:rgba(255,255,255,.044);
+  --bd:rgba(255,255,255,.065);--bd2:rgba(255,255,255,.13);
+  --tx:#ece8e2;--mu:rgba(236,232,226,.36);--mu2:rgba(236,232,226,.60);--ch:rgba(236,232,226,.82);
+  --ne:#7c3aed;--ne2:#a78bfa;--ne3:#c4b5fd;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;background:rgba(5,5,5,.9);backdrop-filter:blur(28px);border-bottom:1px solid var(--bd)}
+.nl{font-family:var(--fd);font-size:18px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.nc{background:var(--tx);color:#000;font-size:12px;font-weight:600;padding:7px 16px;border-radius:7px;text-decoration:none;letter-spacing:.2px}
+
+/* HERO */
+#hero{position:relative;width:100%;height:100svh;overflow:hidden;background:var(--bg)}
+#c3{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;touch-action:none}
+#rui{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:9svh;transition:opacity .85s ease;pointer-events:none}
+#rui.g{opacity:0}
+#rui.gx{display:none}
+.rtb{text-align:center;pointer-events:all;animation:rUp 1.1s .6s ease both}
+@keyframes rUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.rle{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:rgba(196,181,253,.48);margin-bottom:12px;font-weight:500}
+.rh{font-family:var(--fd);font-size:clamp(32px,8vw,64px);font-weight:300;color:var(--ch);line-height:.97;letter-spacing:-1px;margin-bottom:9px}
+.rsb{font-size:12px;color:rgba(236,232,226,.25);letter-spacing:3px;text-transform:uppercase;margin-bottom:32px}
+.rbtn{display:inline-flex;align-items:center;gap:9px;background:none;border:1px solid rgba(167,139,250,.28);color:rgba(196,181,253,.72);font-family:var(--fb);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:12px 30px;border-radius:30px;cursor:pointer;transition:.3s}
+.rbtn:hover,.rbtn:focus{border-color:var(--ne2);color:var(--ne3);background:rgba(124,58,237,.07)}
+.rba{transition:transform .22s}
+.rbtn:hover .rba{transform:translateX(5px)}
+#hui{position:absolute;bottom:0;left:0;right:0;z-index:10;display:flex;flex-direction:column;align-items:center;padding-bottom:28px;opacity:0;transition:opacity .85s ease;pointer-events:none}
+#hui.s{opacity:1}
+.slbl{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(236,232,226,.16);margin-bottom:10px}
+.sln{width:1px;height:44px;background:linear-gradient(180deg,rgba(167,139,250,.32),transparent);animation:sp 2.2s ease-in-out infinite}
+@keyframes sp{0%,100%{transform:scaleY(1);opacity:.45}50%{transform:scaleY(1.35);opacity:1}}
+.hcl{position:absolute;top:72px;left:24px;z-index:10;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(236,232,226,.16);animation:rUp .8s 1.4s ease both;pointer-events:none}
+
+/* CONTENT */
+.pw{max-width:640px;margin:0 auto;padding:0 22px}
+.sec{padding:80px 0;border-top:1px solid var(--bd)}
+.ftxt .sey{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:14px;display:block}
+.ftxt h2{font-family:var(--fd);font-size:clamp(28px,7vw,50px);font-weight:300;line-height:1.08;letter-spacing:-.4px;color:var(--tx);margin-bottom:16px}
+.ftxt h2 em{font-style:italic;color:var(--mu2)}
+.ftxt p{font-size:14px;color:var(--mu);line-height:1.82;font-weight:300;margin-bottom:16px}
+.fvis{display:flex;align-items:center;justify-content:center;padding:44px 0 32px}
+
+/* Spec list */
+.sl{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+.si{display:flex;align-items:flex-start;gap:11px;font-size:13.5px;color:var(--mu);font-weight:300;line-height:1.5}
+.sd{width:5px;height:5px;border-radius:50%;background:var(--ne2);flex-shrink:0;margin-top:7px;box-shadow:0 0 5px var(--ne2)}
+
+/* Metal body CSS visual */
+.v-metal-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.v-metal-glow{position:absolute;width:180px;height:280px;background:radial-gradient(ellipse,rgba(124,58,237,.12) 0%,transparent 68%);pointer-events:none}
+.v-metal{width:62px;height:240px;border-radius:31px;background:linear-gradient(162deg,#f0f0ee 0%,#d8d8d6 18%,#b8b8bc 40%,#9a9a9e 70%,#7e7e84 100%);border:1px solid rgba(255,255,255,.28);box-shadow:4px 6px 28px rgba(0,0,0,.55),inset 2px 0 0 rgba(255,255,255,.22),inset -1px 0 0 rgba(0,0,0,.08);position:relative;overflow:visible}
+.v-metal-shine{position:absolute;top:6%;left:9%;width:26%;height:72%;background:linear-gradient(162deg,rgba(255,255,255,.32) 0%,transparent 55%);border-radius:4px;pointer-events:none}
+
+/* Included grid */
+.ig{display:flex;flex-direction:column;gap:12px;margin-top:40px}
+.ic{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:22px;transition:.25s}
+.ic:hover{border-color:var(--bd2)}
+.icn{font-family:var(--fd);font-size:28px;font-weight:300;color:rgba(167,139,250,.2);margin-bottom:10px;line-height:1}
+.ic h3{font-size:13.5px;font-weight:500;color:var(--ch);margin-bottom:6px}
+.ic p{font-size:12.5px;color:var(--mu);line-height:1.65;font-weight:300}
+
+/* PRICE */
+.prs{padding:80px 0;border-top:1px solid var(--bd);position:relative;overflow:hidden}
+.prs::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 60%,rgba(124,58,237,.055) 0%,transparent 72%);pointer-events:none;animation:pglow 7s ease-in-out infinite}
+@keyframes pglow{0%,100%{opacity:.55}50%{opacity:1}}
+.pey{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:18px;display:block}
+.ph{font-family:var(--fd);font-size:clamp(30px,7vw,58px);font-weight:300;line-height:1.06;letter-spacing:-.5px;margin-bottom:12px}
+.ph em{font-style:italic;color:var(--mu2)}
+.psub{font-size:14px;color:var(--mu);line-height:1.78;margin-bottom:44px;font-weight:300}
+
+/* Liquid cursor glow border */
+.pcard{background:var(--bg2);border:1px solid var(--bd);border-radius:20px;overflow:hidden;position:relative;--gx:50%;--gy:-30%}
+.pcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ne2),transparent);z-index:2;pointer-events:none}
+.pcard-glow{
+  position:absolute;inset:-1px;border-radius:20px;
+  pointer-events:none;z-index:1;
+  opacity:0;transition:opacity .45s ease;
+}
+.pcard-glow::before{
+  content:'';position:absolute;inset:0;border-radius:20px;
+  border:1px solid transparent;
+  background:radial-gradient(500px circle at var(--gx,50%) var(--gy,-30%),rgba(167,139,250,.68),rgba(124,58,237,.28) 28%,transparent 58%) border-box;
+  -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:destination-out;
+  mask-composite:exclude;
+}
+.pcard:hover .pcard-glow{opacity:1}
+
+.ph2{padding:28px 24px 22px;border-bottom:1px solid var(--bd);position:relative;z-index:2}
+.pbadge{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ne2);background:rgba(167,139,250,.09);border:1px solid rgba(167,139,250,.2);padding:5px 12px;border-radius:20px;display:inline-block;margin-bottom:18px}
+.ppr{display:flex;align-items:flex-end;gap:7px;margin-bottom:6px}
+.pcur{font-family:var(--fd);font-size:20px;font-weight:300;color:var(--mu2);line-height:1;padding-bottom:8px}
+.pamt{font-family:var(--fd);font-size:52px;font-weight:300;line-height:1;color:var(--tx)}
+.pnote{font-size:12px;color:var(--mu);font-weight:300}
+.pfeats{padding:20px 24px;border-bottom:1px solid var(--bd);position:relative;z-index:2}
+.pfeat{display:flex;align-items:center;gap:11px;padding:7px 0;font-size:13px;color:var(--mu);font-weight:300}
+.pfeat::before{content:'✓';width:17px;height:17px;border-radius:50%;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.22);flex-shrink:0;font-size:9px;color:var(--ne2);display:grid;place-items:center}
+.pbot{padding:22px 24px;position:relative;z-index:2}
+.pdesc{font-size:12.5px;color:var(--mu);line-height:1.72;font-weight:300;margin-bottom:20px}
+.btnbuy{width:100%;padding:16px;border:none;border-radius:11px;cursor:pointer;font-family:var(--fb);font-size:14px;font-weight:600;letter-spacing:.2px;background:linear-gradient(138deg,#7c3aed,#5b21b6);color:#fff;display:flex;align-items:center;justify-content:center;gap:9px;transition:.25s;box-shadow:0 8px 28px rgba(124,58,237,.34)}
+.btnbuy:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(124,58,237,.48)}
+.btnbuy:active{transform:translateY(0)}
+.ba2{transition:transform .2s;font-size:15px}
+.btnbuy:hover .ba2{transform:translateX(4px)}
+.btnnot{width:100%;padding:13px;background:none;border:1px solid var(--bd);border-radius:11px;font-family:var(--fb);font-size:13px;font-weight:400;color:var(--mu);cursor:pointer;transition:.2s;margin-top:9px}
+.btnnot:hover{border-color:var(--bd2);color:var(--tx)}
+.ptrust{margin-top:16px;display:flex;justify-content:center;flex-wrap:wrap;gap:0}
+.ptag{font-size:10.5px;color:rgba(236,232,226,.2);padding:3px 7px}
+.ptag+.ptag::before{content:'·';margin-right:7px}
+
+/* FAQ */
+.fqw{padding:80px 0}
+.fqh{font-family:var(--fd);font-size:clamp(26px,7vw,44px);font-weight:300;line-height:1.12;margin-bottom:40px}
+.fqh em{font-style:italic;color:var(--mu2)}
+.fqi{border-bottom:1px solid var(--bd)}
+.fqq{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:18px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--fb);font-size:14px;font-weight:400;color:var(--ch);transition:.2s;-webkit-tap-highlight-color:transparent}
+.fqq:hover{color:var(--tx)}
+.fqic{font-size:18px;color:var(--mu);flex-shrink:0;transition:transform .3s}
+.fqi.open .fqic{transform:rotate(45deg)}
+.fqa{font-size:13.5px;color:var(--mu);line-height:1.75;font-weight:300;max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1),padding .3s}
+.fqi.open .fqa{max-height:220px;padding-bottom:18px}
+
+footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:60px}
+.fb{font-family:var(--fd);font-size:16px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.fc{font-size:11px;color:rgba(236,232,226,.16)}
+
+.rv{opacity:0;transform:translateY(22px);transition:opacity .72s ease,transform .72s ease}
+.rv.vs{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nl">Chronis</a>
+  <a href="/#waitlist" class="nc">Waitlist →</a>
+</nav>
+
+<section id="hero">
+  <canvas id="c3"></canvas>
+  <div class="hcl">Physical Object · Memory Interface</div>
+  <div id="rui">
+    <div class="rtb">
+      <div class="rle">The Chronis Locket</div>
+      <h1 class="rh">Carry them<br>with you.</h1>
+      <p class="rsb">A presence you can hold</p>
+      <button class="rbtn" id="rbtn">Discover <span class="rba">→</span></button>
+    </div>
+  </div>
+  <div id="hui">
+    <div class="slbl">Scroll to explore</div>
+    <div class="sln"></div>
+  </div>
+</section>
+
+<!-- FEATURE: METAL BODY -->
+<section class="sec rv">
+  <div class="pw">
+    <div class="fvis">
+      <div class="v-metal-wrap">
+        <div class="v-metal-glow"></div>
+        <div class="v-metal">
+          <div class="v-metal-shine"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ftxt">
+      <span class="sey">The body</span>
+      <h2>Platinum-brushed.<br><em>Precision-weighted.</em></h2>
+      <p>Machined from solid metal with a circular-grain platinum brushed finish. The weight in your hand communicates permanence. This is not a gadget — it is an object designed to be passed down.</p>
+      <div class="sl">
+        <div class="si"><div class="sd"></div>Solid machined metal, 48mm diameter disc</div>
+        <div class="si"><div class="sd"></div>Circular-grain platinum brushed finish</div>
+        <div class="si"><div class="sd"></div>Develops character with wear and time</div>
+        <div class="si"><div class="sd"></div>Titanium-grade chain — two strands, single bail</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE RITUAL — replaces old slider section -->
+<section class="sec rv">
+  <div class="pw">
+    <div class="ftxt">
+      <span class="sey">The ritual</span>
+      <h2>Chosen.<br><em>Not notified.</em></h2>
+      <p>Every other presence on a screen is algorithmically summoned. This one is yours to initiate. A single gesture on the side of the locket opens the connection — deliberate, physical, irreplaceable in its intentionality.</p>
+      <p>We made it physically closed on purpose. The locket sits quiet against your chest. When you are ready, you open it.</p>
+    </div>
+
+    <div class="sl" style="margin-top:28px">
+      <div class="si"><div class="sd"></div>Side control to open — one intentional gesture</div>
+      <div class="si"><div class="sd"></div>Screen completely dormant when closed — no idle glow</div>
+      <div class="si"><div class="sd"></div>Works on cellular or Wi-Fi — wherever you are</div>
+      <div class="si"><div class="sd"></div>Sessions are private and session-bound by design</div>
+    </div>
+  </div>
+</section>
+
+<!-- INCLUDED -->
+<section class="sec rv" style="background:var(--bg2)">
+  <div class="pw">
+    <span class="sey">What you receive</span>
+    <h2 class="ftxt" style="font-family:var(--fd);font-size:clamp(26px,7vw,44px);font-weight:300;line-height:1.08;letter-spacing:-.4px;color:var(--tx);margin-bottom:0">Everything.<br><em style="font-style:italic;color:var(--mu2)">Nothing surplus.</em></h2>
+    <div class="ig">
+      <div class="ic"><div class="icn">01</div><h3>The Locket</h3><p>Machined metal body. Circular OLED front. Flush side control. Titanium chain. Matte black presentation box, care cloth, documentation card.</p></div>
+      <div class="ic"><div class="icn">02</div><h3>12 months Chronis</h3><p>Unlimited sessions. Voice and face replica from your video. Memory-persistent across sessions. No separate subscription required in year one.</p></div>
+      <div class="ic"><div class="icn">03</div><h3>Guided setup</h3><p>Upload any video. First conversation live within 48 hours. Our team available by email or call for your first session — your choice.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICE -->
+<section class="prs rv">
+  <div class="pw">
+    <span class="pey">The Chronis Locket</span>
+    <h2 class="ph">Made to hold<br><em>what matters most.</em></h2>
+    <p class="psub">Precision hardware. Twelve months of presence. Delivered across India in 7–14 days.</p>
+
+    <div class="pcard" id="pcard">
+      <div class="pcard-glow" id="pcardGlow"></div>
+      <div class="ph2">
+        <span class="pbadge">Early access pricing</span>
+        <div class="ppr"><span class="pcur">₹</span><div class="pamt">12,999</div></div>
+        <div class="pnote">Includes 12 months Chronis · Free delivery India · Setup support</div>
+      </div>
+      <div class="pfeats">
+        <div class="pfeat">Precision machined metal body</div>
+        <div class="pfeat">Circular OLED display — 42mm</div>
+        <div class="pfeat">Flush seamless side control</div>
+        <div class="pfeat">Titanium-grade chain</div>
+        <div class="pfeat">12 months Chronis subscription</div>
+        <div class="pfeat">Unlimited conversation sessions</div>
+        <div class="pfeat">Voice + face replica from video</div>
+        <div class="pfeat">Guided setup support</div>
+        <div class="pfeat">Free delivery across India</div>
+      </div>
+      <div class="pbot">
+        <p class="pdesc">After your order we'll reach out to begin replica creation. Upload any video — a birthday clip, a call, home footage. Our team handles everything from there.</p>
+        <button class="btnbuy" id="buybtn">Order the Locket <span class="ba2">→</span></button>
+        <button class="btnnot" onclick="window.location.href='/#waitlist'">Notify me when available</button>
+        <div class="ptrust">
+          <span class="ptag">Razorpay secured</span>
+          <span class="ptag">30-day returns</span>
+          <span class="ptag">Privacy guaranteed</span>
+          <span class="ptag">India-wide shipping</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<div class="fqw rv">
+  <div class="pw">
+    <h2 class="fqh">Questions<br><em>answered honestly.</em></h2>
+    <div class="fqi"><button class="fqq" onclick="tf(this)">When will I receive it?<span class="fqic">+</span></button><div class="fqa">7–14 business days within India from order confirmation. Tracking sent on dispatch. International — contact us directly.</div></div>
+    <div class="fqi"><button class="fqq" onclick="tf(this)">How does setup work?<span class="fqic">+</span></button><div class="fqa">Upload any video through our app. Replica creation: 45–90 minutes. First conversation typically live within 48 hours. Team available by email or call — your choice.</div></div>
+    <div class="fqi"><button class="fqq" onclick="tf(this)">I only have short or low-quality video?<span class="fqic">+</span></button><div class="fqa">Even 30 seconds works. WhatsApp clips, old footage, birthday videos — all fine. Longer video gives richer results. Get in touch before ordering if uncertain about what you have.</div></div>
+    <div class="fqi"><button class="fqq" onclick="tf(this)">What happens after 12 months?<span class="fqic">+</span></button><div class="fqa">Renewal pricing communicated before year one ends. We will never delete a replica without explicit advance notice and a migration path. Your memories are yours.</div></div>
+    <div class="fqi"><button class="fqq" onclick="tf(this)">Can I return it?<span class="fqic">+</span></button><div class="fqa">30-day returns from delivery, original condition. support@chronis.in — no friction, handled with care.</div></div>
+  </div>
+</div>
+
+<footer>
+  <a href="/" class="fb">Chronis</a>
+  <div style="display:flex;gap:14px">
+    <a href="/static/ethics.html" style="font-size:11.5px;color:var(--mu);text-decoration:none">Ethics</a>
+    <a href="/static/privacy.html" style="font-size:11.5px;color:var(--mu);text-decoration:none">Privacy</a>
+  </div>
+  <span class="fc">© 2026 Chronis</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   BRUSHED SILVER TEXTURE GENERATOR
+   Creates a canvas-based roughnessMap simulating circular grain
+   (characteristic of flat-disc machining + fine random scratches)
+═══════════════════════════════════════════════════════════════ */
+function makeBrushedTexture(size) {
+  size = size || 512;
+  var c = document.createElement('canvas');
+  c.width = size; c.height = size;
+  var g = c.getContext('2d');
+  var cx = size / 2, cy = size / 2;
+
+  // Neutral mid-roughness base
+  g.fillStyle = '#7a7a7a';
+  g.fillRect(0, 0, size, size);
+
+  // Circular grain — tight arcs at varying radii, low alpha
+  for (var i = 0; i < 195; i++) {
+    var r  = Math.random() * size * 0.53;
+    var a0 = Math.random() * Math.PI * 2;
+    var sp = 0.022 + Math.random() * 0.27;
+    var al = 0.035 + Math.random() * 0.095;
+    var dk = Math.random() > 0.38;
+    g.strokeStyle = dk
+      ? 'rgba(0,0,0,' + al + ')'
+      : 'rgba(255,255,255,' + (al * 0.48) + ')';
+    g.lineWidth = 0.32 + Math.random() * 1.15;
+    g.beginPath();
+    g.arc(cx, cy, r, a0, a0 + sp);
+    g.stroke();
+  }
+  // Fine radial scratches — very subtle
+  for (var j = 0; j < 52; j++) {
+    var x  = Math.random() * size;
+    var y  = Math.random() * size;
+    var a  = Math.random() * Math.PI;
+    var ln = 7 + Math.random() * 58;
+    g.strokeStyle = 'rgba(0,0,0,' + (0.010 + Math.random() * 0.026) + ')';
+    g.lineWidth   = 0.28;
+    g.beginPath();
+    g.moveTo(x, y);
+    g.lineTo(x + Math.cos(a) * ln, y + Math.sin(a) * ln);
+    g.stroke();
+  }
+  return new THREE.CanvasTexture(c);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OLED STAR FIELD (precomputed, stable positions)
+═══════════════════════════════════════════════════════════════ */
+var oledStars = (function() {
+  var s = [];
+  for (var i = 0; i < 40; i++) {
+    s.push({
+      x:    Math.random(),
+      y:    Math.random(),
+      phase:Math.random() * Math.PI * 2,
+      freq: 0.65 + Math.random() * 2.5,
+      size: 0.75 + Math.random() * 1.55,
+      type: Math.random() > 0.52 ? 'cross' : 'dot'
+    });
+  }
+  return s;
+}());
+
+/* ═══════════════════════════════════════════════════════════════
+   BACK FACE CANVAS — white brushed silver + deep engraving
+═══════════════════════════════════════════════════════════════ */
+var backCanvas  = document.createElement('canvas');
+backCanvas.width = 512; backCanvas.height = 512;
+var bCtx = backCanvas.getContext('2d');
+var bW = 512, bH = 512, bcx = bW / 2, bcy = bH / 2;
+var backTexture; // assigned after scene setup
+
+function drawBack(t) {
+  var ctx = bCtx;
+  ctx.clearRect(0, 0, bW, bH);
+
+  // White-silver radial gradient (matches the 3D body color)
+  var bgrd = ctx.createRadialGradient(bcx * 0.60, bcy * 0.50, 0, bcx, bcy, bcx * 1.02);
+  bgrd.addColorStop(0,    '#eaeaee');
+  bgrd.addColorStop(0.38, '#d5d5d9');
+  bgrd.addColorStop(0.72, '#bebebc');
+  bgrd.addColorStop(1,    '#a5a5aa');
+  ctx.beginPath();
+  ctx.arc(bcx, bcy, bcx, 0, Math.PI * 2);
+  ctx.fillStyle = bgrd;
+  ctx.fill();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(bcx, bcy, bcx, 0, Math.PI * 2);
+  ctx.clip();
+
+  // Circular grain rings
+  for (var i = 0; i < 14; i++) {
+    ctx.beginPath();
+    ctx.arc(bcx, bcy, 20 + i * 37, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,0,0,' + (0.024 - i * 0.0012) + ')';
+    ctx.lineWidth = 0.42;
+    ctx.stroke();
+  }
+
+  // Top-left specular highlight
+  var shGrd = ctx.createRadialGradient(bcx * 0.42, bcy * 0.38, 0, bcx * 0.56, bcy * 0.46, bcx * 0.88);
+  shGrd.addColorStop(0, 'rgba(255,255,255,0.28)');
+  shGrd.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = shGrd;
+  ctx.fillRect(0, 0, bW, bH);
+
+  /* ──────────────────────────────────────
+     ENGRAVED "CHRONIS"
+     Technique: stamped-in depth using
+     layered shadow/highlight offsets on
+     a lighter-than-surface ground.
+  ────────────────────────────────────── */
+  ctx.font = '300 50px "Cormorant Garamond", Georgia, serif';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  var ty = bcy + 2;
+
+  // Layer 1 — deep groove shadow (bottom-right, simulates recessed depth)
+  ctx.fillStyle = 'rgba(0,0,0,0.56)';
+  ctx.fillText('CHRONIS', bcx + 1.9, ty + 1.9);
+  // Layer 2 — secondary shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.30)';
+  ctx.fillText('CHRONIS', bcx + 1.0, ty + 1.0);
+  // Layer 3 — groove floor (darker than surface, like a cut channel)
+  ctx.fillStyle = 'rgba(58,58,68,0.52)';
+  ctx.fillText('CHRONIS', bcx, ty);
+  // Layer 4 — top-left highlight (light catching the beveled groove edge)
+  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.fillText('CHRONIS', bcx - 0.75, ty - 0.75);
+
+  // Fine decorative rule (engraved line below text)
+  ctx.strokeStyle = 'rgba(0,0,0,0.22)';
+  ctx.lineWidth   = 0.75;
+  ctx.beginPath();
+  ctx.moveTo(bcx - 56, ty + 38);
+  ctx.lineTo(bcx + 56, ty + 38);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+  ctx.lineWidth   = 0.45;
+  ctx.beginPath();
+  ctx.moveTo(bcx - 56, ty + 39.2);
+  ctx.lineTo(bcx + 56, ty + 39.2);
+  ctx.stroke();
+
+  /* ────────────────────────────────────
+     NEON ARC — bottom of back face
+  ──────────────────────────────────── */
+  var arcRadius = 208;
+  var arcStart  = 205 * Math.PI / 180;
+  var arcEnd    = 335 * Math.PI / 180;
+  var f = 0.72 + Math.sin(t * 4.3) * 0.10 + Math.cos(t * 7.1) * 0.06 + Math.sin(t * 2.9) * 0.04;
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(124,58,237,' + (f * 0.20) + ')';
+  ctx.lineWidth   = 9;
+  ctx.shadowColor = 'rgba(167,139,250,' + (f * 0.48) + ')';
+  ctx.shadowBlur  = 13;
+  ctx.beginPath();
+  ctx.arc(bcx, bcy, arcRadius, arcStart, arcEnd);
+  ctx.stroke();
+  ctx.restore();
+
+  var arcGrad = ctx.createLinearGradient(
+    bcx + Math.cos(arcStart) * arcRadius, bcy + Math.sin(arcStart) * arcRadius,
+    bcx + Math.cos(arcEnd)   * arcRadius, bcy + Math.sin(arcEnd)   * arcRadius
+  );
+  arcGrad.addColorStop(0,    'rgba(124,58,237,0)');
+  arcGrad.addColorStop(0.18, 'rgba(167,139,250,' + (f * 0.75) + ')');
+  arcGrad.addColorStop(0.50, 'rgba(196,181,253,' + f + ')');
+  arcGrad.addColorStop(0.82, 'rgba(167,139,250,' + (f * 0.75) + ')');
+  arcGrad.addColorStop(1,    'rgba(124,58,237,0)');
+  ctx.save();
+  ctx.strokeStyle = arcGrad;
+  ctx.lineWidth   = 2.2;
+  ctx.beginPath();
+  ctx.arc(bcx, bcy, arcRadius, arcStart, arcEnd);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.restore(); // end clip
+
+  if (backTexture) backTexture.needsUpdate = true;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THREE.JS SCENE
+═══════════════════════════════════════════════════════════════ */
+var hero     = document.getElementById('hero');
+var canvas   = document.getElementById('c3');
+var renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true, alpha: false});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x050505, 1);
+renderer.physicallyCorrectLights = true;
+renderer.outputEncoding          = THREE.sRGBEncoding;
+renderer.toneMapping             = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure     = 1.06;
+
+var scene  = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
+camera.position.set(0, 0.1, 6.2);
+
+var clock = new THREE.Clock();
+
+function resize() {
+  var w = hero.clientWidth, h = hero.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+resize();
+window.addEventListener('resize', function() { resize(); applyScale(); });
+
+/* ── BRUSHED TEXTURE ── */
+var scratchTex = makeBrushedTexture(512);
+scratchTex.wrapS = scratchTex.wrapT = THREE.RepeatWrapping;
+
+/* ════════════════════════════════════
+   MATERIALS — White brushed silver
+════════════════════════════════════ */
+// Main body: near-white silver with brushed roughness map
+var mPlat = new THREE.MeshStandardMaterial({
+  color:        0xeeeeed,
+  metalness:    0.97,
+  roughness:    0.15,
+  roughnessMap: scratchTex
+});
+// Groove / dark accents (slightly lower, catches shadow)
+var mPlatDark = new THREE.MeshStandardMaterial({
+  color:     0xb2b2b6,
+  metalness: 0.93,
+  roughness: 0.24
+});
+// Chrome bezel — mirror polished
+var mChrome = new THREE.MeshStandardMaterial({
+  color:     0xfafaf8,
+  metalness: 1.0,
+  roughness: 0.018
+});
+// Chain — fine-link silver
+var mChain = new THREE.MeshStandardMaterial({
+  color:     0xe0e0e4,
+  metalness: 0.98,
+  roughness: 0.045
+});
+
+/* ── OLED SCREEN TEXTURE CANVAS ── */
+var oledCanvasT  = document.createElement('canvas');
+oledCanvasT.width = 512; oledCanvasT.height = 512;
+var oledTexture3 = new THREE.CanvasTexture(oledCanvasT);
+var oledTCtx     = oledCanvasT.getContext('2d');
+
+/* ────────────────────────────────────────────────────────────
+   OLED DRAW — animated gradient fill + star field
+   The word CHRONIS reveals left→right with a sweeping
+   silver-white gradient, then breathes gently.
+   Subtle 4-point stars twinkle independently in the bg.
+──────────────────────────────────────────────────────────── */
+function drawOledTexture(t) {
+  var ctx = oledTCtx;
+  var W = 512, H = 512, cx = W / 2, cy = H / 2;
+  ctx.clearRect(0, 0, W, H);
+
+  // Black disc base
+  ctx.beginPath();
+  ctx.arc(cx, cy, cx, 0, Math.PI * 2);
+  ctx.fillStyle = '#000000';
+  ctx.fill();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, cx, 0, Math.PI * 2);
+  ctx.clip();
+
+  // Very faint inner purple atmosphere
+  var bg = ctx.createRadialGradient(cx, cy, cx * 0.15, cx, cy, cx * 0.97);
+  bg.addColorStop(0, 'rgba(20,7,42,0.58)');
+  bg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Star field ──
+  for (var si = 0; si < oledStars.length; si++) {
+    var s  = oledStars[si];
+    var a  = Math.pow((Math.sin(t * s.freq + s.phase) + 1) / 2, 2.5);
+    if (a < 0.04) continue;
+    var sx = cx + (s.x - 0.5) * cx * 1.65;
+    var sy = cy + (s.y - 0.5) * cy * 1.65;
+    if (Math.sqrt((sx - cx) * (sx - cx) + (sy - cy) * (sy - cy)) > cx * 0.91) continue;
+    ctx.save();
+    ctx.globalAlpha = a * 0.50;
+    ctx.fillStyle   = '#ffffff';
+    ctx.translate(sx, sy);
+    var sz = s.size * 1.35;
+    if (s.type === 'cross') {
+      // 4-point star — thin cross
+      ctx.fillRect(-sz * 0.15, -sz * 1.22, sz * 0.30, sz * 2.44);
+      ctx.fillRect(-sz * 1.22, -sz * 0.15, sz * 2.44, sz * 0.30);
+    } else {
+      ctx.beginPath();
+      ctx.arc(0, 0, sz, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  /* ── CHRONIS — animated gradient fill ──
+     Period: 5.5s
+     Phase 0→1.8s : fill sweeps left→right
+     Phase 1.8s+   : full text breathes gently
+  */
+  ctx.font         = '300 66px "Cormorant Garamond", Georgia, serif';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  var textY   = cy - 10;
+  var textHW  = 130; // approx half-width of CHRONIS at 66px Cormorant
+
+  var period  = 5.5;
+  var ph      = t % period;
+  var fillDur = 1.8;
+  var fillP   = ph < fillDur ? ph / fillDur : 1.0;
+  var bright  = fillP < 1
+    ? (0.12 + fillP * 0.64)
+    : (0.76 + Math.sin(t * 0.88) * 0.068);
+
+  // Ghost base (always present, very dim — like unlit substrate)
+  ctx.fillStyle = 'rgba(255,255,255,' + Math.min(bright * 0.26, 0.20) + ')';
+  ctx.fillText('CHRONIS', cx, textY);
+
+  // Gradient fill revealed progressively via clip
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(cx - textHW - 22, textY - 58, (textHW * 2 + 44) * fillP, 116);
+  ctx.clip();
+
+  var tGrad = ctx.createLinearGradient(cx - textHW, 0, cx + textHW, 0);
+  tGrad.addColorStop(0,    'rgba(200,200,215,' + bright + ')');
+  tGrad.addColorStop(0.40, 'rgba(255,255,255,' + Math.min(bright * 1.14, 1) + ')');
+  tGrad.addColorStop(0.75, 'rgba(228,228,238,' + (bright * 0.96) + ')');
+  tGrad.addColorStop(1,    'rgba(195,195,210,' + (bright * 0.88) + ')');
+  ctx.fillStyle = tGrad;
+  ctx.fillText('CHRONIS', cx, textY);
+
+  // Leading-edge shine (only while fill is in progress)
+  if (fillP < 0.97) {
+    var edgeX = cx - textHW + fillP * (textHW * 2);
+    var eGrad = ctx.createLinearGradient(edgeX - 24, 0, edgeX + 10, 0);
+    eGrad.addColorStop(0, 'rgba(255,255,255,0)');
+    eGrad.addColorStop(1, 'rgba(255,255,255,0.55)');
+    ctx.fillStyle = eGrad;
+    ctx.fillText('CHRONIS', cx, textY);
+  }
+  ctx.restore();
+
+  // Thin rule below — fades in with the fill
+  var rOpacity = 0.05 + fillP * 0.16;
+  ctx.strokeStyle = 'rgba(255,255,255,' + rOpacity + ')';
+  ctx.lineWidth   = 1.1;
+  ctx.beginPath();
+  ctx.moveTo(cx - 74, textY + 36);
+  ctx.lineTo(cx + 74, textY + 36);
+  ctx.stroke();
+
+  ctx.restore(); // end circle clip
+
+  // Subtle purple edge ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, cx - 1.5, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(167,139,250,0.18)';
+  ctx.lineWidth   = 2.5;
+  ctx.stroke();
+
+  oledTexture3.needsUpdate = true;
+}
+
+/* ── SCREEN MATERIAL ── */
+var mScreen = new THREE.MeshStandardMaterial({
+  color:            0x000000,
+  metalness:        0,
+  roughness:        0.02,
+  map:              oledTexture3,
+  emissiveMap:      oledTexture3,
+  emissive:         0x111111,
+  emissiveIntensity:0.28
+});
+
+/* ── BACK MATERIAL (white silver, canvas map) ── */
+backTexture = new THREE.CanvasTexture(backCanvas);
+var mBack = new THREE.MeshStandardMaterial({
+  color:        0xcacace,
+  metalness:    0.91,
+  roughness:    0.20,
+  map:          backTexture,
+  roughnessMap: scratchTex
+});
+
+/* ── ACCENT (purple pip / arc emissive) ── */
+var mAccent = new THREE.MeshStandardMaterial({
+  color:            0x5b21b6,
+  metalness:        0.4,
+  roughness:        0.30,
+  emissive:         0x7c3aed,
+  emissiveIntensity:0.55
+});
+
+/* ── NEON ARC MATERIAL ── */
+var mArc = new THREE.MeshStandardMaterial({
+  color:            0x5b21b6,
+  metalness:        0,
+  emissive:         0xa78bfa,
+  emissiveIntensity:0.82,
+  transparent:      true,
+  opacity:          0.82
+});
+
+/* ════════════════════════════════
+   LOCKET GROUP — all geometry
+════════════════════════════════ */
+var G = new THREE.Group();
+scene.add(G);
+
+// Main disc body — CylinderGeometry, rotated so caps face ±Z
+var body = new THREE.Mesh(
+  new THREE.CylinderGeometry(1.42, 1.42, 0.285, 128, 1, false),
+  mPlat
+);
+body.rotation.x = Math.PI / 2;
+G.add(body);
+
+// Equator groove
+G.add(Object.assign(new THREE.Mesh(new THREE.TorusGeometry(1.42, 0.0095, 8, 128), mPlatDark), {}));
+
+// Inner accent ring (front face, slight z offset)
+var inner = new THREE.Mesh(new THREE.TorusGeometry(1.305, 0.0075, 8, 128), mPlatDark);
+inner.position.z = 0.125;
+G.add(inner);
+
+// Chrome bezel (front)
+var bezel = new THREE.Mesh(new THREE.TorusGeometry(1.295, 0.088, 20, 128), mChrome);
+bezel.position.z = 0.144;
+G.add(bezel);
+
+// OLED screen disc (front face)
+var scrn = new THREE.Mesh(new THREE.CircleGeometry(1.20, 128), mScreen);
+scrn.position.z = 0.143;
+G.add(scrn);
+
+// Purple emissive ring at screen border
+var sEdge = new THREE.Mesh(new THREE.TorusGeometry(1.20, 0.015, 8, 128), mAccent);
+sEdge.position.z = 0.144;
+G.add(sEdge);
+
+// Back disc
+var backDisc = new THREE.Mesh(new THREE.CircleGeometry(1.20, 128), mBack);
+backDisc.position.z = -0.143;
+backDisc.rotation.y = Math.PI;
+G.add(backDisc);
+
+// Chrome bezel (back, mirrored)
+var bezelBack = new THREE.Mesh(new THREE.TorusGeometry(1.295, 0.088, 20, 128), mChrome);
+bezelBack.position.z = -0.144;
+G.add(bezelBack);
+
+// Neon arc on back (partial torus, 130°, centered at bottom)
+var arcMesh = new THREE.Mesh(
+  new THREE.TorusGeometry(1.18, 0.010, 8, 64, Math.PI * 130 / 180),
+  mArc
+);
+arcMesh.position.z = -0.145;
+arcMesh.rotation.z = 205 * Math.PI / 180;
+G.add(arcMesh);
+
+// Hinge knuckle (top center)
+var hinge = new THREE.Mesh(new THREE.CylinderGeometry(0.054, 0.054, 0.275, 18), mPlat);
+hinge.position.set(0, 1.43, 0);
+G.add(hinge);
+
+// Central bail ring — both chain strands thread through here
+var bail = new THREE.Mesh(new THREE.TorusGeometry(0.110, 0.034, 12, 32), mChain);
+bail.position.set(0, 1.62, 0);
+bail.rotation.x = Math.PI / 2;
+G.add(bail);
+
+/* ══════════════════════════════════════════════════════
+   TWO-STRAND CHAIN
+   Each side starts at the bail, diverges outward with
+   alternating flat/standing links (interlocked visual).
+   Standing links are tilted to follow the diverging path.
+══════════════════════════════════════════════════════ */
+(function buildChains() {
+  var cR     = 0.060;
+  var cTube  = 0.015;
+  var cStep  = 0.130;
+  var cCount = 12;
+  var sides  = [-1, 1];
+
+  for (var si = 0; si < sides.length; si++) {
+    var side = sides[si];
+    for (var i = 0; i < cCount; i++) {
+      var lk   = new THREE.Mesh(new THREE.TorusGeometry(cR, cTube, 10, 26), mChain);
+      var drift = side * Math.min(i * 0.034, 0.45);
+      lk.position.set(side * 0.042 + drift, 1.74 + i * cStep, 0);
+      if (i % 2 === 0) {
+        lk.rotation.x = Math.PI / 2;
+      } else {
+        // Tilt to naturally follow the diverging direction
+        lk.rotation.z = Math.atan2(0.034, cStep) * side * 0.48;
+      }
+      G.add(lk);
+    }
+  }
+}());
+
+/* ══════════════════════════════════════
+   MINIMAL SIDE CONTROL
+   A barely-visible groove arc pressed into
+   the right equator edge, with a hair-thin
+   capacitive pip — nearly flush, intentional.
+══════════════════════════════════════ */
+// Groove: thin partial torus arc on right side of disc edge
+var ctrlGroove = new THREE.Mesh(
+  new THREE.TorusGeometry(1.424, 0.0042, 8, 80, Math.PI * 0.38),
+  mPlatDark
+);
+// Center the arc on the positive-X side
+ctrlGroove.rotation.z = -Math.PI * 0.19;
+G.add(ctrlGroove);
+
+// Tactile pip — tiny accent dot, nearly flush
+var pip = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.010, 0.010, 0.006, 14),
+  mAccent
+);
+pip.rotation.z = Math.PI / 2;
+pip.position.set(1.437, 0.04, 0);
+G.add(pip);
+
+/* ── AMBIENT PARTICLE FIELD ── */
+var pGeo = new THREE.BufferGeometry();
+var pN   = 280;
+var pPos = new Float32Array(pN * 3);
+for (var pi = 0; pi < pN; pi++) {
+  pPos[pi * 3]     = (Math.random() - 0.5) * 24;
+  pPos[pi * 3 + 1] = (Math.random() - 0.5) * 18;
+  pPos[pi * 3 + 2] = (Math.random() - 0.5) * 10 - 5;
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({
+  color: 0xffffff, size: 0.017, transparent: true, opacity: 0.18, sizeAttenuation: true
+})));
+
+/* ══════════════════════════════════
+   LIGHTING
+   Key (warm, upper-right front)   → bright highlights on silver
+   Fill (cool blue, left)          → depth in shadows
+   Rim (purple, behind/below)      → signature purple edge bloom
+   Hemisphere + ambient            → fills the scene
+══════════════════════════════════ */
+scene.add(new THREE.AmbientLight(0xffffff, 0.16));
+scene.add(new THREE.HemisphereLight(0xdde8ff, 0x553377, 0.58));
+var keyL  = new THREE.PointLight(0xfff8f0, 6.4, 26); keyL.position.set(4.5, 5.5, 5.0);  scene.add(keyL);
+var fillL = new THREE.PointLight(0xd0e0ff, 1.7, 20); fillL.position.set(-5.0, 2.0, 3.0);scene.add(fillL);
+var rimL  = new THREE.PointLight(0x7c3aed, 9.2, 20); rimL.position.set(0.5, -4.5, -6.0); scene.add(rimL);
+var topL  = new THREE.PointLight(0xffffff, 1.5, 14); topL.position.set(0, 6.5, 2.0);    scene.add(topL);
+var sideL = new THREE.PointLight(0xaaaacc, 1.0, 14); sideL.position.set(-3, -2, 3);     scene.add(sideL);
+
+/* ── RESPONSIVE SCALE ── */
+function applyScale() {
+  var s = window.innerWidth < 400 ? 0.66
+        : window.innerWidth < 600 ? 0.74
+        : window.innerWidth < 900 ? 0.86 : 1;
+  G.scale.setScalar(s);
+}
+applyScale();
+
+/* ── REVEAL ── */
+var revealed = false;
+function doReveal() {
+  if (revealed) return;
+  revealed = true;
+  var ui  = document.getElementById('rui');
+  var hui = document.getElementById('hui');
+  ui.classList.add('g');
+  setTimeout(function() { ui.classList.add('gx'); hui.classList.add('s'); }, 880);
+}
+document.getElementById('rbtn').addEventListener('click', doReveal);
+hero.addEventListener('click', doReveal);
+setTimeout(doReveal, 5200);
+
+/* ── ANIMATION LOOP ── */
+var scrollLerp = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  var t = clock.getElapsedTime();
+
+  drawOledTexture(t);
+  drawBack(t);
+
+  // Arc flicker
+  mArc.emissiveIntensity = 0.62 + Math.sin(t * 4.3) * 0.12 + Math.cos(t * 7.1) * 0.07 + Math.sin(t * 2.8) * 0.05;
+  mArc.opacity           = 0.72 + Math.sin(t * 3.7) * 0.10 + Math.cos(t * 5.9) * 0.06;
+
+  // Scroll parallax
+  var heroH   = hero.clientHeight || window.innerHeight;
+  var scrollP = Math.max(0, Math.min(1, -hero.getBoundingClientRect().top / heroH));
+  scrollLerp += (scrollP * 2.2 - scrollLerp) * 0.055;
+
+  // Float + rotation
+  G.position.y  = Math.sin(t * 0.50) * 0.09 + scrollLerp;
+  G.rotation.y += revealed ? 0.0034 : 0.0062;
+  G.rotation.x  = Math.sin(t * 0.36) * (revealed ? 0.055 : 0.092);
+
+  // Gentle camera drift
+  camera.position.x = Math.sin(t * 0.16) * 0.18;
+  camera.position.y = 0.10 + Math.cos(t * 0.24) * 0.12;
+  camera.lookAt(0, 0.06, 0);
+
+  // Rim light breathe
+  rimL.intensity = 9.2 + Math.sin(t * 0.62) * 1.8;
+
+  renderer.render(scene, camera);
+}
+
+// Wait for fonts so Cormorant renders correctly in canvas
+document.fonts.ready.then(function() { animate(); drawBack(0); });
+
+/* ════════════════════════════════════════════════════
+   LIQUID CURSOR GLOW — price card border
+   The neon border flows toward wherever the cursor
+   is hovering, like mercury finding its level.
+════════════════════════════════════════════════════ */
+(function initCardGlow() {
+  var card = document.getElementById('pcard');
+  var glow = document.getElementById('pcardGlow');
+  if (!card || !glow) return;
+
+  var mx = 0.5, my = -0.3;
+  var lx = 0.5, ly = -0.3;
+
+  card.addEventListener('mouseleave', function() { mx = 0.5; my = -0.3; });
+  card.addEventListener('mousemove', function(e) {
+    var r = card.getBoundingClientRect();
+    mx = (e.clientX - r.left)  / r.width;
+    my = (e.clientY - r.top)   / r.height;
+  });
+
+  function loop() {
+    lx += (mx - lx) * 0.062;
+    ly += (my - ly) * 0.062;
+    glow.style.setProperty('--gx', (lx * 100).toFixed(1) + '%');
+    glow.style.setProperty('--gy', (ly * 100).toFixed(1) + '%');
+    requestAnimationFrame(loop);
+  }
+  loop();
+}());
+
+/* ── BUY BUTTON ── */
+document.getElementById('buybtn').addEventListener('click', function() {
+  this.textContent  = 'Coming soon — join the waitlist';
+  this.style.background  = 'rgba(124,58,237,.22)';
+  this.style.boxShadow   = 'none';
+  this.style.cursor      = 'default';
+  setTimeout(function() { window.location.href = '/#waitlist'; }, 1500);
+});
+
+/* ── FAQ ── */
+function tf(btn){ btn.closest('.fqi').classList.toggle('open'); }
+
+/* Scroll reveal for content sections */
+const obs = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vs'); });
+},{threshold:.07, rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
