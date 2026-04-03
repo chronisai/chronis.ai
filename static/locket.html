@@ -607,180 +607,188 @@ oledCanvasT.width = 512; oledCanvasT.height = 512;
 var oledTexture3 = new THREE.CanvasTexture(oledCanvasT);
 var oledTCtx     = oledCanvasT.getContext('2d');
 
+/* ── OFFSCREEN TEXT COMPOSITE CANVAS ──────────────────────────────
+   Created once, reused every frame.
+   Step 1 → draw CHRONIS in solid white   (alpha mask = letter shapes)
+   Step 2 → source-atop gradient fill     (paint ONLY inside strokes)
+   This is the real Rockstar technique: gradient confined to glyph
+   geometry, not a rectangle crop.
+──────────────────────────────────────────────────────────────── */
+var oledTextCanvas = document.createElement('canvas');
+oledTextCanvas.width = 512; oledTextCanvas.height = 512;
+var oledTextCtx    = oledTextCanvas.getContext('2d');
+
 function drawOledTexture(t) {
   var ctx = oledTCtx;
   var W = 512, H = 512, cx = W / 2, cy = H / 2;
+  var textY = cy - 8;
+  var FONT  = '300 68px "Cormorant Garamond", Georgia, serif';
+
+  /* ════════════════════════════════════════════════════════════
+     FACING FACTOR
+     cos(curRotY) tracks whether the OLED face points at camera.
+     +1 = fully facing, 0 = edge-on, −1 = back facing.
+     face is smoothstepped so the fade-in/out has no linear kink.
+  ════════════════════════════════════════════════════════════ */
+  var raw  = Math.max(0, Math.min(1, Math.cos(curRotY)));
+  var face = raw * raw * (3 - 2 * raw); // smoothstep [0→1]
+
+  /* ── Pure OLED black base ── */
   ctx.clearRect(0, 0, W, H);
+  ctx.beginPath(); ctx.arc(cx, cy, cx, 0, Math.PI * 2);
+  ctx.fillStyle = '#000000'; ctx.fill();
 
-  /* ── Facing factor ─────────────────────────────────────────────
-     curRotY is the live Y-rotation of the locket group (outer scope).
-     cos(curRotY) = 1 when front faces camera, -1 when back faces camera.
-     We clamp to [0,1] and apply smoothstep so the transition is
-     silky — not linear. This single value drives EVERYTHING below.
-  ──────────────────────────────────────────────────────────────── */
-  var raw   = Math.max(0, Math.min(1, Math.cos(curRotY)));
-  // smoothstep — cubic ease, eliminates the abrupt start at edge-on
-  var face  = raw * raw * (3 - 2 * raw);
-  // Slightly more aggressive curve for text fill (hold off until well-turned)
-  var fillP = Math.max(0, Math.min(1, (face - 0.18) / 0.72));
-  fillP     = fillP * fillP * (3 - 2 * fillP); // double smooth
+  // Nothing visible when screen faces away
+  if (face < 0.018) { oledTexture3.needsUpdate = true; return; }
 
-  /* ── Pure black disc base ── */
-  ctx.beginPath();
-  ctx.arc(cx, cy, cx, 0, Math.PI * 2);
-  ctx.fillStyle = '#000';
-  ctx.fill();
-
-  /* ── Clip everything inside the disc ── */
   ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, cy, cx, 0, Math.PI * 2);
-  ctx.clip();
+  ctx.beginPath(); ctx.arc(cx, cy, cx, 0, Math.PI * 2); ctx.clip();
 
-  /* ── Very faint deep-violet atmosphere — only visible when screen faces you ── */
-  if (face > 0.05) {
-    var bg = ctx.createRadialGradient(cx, cy, cx * 0.08, cx, cy, cx * 0.96);
-    bg.addColorStop(0, 'rgba(14,5,30,' + (face * 0.52) + ')');
-    bg.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-  }
+  /* ── Deep violet atmosphere ── */
+  var atm = ctx.createRadialGradient(cx * 0.52, cy * 0.44, 0, cx, cy, cx * 0.98);
+  atm.addColorStop(0, 'rgba(10,3,26,' + (face * 0.72) + ')');
+  atm.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = atm; ctx.fillRect(0, 0, W, H);
 
-  /* ══════════════════════════════════════════════════════════════
-     INTENTIONAL STAR FIELD
-     ──────────────────────────────────────────────────────────────
-     Stars have two opacity layers:
-       1. Base presence:  driven by `face` — they exist as the
-          screen turns toward you, black when turned away.
-       2. Individual twinkle: very slow sine, low amplitude.
-          The twinkle is additive but capped so no star ever blows
-          out — they breathe, they don't shout.
+  /* ════════════════════════════════════════════════════════════
+     STAR FIELD — intentional minimal constellation
+     ──────────────────────────────────────────────────────────
+     Opacity = face × (basePresence + twinkle).
+     Stars appear as the screen turns toward you and vanish as
+     it turns away. Twinkle is slow and small so they read as
+     real — not like a particle effect.
+     Anchor stars (sz ≥ 1.8) get a soft radial glow halo.
+  ════════════════════════════════════════════════════════════ */
+  for (var si = 0; si < oledStars.length; si++) {
+    var st = oledStars[si];
+    // Slow sine twinkle — squared to spend more time near the bottom
+    var tw = Math.pow(0.5 + 0.5 * Math.sin(t * st.freq * Math.PI * 2 + st.phase), 2);
+    var alpha = face * (0.28 + tw * 0.38); // 0.28 base, up to 0.66 at peak twinkle
+    alpha = Math.min(alpha, 0.62);         // hard cap
+    if (alpha < 0.04) continue;
 
-     All dots. Clean. Considered. The two anchor stars (sz≥1.8)
-     get a tiny soft glow halo to give the field depth without
-     adding complexity.
-  ══════════════════════════════════════════════════════════════ */
-  if (face > 0.04) {
-    for (var si = 0; si < oledStars.length; si++) {
-      var st = oledStars[si];
+    var sx = cx + (st.x - 0.5) * W * 0.80;
+    var sy = cy + (st.y - 0.5) * H * 0.80;
+    if (Math.sqrt((sx-cx)*(sx-cx)+(sy-cy)*(sy-cy)) > cx * 0.86) continue;
 
-      // Twinkle: sine wave, amplitude only 18% of base — almost imperceptible
-      var twinkle = (Math.sin(t * st.freq * Math.PI * 2 + st.phase) + 1) * 0.5;
-      twinkle     = twinkle * twinkle; // square for sharper but still smooth blink
-
-      // Base opacity: face drives it, twinkle modulates gently on top
-      var starBase  = face * 0.30;             // max base = 0.30 when fully facing
-      var starAlpha = starBase + twinkle * face * 0.14; // twinkle adds up to 0.14
-      starAlpha     = Math.min(starAlpha, 0.44); // hard cap — no blown-out stars
-
-      if (starAlpha < 0.02) continue;
-
-      // Map [0,1] coords to disc, keeping them within the circle boundary
-      var sx = cx + (st.x - 0.5) * W * 0.84;
-      var sy = cy + (st.y - 0.5) * H * 0.84;
-      // Reject if outside disc radius (with 8% margin inside edge)
-      var dist = Math.sqrt((sx - cx) * (sx - cx) + (sy - cy) * (sy - cy));
-      if (dist > cx * 0.88) continue;
-
-      ctx.save();
-      ctx.translate(sx, sy);
-
-      // Anchor stars (sz≥1.8) get a soft halo — very subtle, 1px feather
-      if (st.sz >= 1.8) {
-        var halo = ctx.createRadialGradient(0, 0, 0, 0, 0, st.sz * 3.5);
-        halo.addColorStop(0, 'rgba(255,255,255,' + (starAlpha * 0.28) + ')');
-        halo.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = halo;
-        ctx.beginPath();
-        ctx.arc(0, 0, st.sz * 3.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Core dot — crisp, round
-      ctx.globalAlpha = starAlpha;
-      ctx.fillStyle   = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(0, 0, st.sz, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
-    }
-  }
-
-  /* ══════════════════════════════════════════════════════════════
-     CHRONIS — white gradient fill driven by facing angle
-     ──────────────────────────────────────────────────────────────
-     fillP maps the rotation to a 0→1 fill progress.
-     Clip rect sweeps left→right (C to S) as fillP increases.
-     A leading-edge shimmer rides the fill boundary.
-     The rule below the text fades in with the fill.
-     Everything fades back out when locket turns away.
-  ══════════════════════════════════════════════════════════════ */
-  ctx.font         = '300 66px "Cormorant Garamond", Georgia, serif';
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'middle';
-  var textY   = cy - 10;
-  // Half-width of "CHRONIS" at 66px Cormorant ≈ 132px; measured conservatively
-  var textHW  = 132;
-  var textFull = textHW * 2 + 8; // full clip span
-
-  // Ghost substrate — very dim, always present when even slightly facing
-  if (face > 0.05) {
-    ctx.fillStyle = 'rgba(255,255,255,' + (face * 0.08) + ')';
-    ctx.fillText('CHRONIS', cx, textY);
-  }
-
-  // Bright fill — revealed left→right by clip
-  if (fillP > 0.001) {
-    var bright = fillP * (0.82 + Math.sin(t * 0.72) * 0.03 * fillP); // subtle breathe at full reveal
-
-    ctx.save();
-    // Clip rect: starts at C (left edge), sweeps to S (right edge)
-    var clipW = textFull * fillP;
-    ctx.beginPath();
-    ctx.rect(cx - textHW - 4, textY - 56, clipW, 112);
-    ctx.clip();
-
-    // White gradient: slightly cooler at left (C), brightest at centre, cool again at S
-    var tGrad = ctx.createLinearGradient(cx - textHW, 0, cx + textHW, 0);
-    tGrad.addColorStop(0,    'rgba(210,212,220,' + bright + ')');
-    tGrad.addColorStop(0.35, 'rgba(255,255,255,' + Math.min(bright * 1.08, 1) + ')');
-    tGrad.addColorStop(0.62, 'rgba(240,240,248,' + (bright * 0.98) + ')');
-    tGrad.addColorStop(1,    'rgba(205,208,218,' + (bright * 0.90) + ')');
-    ctx.fillStyle = tGrad;
-    ctx.fillText('CHRONIS', cx, textY);
-
-    // Leading-edge shimmer — a narrow bright sliver riding the fill front
-    if (fillP < 0.96) {
-      var edgeX = (cx - textHW - 4) + clipW;
-      var shimW  = 18 + fillP * 10; // shimmer widens slightly as fill progresses
-      var eGrad  = ctx.createLinearGradient(edgeX - shimW, 0, edgeX, 0);
-      eGrad.addColorStop(0, 'rgba(255,255,255,0)');
-      eGrad.addColorStop(1, 'rgba(255,255,255,' + (bright * 0.60) + ')');
-      ctx.fillStyle = eGrad;
-      ctx.fillText('CHRONIS', cx, textY);
+    // Glow halo for anchor stars
+    if (st.sz >= 1.8) {
+      var glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, st.sz * 5);
+      glow.addColorStop(0,   'rgba(255,255,255,' + (alpha * 0.36) + ')');
+      glow.addColorStop(0.5, 'rgba(255,255,255,' + (alpha * 0.10) + ')');
+      glow.addColorStop(1,   'rgba(255,255,255,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(sx, sy, st.sz * 5, 0, Math.PI * 2); ctx.fill();
     }
 
-    ctx.restore();
+    // Crisp core dot
+    ctx.beginPath(); ctx.arc(sx, sy, st.sz, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,' + alpha + ')';
+    ctx.fill();
+  }
 
-    // Fine rule — fades in beneath the text as fill completes
-    var rAlpha = fillP * 0.20;
-    ctx.strokeStyle = 'rgba(255,255,255,' + rAlpha + ')';
+  /* ════════════════════════════════════════════════════════════
+     ROCKSTAR FILL — "CHRONIS" painted inside letter strokes
+     ──────────────────────────────────────────────────────────
+     TECHNIQUE: source-atop compositing on an offscreen canvas.
+       1. Draw text as solid white on oledTextCanvas.
+          → This creates the alpha mask (letter-shaped pixels).
+       2. Set globalCompositeOperation = 'source-atop'.
+          → Anything drawn now only appears WHERE step 1 has alpha.
+          → The gradient is clipped to exact glyph geometry.
+       3. Blit the composited canvas onto the main OLED canvas.
+
+     ANIMATION: time-based loop (2.4s fill → 0.9s hold → reset).
+     `face` multiplies the final alpha so the whole OLED dims
+     when the locket is not pointing at the camera.
+
+     GRADIENT ZONES (left → right, C → S):
+       [0 … fp-sw] — bright white   (fully lit, filled zone)
+       [fp-sw … fp] — still bright  (fill front arrival)
+       [fp … fp+sw] — shimmer spike (light catching the fill edge)
+       [fp+sw … 1] — dim 12%        (unlit letter substrate)
+  ════════════════════════════════════════════════════════════ */
+  var period  = 3.8;   // total loop duration in seconds
+  var fillDur = 2.4;   // how long the sweep takes
+  var ph      = t % period;
+  var fp;              // fill progress 0→1
+  if (ph < fillDur) {
+    var lin = ph / fillDur;
+    fp = lin * lin * (3 - 2 * lin); // smoothstep — accelerates then decelerates
+  } else {
+    fp = 1.0;          // hold at full until loop resets
+  }
+
+  /* ── Offscreen text compositing ── */
+  var tctx = oledTextCtx;
+  tctx.clearRect(0, 0, W, H);
+
+  // Step 1 — draw CHRONIS as solid white = the alpha mask
+  tctx.font          = FONT;
+  tctx.textAlign     = 'center';
+  tctx.textBaseline  = 'middle';
+  tctx.fillStyle     = '#ffffff';
+  tctx.fillText('CHRONIS', cx, textY);
+
+  // Step 2 — fill inside letter shapes with the sweeping gradient
+  tctx.globalCompositeOperation = 'source-atop';
+
+  var span = 148;  // half-span of gradient (covers full CHRONIS + margin)
+  var sw   = 0.06; // shimmer zone width (in 0–1 gradient space)
+  var grd  = tctx.createLinearGradient(cx - span, 0, cx + span, 0);
+
+  if (fp <= 0.001) {
+    // Nothing filled yet — dim substrate only
+    grd.addColorStop(0, 'rgba(255,255,255,0.12)');
+    grd.addColorStop(1, 'rgba(255,255,255,0.12)');
+  } else if (fp >= 0.999) {
+    // Completely filled
+    grd.addColorStop(0, 'rgba(255,255,255,1.0)');
+    grd.addColorStop(1, 'rgba(255,255,255,1.0)');
+  } else {
+    // Sweeping fill — gradient stops must be strictly increasing
+    var s0 = 0;
+    var s1 = Math.max(0.001, fp - sw);       // filled zone ends
+    var s2 = fp;                              // leading edge
+    var s3 = Math.min(0.999, fp + sw * 0.4); // shimmer peak
+    var s4 = Math.min(1.000, fp + sw);       // unfilled begins
+    var s5 = 1;
+
+    grd.addColorStop(s0, 'rgba(255,255,255,1.00)'); // filled, bright
+    if (s1 > s0) grd.addColorStop(s1, 'rgba(255,255,255,1.00)');
+    grd.addColorStop(s2, 'rgba(255,255,255,1.00)'); // fill front
+    if (s3 > s2) grd.addColorStop(s3, 'rgba(255,255,255,0.72)'); // shimmer
+    if (s4 > s3) grd.addColorStop(s4, 'rgba(255,255,255,0.12)'); // drops into unfilled
+    if (s5 > s4) grd.addColorStop(s5, 'rgba(255,255,255,0.12)'); // unfilled dim substrate
+  }
+
+  tctx.fillStyle = grd;
+  tctx.fillRect(0, 0, W, H);
+
+  // Reset compositing mode
+  tctx.globalCompositeOperation = 'source-over';
+
+  // Step 3 — blit the composited text onto the main OLED at face opacity
+  ctx.globalAlpha = face;
+  ctx.drawImage(oledTextCanvas, 0, 0);
+  ctx.globalAlpha = 1;
+
+  /* ── Fine rule below text — fades in as fill reaches completion ── */
+  var ruleAlpha = face * Math.max(0, (fp - 0.75) / 0.25) * 0.22;
+  if (ruleAlpha > 0.01) {
+    ctx.strokeStyle = 'rgba(255,255,255,' + ruleAlpha + ')';
     ctx.lineWidth   = 0.85;
     ctx.beginPath();
-    ctx.moveTo(cx - 68, textY + 36);
-    ctx.lineTo(cx + 68, textY + 36);
+    ctx.moveTo(cx - 64, textY + 38); ctx.lineTo(cx + 64, textY + 38);
     ctx.stroke();
   }
 
   ctx.restore(); // end disc clip
 
-  // Subtle purple edge ring — always at fixed opacity (it's the bezel, not the screen)
-  ctx.beginPath();
-  ctx.arc(cx, cy, cx - 1.5, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(167,139,250,0.16)';
-  ctx.lineWidth   = 2.2;
-  ctx.stroke();
+  /* ── Purple bezel ring ── */
+  ctx.beginPath(); ctx.arc(cx, cy, cx - 1.5, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(167,139,250,' + (0.10 + face * 0.12) + ')';
+  ctx.lineWidth   = 2.2; ctx.stroke();
 
   oledTexture3.needsUpdate = true;
 }
