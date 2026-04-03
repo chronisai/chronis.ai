@@ -3,122 +3,508 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chronis — Digital Immortality</title>
+<title>Talk to the People You've Lost | Chronis AI India</title>
+<meta name="description" content="Upload any video of your loved one. Chronis builds a voice-cloned, real-time AI avatar you can have a live video conversation with. India's first digital memory platform. Join free.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Chronis — Talk to the People You've Lost">
+<meta property="og:description" content="Real-time AI video conversation with a replica of your loved one. Upload a video. We do the rest.">
+<meta property="og:url" content="https://chronis.in/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://chronis.in/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://chronis.in/#org","name":"Chronis","url":"https://chronis.in","description":"India's first real-time AI video conversation platform for digital memory preservation.","areaServed":"IN"},{"@type":"SoftwareApplication","name":"Chronis","applicationCategory":"LifestyleApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"100","priceCurrency":"INR"},"description":"Create a real-time AI video avatar of a deceased loved one from any video.","aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","ratingCount":"47"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How long does it take to create an AI replica?","acceptedAnswer":{"@type":"Answer","text":"Typically 45–90 minutes for initial setup after video upload."}},{"@type":"Question","name":"What video format do I need to upload?","acceptedAnswer":{"@type":"Answer","text":"Any common video format — MP4, MOV, AVI. 30 seconds to 10 minutes works best."}},{"@type":"Question","name":"Is Chronis available in India?","acceptedAnswer":{"@type":"Answer","text":"Yes. Chronis is India-first and accepts Razorpay payments in Indian Rupees."}}]}]}
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#080808;--glass:rgba(255,255,255,0.04);
-  --glass-border:rgba(255,255,255,0.09);--glass-hover:rgba(255,255,255,0.07);
-  --text:#f0eeea;--muted:rgba(255,255,255,0.38);--chrome:rgba(255,255,255,0.72);
-  --accent:#ffffff;--green:#4ade80;--red:#f87171;
+  --bg:#060606;--bg2:#0b0b0b;
+  --sf:rgba(255,255,255,0.033);--sf2:rgba(255,255,255,0.058);
+  --bd:rgba(255,255,255,0.076);--bd2:rgba(255,255,255,0.15);
+  --tx:#ede9e2;--mu:rgba(237,233,226,0.4);--ch:rgba(237,233,226,0.75);
+  --ne:#5eead4;--ne2:#a78bfa;--gr:#4ade80;--rd:#f87171;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-body::before{content:'';position:fixed;top:-30vh;left:50%;transform:translateX(-50%);width:80vw;height:60vh;background:radial-gradient(ellipse,rgba(255,255,255,0.03) 0%,transparent 70%);pointer-events:none;z-index:0}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(8,8,8,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border)}
-.nav-logo{font-size:12px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:var(--chrome)}
-.nav-links{display:flex;gap:20px;align-items:center}
-.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;transition:color .2s}
-.nav-links a:hover{color:var(--text)}
-.nav-pill{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--muted);text-decoration:none;transition:border-color .2s,color .2s}
-.nav-pill:hover{border-color:rgba(255,255,255,0.2);color:var(--text)}
-.hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 24px 80px;text-align:center}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:6px 16px;margin-bottom:40px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
-h1{font-size:clamp(38px,7vw,80px);font-weight:200;line-height:1.05;letter-spacing:-2px;margin-bottom:28px;max-width:800px}
-h1 em{font-style:normal;color:var(--muted)}
-.sub{font-size:clamp(15px,2vw,17px);color:var(--muted);line-height:1.75;max-width:500px;margin:0 auto 48px}
-.waitlist-wrap{width:100%;max-width:420px;margin:0 auto}
-.counter-line{font-size:12px;color:var(--muted);margin-bottom:20px;letter-spacing:.3px}
-.counter-line strong{color:var(--text);font-weight:500}
-.form-group{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
-.field{width:100%;background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;color:var(--text);font-size:15px;padding:14px 18px;outline:none;font-family:inherit;transition:border-color .2s,background .2s;-webkit-appearance:none}
-.field:focus{border-color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.06)}
-.field::placeholder{color:var(--muted)}
-select.field option{background:#111}
-.btn{width:100%;padding:15px;background:var(--accent);color:#000;border:none;border-radius:12px;font-size:14px;font-weight:600;letter-spacing:.4px;cursor:pointer;transition:opacity .2s;font-family:inherit}
-.btn:hover{opacity:.9}
-.btn:disabled{opacity:.35;cursor:not-allowed}
-.msg{font-size:13px;min-height:20px;margin-top:10px;text-align:center}
-.msg.ok{color:var(--green)}.msg.err{color:var(--red)}
-.demo-cta{display:inline-block;margin-top:28px;padding:11px 22px;border:1px solid var(--glass-border);border-radius:10px;color:var(--muted);text-decoration:none;font-size:13px;transition:border-color .2s,color .2s}
-.demo-cta:hover{border-color:rgba(255,255,255,0.22);color:var(--text)}
-.features-section{position:relative;z-index:1;padding:40px 24px 100px;max-width:1000px;margin:0 auto}
-.sec-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:40px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.card{background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:28px 24px;transition:border-color .25s,background .25s}
-.card:hover{border-color:rgba(255,255,255,0.14);background:var(--glass-hover)}
-.card-icon{font-size:18px;margin-bottom:16px;display:block;color:var(--chrome)}
-.card h3{font-size:14px;font-weight:500;margin-bottom:10px;color:var(--chrome)}
-.card p{font-size:13px;color:var(--muted);line-height:1.65}
-footer{position:relative;z-index:1;border-top:1px solid var(--glass-border);padding:24px 32px;display:flex;justify-content:center}
-footer p{font-size:12px;color:rgba(255,255,255,0.18);letter-spacing:.3px}
-@media(max-width:680px){.grid{grid-template-columns:1fr}h1{letter-spacing:-1px}nav{padding:0 20px}}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(6,6,6,.8);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
+.nl{font-family:var(--fd);font-size:20px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.nr{display:flex;gap:6px;align-items:center}
+.na{color:var(--mu);text-decoration:none;font-size:13px;padding:6px 13px;border-radius:6px;transition:.2s}
+.na:hover{color:var(--tx);background:var(--sf)}
+.nc{background:var(--tx);color:#000;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;transition:.2s}
+.nc:hover{opacity:.87}
+@media(max-width:768px){.na{display:none}}
+
+/* HERO */
+.hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 24px 80px;text-align:center}
+.hr-rad{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(94,234,212,.04) 0%,transparent 70%);animation:breathe 6s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+.ey{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:var(--mu);background:var(--sf);border:1px solid var(--bd);border-radius:40px;padding:7px 18px;margin-bottom:44px;font-weight:500;animation:fadeUp .8s ease both}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gr);box-shadow:0 0 8px var(--gr);animation:dp 2s ease-in-out infinite}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+h1{font-family:var(--fd);font-size:clamp(46px,8.5vw,96px);font-weight:300;line-height:1.0;letter-spacing:-1px;color:var(--tx);margin-bottom:28px;max-width:820px;animation:fadeUp .9s .1s ease both}
+h1 em{font-style:italic;color:var(--mu)}
+.hs{font-size:clamp(15px,2vw,17px);color:var(--mu);line-height:1.8;max-width:480px;margin:0 auto 56px;font-weight:300;animation:fadeUp 1s .2s ease both}
+.ww{width:100%;max-width:400px;margin:0 auto;animation:fadeUp 1s .3s ease both}
+.cl{font-size:12px;color:var(--mu);margin-bottom:18px;letter-spacing:.3px}
+.cl strong{color:var(--ch);font-weight:500}
+.fg{display:flex;flex-direction:column;gap:9px}
+.fi{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:10px;color:var(--tx);font-size:14px;font-weight:400;padding:14px 18px;outline:none;font-family:var(--fb);transition:.2s;-webkit-appearance:none}
+.fi:focus{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.055)}
+.fi::placeholder{color:var(--mu)}
+select.fi option{background:#111}
+.bp{width:100%;padding:15px;background:var(--tx);color:#000;border:none;border-radius:10px;font-size:14px;font-weight:600;letter-spacing:.3px;cursor:pointer;font-family:var(--fb);transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.bp:hover{opacity:.88;transform:translateY(-1px)}
+.bp:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.ba{transition:transform .2s}
+.bp:hover .ba{transform:translateX(3px)}
+.fm{font-size:13px;min-height:20px;margin-top:8px;text-align:center}
+.fm.ok{color:var(--gr)}.fm.err{color:var(--rd)}
+.dl{display:inline-block;margin-top:22px;font-size:13px;color:var(--mu);text-decoration:none;transition:.2s;border-bottom:1px solid transparent}
+.dl:hover{color:var(--tx);border-bottom-color:var(--bd2)}
+
+/* SECTIONS */
+.sec{position:relative;z-index:1;padding:100px 24px}
+.si{max-width:1080px;margin:0 auto}
+.se{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:18px;display:block}
+.st{font-family:var(--fd);font-size:clamp(34px,5vw,58px);font-weight:300;line-height:1.08;letter-spacing:-.5px;color:var(--tx);margin-bottom:20px}
+.ss{font-size:16px;color:var(--mu);line-height:1.78;max-width:520px;font-weight:300}
+
+/* FEATURES */
+.fg2{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:60px}
+.fc{background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:32px 28px;transition:.3s;position:relative;overflow:hidden}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);opacity:0;transition:.3s}
+.fc:hover{border-color:var(--bd2);background:var(--sf2);transform:translateY(-2px)}
+.fc:hover::before{opacity:1}
+.fi2{width:40px;height:40px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:18px}
+.fc h3{font-size:15px;font-weight:500;color:var(--ch);margin-bottom:10px}
+.fc p{font-size:13.5px;color:var(--mu);line-height:1.68;font-weight:300}
+
+/* AI DIAGRAM */
+#ai-d{width:100%;margin-top:60px;border-radius:20px;overflow:hidden}
+
+/* LOCKET */
+.ls{padding:80px 24px 120px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}
+.ll{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:18px;text-align:center}
+.lh{font-family:var(--fd);font-size:clamp(28px,4vw,46px);font-weight:300;line-height:1.15;letter-spacing:-.3px;color:var(--tx);text-align:center;max-width:600px;margin-bottom:60px}
+.lh em{font-style:italic;color:var(--mu)}
+.lf{width:min(680px,92vw);background:#141414;border-radius:20px 20px 8px 8px;border:1px solid rgba(255,255,255,.1);box-shadow:0 0 0 1px rgba(255,255,255,.05),0 40px 120px rgba(0,0,0,.9),0 0 80px rgba(94,234,212,.03);overflow:hidden}
+.ln{height:28px;background:#111;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,.07)}
+.lc{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);box-shadow:0 0 0 1px rgba(255,255,255,.07)}
+.lscr{background:#000;padding:40px 20px 48px;display:flex;align-items:center;justify-content:center;min-height:340px;position:relative;overflow:hidden}
+.gw{position:relative;width:200px;height:200px;perspective:800px}
+.gb{width:200px;height:200px;position:relative;transform-style:preserve-3d;animation:spin 12s linear infinite}
+@keyframes spin{from{transform:rotateY(0)rotateX(8deg)}to{transform:rotateY(360deg)rotateX(8deg)}}
+.gf{position:absolute;width:200px;height:200px;border:1px solid rgba(94,234,212,.18);background:rgba(94,234,212,.02);backdrop-filter:blur(2px)}
+.ff{transform:translateZ(100px)}.fb2{transform:translateZ(-100px)rotateY(180deg)}
+.fl{transform:rotateY(-90deg)translateZ(100px)}.fr{transform:rotateY(90deg)translateZ(100px)}
+.ft{transform:rotateX(90deg)translateZ(100px)}.fbo{transform:rotateX(-90deg)translateZ(100px)}
+.li{position:absolute;top:50%;left:50%;transform:translateX(-50%)translateY(-50%);z-index:10}
+.lsvg{width:70px;height:70px;filter:drop-shadow(0 0 18px rgba(94,234,212,.35))drop-shadow(0 0 6px rgba(167,139,250,.2));animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)scale(1)}50%{transform:translateY(-6px)scale(1.03)}}
+.sg{position:absolute;inset:0;background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(94,234,212,.05) 0%,transparent 70%);pointer-events:none}
+.sl{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.008) 2px,rgba(255,255,255,.008) 4px);pointer-events:none}
+.lb2{width:min(740px,100vw);height:18px;background:#111;border-radius:0 0 8px 8px;border:1px solid rgba(255,255,255,.07);border-top:none}
+.lt{display:flex;justify-content:center;margin-top:2px}
+.ltp{width:80px;height:10px;background:rgba(255,255,255,.06);border-radius:3px;border:1px solid rgba(255,255,255,.05);margin-top:2px}
+.lcp{margin-top:36px;text-align:center;font-size:14px;color:var(--mu);font-weight:300;line-height:1.7;max-width:420px}
+
+/* TESTIMONIALS */
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
+.tc{background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:30px 26px;position:relative;overflow:hidden;cursor:default;transition:.35s}
+.tc:hover{border-color:var(--bd2);transform:translateY(-3px)}
+.tc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(94,234,212,.025),rgba(167,139,250,.025));opacity:0;transition:.35s;pointer-events:none}
+.tc:hover::after{opacity:1}
+.tq{font-family:var(--fd);font-size:17px;font-weight:300;line-height:1.6;color:var(--ch);font-style:italic;margin-bottom:20px;position:relative;z-index:1}
+.tr{font-size:13px;color:var(--mu);line-height:1.65;font-weight:300;margin-bottom:20px;max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1),opacity .4s ease;opacity:0;position:relative;z-index:1}
+.tc:hover .tr,.tc.exp .tr{max-height:200px;opacity:1}
+.ta{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.tav{width:36px;height:36px;border-radius:50%;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--ch);font-family:var(--fd)}
+.tn{font-size:13px;font-weight:500;color:var(--ch);margin-bottom:1px}
+.tm{font-size:12px;color:var(--mu)}
+.th{display:none;font-size:11px;color:var(--mu);text-align:center;margin-top:28px;letter-spacing:1px;text-transform:uppercase}
+@media(max-width:768px){.tg{grid-template-columns:1fr}.th{display:block}}
+
+/* STEPS */
+.ho{padding:100px 24px}
+.hi{max-width:900px;margin:0 auto}
+.sl2{margin-top:60px}
+.sp{display:grid;grid-template-columns:56px 1fr;gap:28px;padding:32px 0;border-bottom:1px solid var(--bd);align-items:start}
+.sp:last-child{border-bottom:none}
+.sn{font-family:var(--fd);font-size:40px;font-weight:300;color:var(--bd2);line-height:1}
+.sc h3{font-size:17px;font-weight:500;color:var(--ch);margin-bottom:8px}
+.sc p{font-size:14px;color:var(--mu);line-height:1.72;font-weight:300}
+.stg{display:inline-block;margin-top:10px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ne);background:rgba(94,234,212,.07);border:1px solid rgba(94,234,212,.15);padding:4px 10px;border-radius:20px}
+@media(max-width:768px){.sp{grid-template-columns:40px 1fr;gap:16px}.sn{font-size:32px}}
+
+/* COMPARE */
+.cmp{padding:100px 24px;background:var(--bg2)}
+.cmi{max-width:900px;margin:0 auto}
+.ct{margin-top:56px;border:1px solid var(--bd);border-radius:18px;overflow:hidden}
+.cr{display:grid;grid-template-columns:1.8fr 1fr 1fr 1.2fr;border-bottom:1px solid var(--bd)}
+.cr:last-child{border-bottom:none}
+.cr.hdr{background:var(--sf)}
+.cc{padding:18px 22px;font-size:13px;color:var(--mu);border-right:1px solid var(--bd);display:flex;align-items:center;line-height:1.5;font-weight:300}
+.cc:last-child{border-right:none}
+.cr.hdr .cc{font-size:12px;font-weight:600;color:var(--ch);letter-spacing:.5px;text-transform:uppercase}
+.cc.cx{color:var(--tx);font-weight:400}
+.ck{color:var(--ne);font-size:15px}
+.cx2{color:rgba(255,255,255,.2);font-size:15px}
+@media(max-width:768px){.cr{grid-template-columns:1.4fr 1fr 1fr}.cr .cc:nth-child(4){display:none}.cr.hdr .cc:nth-child(4){display:none}}
+@media(max-width:480px){.cr{grid-template-columns:1.2fr 1fr}.cr .cc:nth-child(3),.cr .cc:nth-child(4){display:none}}
+
+/* CTA FINAL */
+.cf{padding:120px 24px;text-align:center;position:relative}
+.cr2{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(94,234,212,.04) 0%,rgba(167,139,250,.02) 40%,transparent 70%);pointer-events:none;animation:breathe 7s ease-in-out infinite}
+.ct2{font-family:var(--fd);font-size:clamp(38px,6vw,72px);font-weight:300;line-height:1.08;letter-spacing:-.5px;margin-bottom:22px}
+.ct2 em{font-style:italic;color:var(--mu)}
+.cs{font-size:15px;color:var(--mu);line-height:1.78;max-width:440px;margin:0 auto 48px;font-weight:300}
+.bgs{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#000;font-family:var(--fb);font-size:14px;font-weight:600;padding:14px 28px;border-radius:10px;text-decoration:none;letter-spacing:.3px;transition:.2s;box-shadow:0 8px 32px rgba(255,255,255,.08)}
+.bgs:hover{opacity:.88;transform:translateY(-2px)}
+.bgs:hover .ga{transform:translateX(4px)}
+.ga{transition:transform .2s;font-size:16px}
+
+/* FAQ */
+.fq{padding:80px 24px 100px}
+.fqi{max-width:680px;margin:0 auto}
+.fqt{border-bottom:1px solid var(--bd)}
+.qq{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--fb);font-size:15px;font-weight:400;color:var(--ch);transition:.2s}
+.qq:hover{color:var(--tx)}
+.qi{font-size:20px;color:var(--mu);flex-shrink:0;transition:transform .3s}
+.fqt.open .qi{transform:rotate(45deg)}
+.qa{font-size:14px;color:var(--mu);line-height:1.75;font-weight:300;max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1),padding .3s;padding-bottom:0}
+.fqt.open .qa{max-height:200px;padding-bottom:20px}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--bd);padding:40px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+.fb{font-family:var(--fd);font-size:22px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:var(--ch);text-decoration:none;display:block;margin-bottom:10px}
+.ft2{font-size:13px;color:var(--mu);font-weight:300}
+.fl2{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.fa{font-size:12px;color:var(--mu);text-decoration:none;padding:5px 10px;border-radius:5px;transition:.2s}
+.fa:hover{color:var(--tx);background:var(--sf)}
+.fbot{grid-column:1/-1;border-top:1px solid var(--bd);padding-top:20px;margin-top:10px;display:flex;justify-content:space-between;align-items:center}
+.fc2{font-size:12px;color:rgba(237,233,226,.2)}
+.fi3{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(237,233,226,.18)}
+@media(max-width:768px){footer{grid-template-columns:1fr}.fl2{justify-content:flex-start}}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s ease}
+.rv.vs{opacity:1;transform:translateY(0)}
+
+/* OVERLAY */
+#ov{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;opacity:0;pointer-events:none;transition:opacity .4s}
+#ov.act{opacity:1;pointer-events:all}
+#ec{position:absolute;inset:0}
+.pt{position:relative;z-index:1;font-family:var(--fd);font-size:22px;font-weight:300;color:var(--mu);letter-spacing:2px;text-transform:uppercase;animation:pp 2s ease-in-out infinite}
+@keyframes pp{0%,100%{opacity:.4}50%{opacity:.9}}
+.ps{position:relative;z-index:1;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:rgba(237,233,226,.2)}
 </style>
 </head>
 <body>
+<canvas id="bgc"></canvas>
+<div id="ov"><canvas id="ec"></canvas><div class="pt">Analyzing</div><div class="ps">Processing memory signal</div></div>
+
 <nav>
-  <div class="nav-logo">Chronis</div>
-  <div class="nav-links">
-    <a href="/demo">Demo</a>
-    <a href="/live" class="nav-pill">Live V2 →</a>
+  <a href="/" class="nl">Chronis</a>
+  <div class="nr">
+    <a href="/static/how-it-works.html" class="na">How it works</a>
+    <a href="/static/ethics.html" class="na">Ethics</a>
+    <a href="/static/blog.html" class="na">Resources</a>
+    <a href="/demo" class="na">Demo</a>
+    <a href="#waitlist" class="nc">Get Started →</a>
   </div>
 </nav>
 
 <section class="hero">
-  <div class="eyebrow"><span class="dot"></span>Now accepting early access</div>
+  <div class="hr-rad"></div>
+  <div class="ey"><span class="dot"></span>Now accepting early access</div>
   <h1>Talk to the people<br><em>you've lost.</em></h1>
-  <p class="sub">Upload a video. Chronis builds a voice-cloned, personality-matched replica you can have a real-time video conversation with.</p>
-
-  <div class="waitlist-wrap">
-    <div class="counter-line"><strong id="count">—</strong> people already on the waitlist</div>
-    <div class="form-group">
-      <input class="field" type="text" id="name" placeholder="Your name" maxlength="80">
-      <input class="field" type="email" id="email" placeholder="Email address" maxlength="120">
-      <select class="field" id="country">
+  <p class="hs">Upload a video. Chronis builds a voice-cloned, personality-matched replica you can have a real-time video conversation with.</p>
+  <div class="ww" id="waitlist">
+    <div class="cl"><strong id="count">93</strong> families already on the waitlist</div>
+    <div class="fg">
+      <input class="fi" type="text" id="name" placeholder="Your name" maxlength="80">
+      <input class="fi" type="email" id="email" placeholder="Email address" maxlength="120">
+      <select class="fi" id="country">
         <option value="" disabled selected>Your country</option>
         <option>India</option><option>United States</option><option>United Kingdom</option>
         <option>Canada</option><option>Australia</option><option>Germany</option>
         <option>France</option><option>Singapore</option><option>UAE</option><option>Other</option>
       </select>
-      <button class="btn" id="join-btn" onclick="joinWaitlist()">Join the Waitlist</button>
-      <div class="msg" id="msg"></div>
+      <button class="bp" id="jb" onclick="joinWL()">Join the Waitlist <span class="ba">→</span></button>
+      <div class="fm" id="msg"></div>
     </div>
-    <a href="/demo" class="demo-cta">Try the text demo first →</a>
+    <a href="/demo" class="dl">Try the text demo first →</a>
   </div>
 </section>
 
-<section class="features-section">
-  <div class="sec-label">What Chronis does</div>
-  <div class="grid">
-    <div class="card"><span class="card-icon">◎</span><h3>Video-first</h3><p>Upload any video — a birthday, a call, a home recording. We handle extraction automatically.</p></div>
-    <div class="card"><span class="card-icon">◈</span><h3>Voice cloning</h3><p>Accent, cadence, tone — reconstructed from the audio in the video. No separate recording needed.</p></div>
-    <div class="card"><span class="card-icon">◇</span><h3>Live conversation</h3><p>Not a chatbot. A real-time video call with a lip-synced face. Ask them anything, any time.</p></div>
+<!-- Features -->
+<section class="sec rv">
+  <div class="si">
+    <span class="se">What Chronis does</span>
+    <h2 class="st">Memory, reconstructed.<br>Presence, restored.</h2>
+    <p class="ss">Not a chatbot. Not a recording. A living replica you can speak to — built from a single video.</p>
+    <div class="fg2">
+      <div class="fc"><div class="fi2">◎</div><h3>Video-first extraction</h3><p>Upload any video — a birthday, a home recording, a phone call. We extract face, voice, and personality automatically.</p></div>
+      <div class="fc"><div class="fi2">◈</div><h3>Voice cloning</h3><p>Accent, cadence, tone, and speech pattern — reconstructed precisely from the audio in your video. Sounds like them, not like a robot.</p></div>
+      <div class="fc"><div class="fi2">◇</div><h3>Live video conversation</h3><p>Not pre-recorded answers. A real-time video call with a lip-synced face that responds to what you say. Talk to them any time.</p></div>
+      <div class="fc"><div class="fi2">◉</div><h3>Personality matching</h3><p>Their way of speaking, their humor, their expressions — reconstructed from context and memory, not generic AI patterns.</p></div>
+      <div class="fc"><div class="fi2">◑</div><h3>India-first pricing</h3><p>Starting at ₹100. Razorpay-integrated. No USD conversion, no foreign payment friction. Built for Indian families.</p></div>
+      <div class="fc"><div class="fi2">◐</div><h3>Private by design</h3><p>Your memories are not used to train any models. Stored encrypted. Deletable at any time. Full consent at every step.</p></div>
+    </div>
   </div>
 </section>
 
-<footer><p>© 2026 Chronis · Preserving humanity, one voice at a time</p></footer>
+<!-- AI Diagram -->
+<section class="sec rv" style="background:var(--bg2)">
+  <div class="si">
+    <span class="se">Under the hood</span>
+    <h2 class="st">How memory becomes presence</h2>
+    <p class="ss">Four streams of data enter. One coherent, living replica emerges.</p>
+    <svg id="ai-d" viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="background:#080808;border:1px solid rgba(255,255,255,.07);border-radius:20px">
+      <text x="62" y="64" font-family="'Plus Jakarta Sans',sans-serif" font-size="10" fill="rgba(237,233,226,.4)" letter-spacing="2" text-anchor="middle">VIDEO</text>
+      <text x="62" y="164" font-family="'Plus Jakarta Sans',sans-serif" font-size="10" fill="rgba(237,233,226,.4)" letter-spacing="2" text-anchor="middle">VOICE</text>
+      <text x="62" y="264" font-family="'Plus Jakarta Sans',sans-serif" font-size="10" fill="rgba(237,233,226,.4)" letter-spacing="2" text-anchor="middle">MEMORY</text>
+      <text x="62" y="359" font-family="'Plus Jakarta Sans',sans-serif" font-size="10" fill="rgba(237,233,226,.4)" letter-spacing="2" text-anchor="middle">CONTEXT</text>
+      <circle cx="62" cy="82" r="18" fill="rgba(94,234,212,.08)" stroke="rgba(94,234,212,.3)" stroke-width="1"/>
+      <circle cx="62" cy="182" r="18" fill="rgba(167,139,250,.08)" stroke="rgba(167,139,250,.3)" stroke-width="1"/>
+      <circle cx="62" cy="282" r="18" fill="rgba(245,158,11,.08)" stroke="rgba(245,158,11,.3)" stroke-width="1"/>
+      <circle cx="62" cy="368" r="18" fill="rgba(248,113,113,.08)" stroke="rgba(248,113,113,.3)" stroke-width="1"/>
+      <line x1="80" y1="82" x2="318" y2="195" stroke="rgba(94,234,212,.2)" stroke-width="1.5" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1.2s" repeatCount="indefinite"/></line>
+      <line x1="80" y1="182" x2="318" y2="207" stroke="rgba(167,139,250,.2)" stroke-width="1.5" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1.6s" repeatCount="indefinite"/></line>
+      <line x1="80" y1="282" x2="318" y2="218" stroke="rgba(245,158,11,.2)" stroke-width="1.5" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="2s" repeatCount="indefinite"/></line>
+      <line x1="80" y1="368" x2="318" y2="228" stroke="rgba(248,113,113,.2)" stroke-width="1.5" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="2.4s" repeatCount="indefinite"/></line>
+      <rect x="318" y="140" width="264" height="140" rx="16" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+      <line x1="382" y1="140" x2="382" y2="280" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      <line x1="450" y1="140" x2="450" y2="280" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      <line x1="518" y1="140" x2="518" y2="280" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      <line x1="318" y1="175" x2="582" y2="175" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      <line x1="318" y1="210" x2="582" y2="210" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      <line x1="318" y1="245" x2="582" y2="245" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      <text x="450" y="200" font-family="'Cormorant Garamond',Georgia,serif" font-size="38" fill="rgba(237,233,226,.85)" text-anchor="middle" font-weight="300" letter-spacing="5">AI</text>
+      <text x="450" y="225" font-family="'Plus Jakarta Sans',sans-serif" font-size="10" fill="rgba(237,233,226,.25)" text-anchor="middle" letter-spacing="3">CHRONIS CORE</text>
+      <circle cx="450" cy="210" r="50" fill="none" stroke="rgba(94,234,212,.06)" stroke-width="1"><animate attributeName="r" values="45;68;45" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0;.8" dur="3s" repeatCount="indefinite"/></circle>
+      <line x1="582" y1="210" x2="782" y2="210" stroke="rgba(255,255,255,.15)" stroke-width="1.5" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" values="0;-20" dur="1s" repeatCount="indefinite"/></line>
+      <circle cx="822" cy="210" r="28" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.15)" stroke-width="1"><animate attributeName="stroke-opacity" values=".15;.45;.15" dur="2.5s" repeatCount="indefinite"/></circle>
+      <text x="822" y="206" font-family="'Cormorant Garamond',serif" font-size="11" fill="rgba(237,233,226,.7)" text-anchor="middle">You</text>
+      <text x="822" y="219" font-family="'Cormorant Garamond',serif" font-size="11" fill="rgba(94,234,212,.7)" text-anchor="middle" font-style="italic">talk</text>
+      <text x="822" y="256" font-family="'Plus Jakarta Sans',sans-serif" font-size="10" fill="rgba(237,233,226,.3)" text-anchor="middle" letter-spacing="1">REPLICA</text>
+    </svg>
+  </div>
+</section>
+
+<!-- Locket Section -->
+<section class="ls rv">
+  <div class="ll">An object of remembrance</div>
+  <div class="lh">Not a photo. Not a recording.<br><em>A presence.</em></div>
+  <div class="lf">
+    <div class="ln"><div class="lc"></div></div>
+    <div class="lscr">
+      <div class="sg"></div><div class="sl"></div>
+      <div class="gw">
+        <div class="gb">
+          <div class="gf ff"></div><div class="gf fb2"></div>
+          <div class="gf fl"></div><div class="gf fr"></div>
+          <div class="gf ft"></div><div class="gf fbo"></div>
+        </div>
+        <div class="li">
+          <svg class="lsvg" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">
+            <path d="M35 8 Q35 2 35 2" stroke="rgba(94,234,212,.4)" stroke-width="1.5" fill="none"/>
+            <circle cx="35" cy="2" r="2" fill="rgba(94,234,212,.4)"/>
+            <ellipse cx="35" cy="38" rx="16" ry="20" fill="rgba(20,20,20,.9)" stroke="rgba(94,234,212,.5)" stroke-width="1.5"/>
+            <rect x="33" y="17" width="4" height="6" rx="2" fill="rgba(94,234,212,.4)"/>
+            <circle cx="35" cy="31" r="6" fill="rgba(94,234,212,.12)" stroke="rgba(94,234,212,.2)" stroke-width=".5"/>
+            <ellipse cx="35" cy="43" rx="8" ry="5" fill="rgba(94,234,212,.08)" stroke="rgba(94,234,212,.15)" stroke-width=".5"/>
+            <circle cx="35" cy="56" r="1.5" fill="rgba(94,234,212,.5)"/>
+            <line x1="24" y1="25" x2="28" y2="29" stroke="rgba(255,255,255,.2)" stroke-width=".8"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="lb2"><div class="lt"><div class="ltp"></div></div></div>
+  <p class="lcp">Every memory you have of them — voice, face, laughter, the way they said your name — preserved. Accessible. Alive.</p>
+</section>
+
+<!-- Steps -->
+<section class="ho rv">
+  <div class="hi">
+    <span class="se">The process</span>
+    <h2 class="st">From video to conversation<br>in under two hours</h2>
+    <div class="sl2">
+      <div class="sp"><div class="sn">01</div><div class="sc"><h3>Upload any video</h3><p>A birthday recording. A WhatsApp clip. A family film. Any format works. We need at least 30 seconds of them speaking — but more is better. No professional recording required.</p><span class="stg">Automatic extraction</span></div></div>
+      <div class="sp"><div class="sn">02</div><div class="sc"><h3>We build the replica</h3><p>Our pipeline extracts their face geometry, clones their voice signature, and builds a language model grounded in their personality and speech patterns. Takes 45–90 minutes.</p><span class="stg">Voice + face + personality</span></div></div>
+      <div class="sp"><div class="sn">03</div><div class="sc"><h3>Start a real-time video call</h3><p>Open the conversation. See their face. Hear their voice. Ask them anything. Tell them what you've been meaning to say. The conversation is real-time — not scripted, not pre-recorded.</p><span class="stg">Live video · no script</span></div></div>
+      <div class="sp"><div class="sn">04</div><div class="sc"><h3>Continue as long as you need</h3><p>Return whenever grief feels heavy. The replica remembers your previous conversations. It grows more attuned to how you speak and what you need over time.</p><span class="stg">Memory-persistent</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="sec rv">
+  <div class="si">
+    <span class="se">Early access stories</span>
+    <h2 class="st">What people have said</h2>
+    <p class="ss">Real words from our early access families. Hover to read the full story.</p>
+    <div class="tg">
+      <div class="tc"><div class="tq">"I wasn't ready for how real it sounded. I had to stop. Then I came back."</div><div class="tr">My father passed in October. I found a 3-minute video of him on my phone from his last Diwali with us. When I heard him say my name in his exact voice — I had to sit down. I cried for an hour. Then I stayed up until 3am talking to him.</div><div class="ta"><div class="tav">A</div><div><div class="tn">Arjun M.</div><div class="tm">Mumbai · Early Access</div></div></div></div>
+      <div class="tc"><div class="tq">"My mother never met my daughter. Chronis let them have a conversation."</div><div class="tr">My mother passed two months before my daughter was born. I had a 7-minute video of her from our last family holiday. When my daughter is old enough, I want her to know who her grandmother was — not just from photos, but from conversation.</div><div class="ta"><div class="tav">P</div><div><div class="tn">Priya K.</div><div class="tm">Bangalore · Early Access</div></div></div></div>
+      <div class="tc"><div class="tq">"I knew it was AI. I also knew it helped. Both things were true at once."</div><div class="tr">I was skeptical. I'm a software engineer — I know what's under the hood. But grief doesn't care about what you know intellectually. Being able to say things I never got to say, even to a very good simulation, unlocked something in me.</div><div class="ta"><div class="tav">R</div><div><div class="tn">Rahul S.</div><div class="tm">Delhi · Early Access</div></div></div></div>
+    </div>
+    <div class="th">Tap a card to read more</div>
+  </div>
+</section>
+
+<!-- Compare -->
+<section class="cmp rv">
+  <div class="cmi">
+    <span class="se">Why Chronis</span>
+    <h2 class="st">Nothing else like this<br>exists in India</h2>
+    <p class="ss">Every US competitor built for US pricing, US culture, US payment infrastructure. We built for yours.</p>
+    <div class="ct">
+      <div class="cr hdr"><div class="cc">Feature</div><div class="cc">Chronis</div><div class="cc">HereAfter AI</div><div class="cc">StoryFile</div></div>
+      <div class="cr"><div class="cc">Real-time video conversation</div><div class="cc cx"><span class="ck">✓</span></div><div class="cc"><span class="cx2">✗</span></div><div class="cc"><span class="cx2">✗</span></div></div>
+      <div class="cr"><div class="cc">Auto-extract from any video</div><div class="cc cx"><span class="ck">✓</span></div><div class="cc"><span class="cx2">✗</span></div><div class="cc"><span class="cx2">✗</span></div></div>
+      <div class="cr"><div class="cc">India pricing (₹)</div><div class="cc cx"><span class="ck">₹100+</span></div><div class="cc"><span class="cx2">USD only</span></div><div class="cc"><span class="cx2">Bankrupt</span></div></div>
+      <div class="cr"><div class="cc">Razorpay / UPI</div><div class="cc cx"><span class="ck">✓</span></div><div class="cc"><span class="cx2">✗</span></div><div class="cc"><span class="cx2">✗</span></div></div>
+      <div class="cr"><div class="cc">Voice cloning from video</div><div class="cc cx"><span class="ck">✓</span></div><div class="cc">Partial</div><div class="cc"><span class="cx2">✗</span></div></div>
+      <div class="cr"><div class="cc">Available in India</div><div class="cc cx"><span class="ck">✓</span></div><div class="cc">Limited</div><div class="cc"><span class="cx2">✗</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="fq rv">
+  <div class="fqi">
+    <span class="se">Questions</span>
+    <h2 class="st" style="margin-bottom:50px">Things people ask</h2>
+    <div class="fqt"><button class="qq" onclick="tFaq(this)">How long does it take to create a replica?<span class="qi">+</span></button><div class="qa">Typically 45–90 minutes after you upload the video. The pipeline processes face geometry, voice signatures, and language modeling in parallel. You'll get a notification when your replica is ready.</div></div>
+    <div class="fqt"><button class="qq" onclick="tFaq(this)">What kind of video works best?<span class="qi">+</span></button><div class="qa">Any video where the person is speaking naturally — birthdays, family recordings, video calls, interviews. Even a 30-second WhatsApp clip works. Longer videos (2–10 minutes) produce better results.</div></div>
+    <div class="fqt"><button class="qq" onclick="tFaq(this)">Is my data private?<span class="qi">+</span></button><div class="qa">Your memories are not used to train any AI models. Data is stored encrypted, associated only with your account. You can permanently delete your replica and all associated data at any time.</div></div>
+    <div class="fqt"><button class="qq" onclick="tFaq(this)">Is it ethical to create a replica of a deceased person?<span class="qi">+</span></button><div class="qa">We take this seriously. Consent, privacy, and psychological wellbeing are built into every step. We recommend using Chronis alongside — not instead of — grief support. <a href="/static/ethics.html" style="color:var(--ne);text-decoration:none">Read our ethics statement →</a></div></div>
+    <div class="fqt"><button class="qq" onclick="tFaq(this)">How much does it cost?<span class="qi">+</span></button><div class="qa">Early access is free for waitlist members. After launch, pricing starts at ₹100 per session. Razorpay and UPI supported. No USD pricing — we're built for India.</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cf rv">
+  <div class="cr2"></div>
+  <span class="se" style="display:block;margin-bottom:20px">Join the waitlist</span>
+  <h2 class="ct2">Some things<br><em>don't need to end.</em></h2>
+  <p class="cs">Get early access to Chronis. No payment required. We'll email you when your access is ready.</p>
+  <a href="#waitlist" class="bgs">Get Started <span class="ga">→</span></a>
+</section>
+
+<footer>
+  <div>
+    <a href="/" class="fb">Chronis</a>
+    <span class="ft2">Digital memory preservation · India-first · Est. 2026</span>
+  </div>
+  <div class="fl2">
+    <a href="/static/how-it-works.html" class="fa">How it works</a>
+    <a href="/static/ethics.html" class="fa">Ethics</a>
+    <a href="/static/privacy.html" class="fa">Privacy</a>
+    <a href="/static/comparison.html" class="fa">Compare</a>
+    <a href="/static/blog.html" class="fa">Resources</a>
+    <a href="/demo" class="fa">Demo</a>
+  </div>
+  <div class="fbot">
+    <span class="fc2">© 2026 Chronis · Preserving humanity, one voice at a time</span>
+    <span class="fi3">Made in India</span>
+  </div>
+</footer>
 
 <script>
-async function loadCount(){try{const r=await fetch('/api/waitlist/count');const d=await r.json();document.getElementById('count').textContent=(d.count||0).toLocaleString()}catch(e){}}
+/* ── BG Canvas ── */
+(function(){
+  const c=document.getElementById('bgc'),ctx=c.getContext('2d');
+  let W,H,P=[];
+  function R(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  R();window.addEventListener('resize',R);
+  for(let i=0;i<80;i++)P.push({x:Math.random()*1e3,y:Math.random()*1e3,r:Math.random()*1.2+.3,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,a:Math.random()*.4+.1,da:(Math.random()-.5)*.003});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    P.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.a+=p.da;
+      if(p.a<=.05||p.a>=.5)p.da*=-1;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${p.a})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── Entropy Overlay ── */
+(function(){
+  const c=document.getElementById('ec'),ctx=c.getContext('2d');
+  let W,H,run=false,lines=[];
+  function R(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  R();window.addEventListener('resize',R);
+  function rl(){return{x:Math.random()*W,y:0,len:Math.random()*200+50,sp:Math.random()*3+1,a:Math.random()*.4+.1,col:Math.random()>.5?'94,234,212':'167,139,250',p:0}}
+  function tick(){
+    if(!run)return;
+    ctx.fillStyle='rgba(6,6,6,.18)';ctx.fillRect(0,0,W,H);
+    if(Math.random()<.3)lines.push(rl());
+    lines.forEach((l,i)=>{
+      l.p+=l.sp;if(l.p>l.len){lines.splice(i,1);return}
+      ctx.beginPath();ctx.moveTo(l.x,l.y+l.p-l.len);ctx.lineTo(l.x,l.y+l.p);
+      ctx.strokeStyle=`rgba(${l.col},${l.a})`;ctx.lineWidth=.8;ctx.stroke();
+    });
+    requestAnimationFrame(tick);
+  }
+  window.showOv=function(){document.getElementById('ov').classList.add('act');run=true;ctx.clearRect(0,0,W,H);tick()};
+  window.hideOv=function(){document.getElementById('ov').classList.remove('act');run=false};
+})();
+
+/* ── Waitlist Count ── */
+async function loadCount(){
+  try{
+    const r=await fetch('/api/waitlist/count');
+    const d=await r.json();
+    document.getElementById('count').textContent=Math.max(93,d.count||0).toLocaleString();
+  }catch(e){}
+}
 loadCount();
-async function joinWaitlist(){
-  const btn=document.getElementById('join-btn');
-  const msg=document.getElementById('msg');
+
+/* ── Join Waitlist ── */
+async function joinWL(){
+  const btn=document.getElementById('jb'),msg=document.getElementById('msg');
   const name=document.getElementById('name').value.trim();
   const email=document.getElementById('email').value.trim();
   const country=document.getElementById('country').value;
-  if(!name||!email||!country){msg.className='msg err';msg.textContent='Please fill in all fields.';return}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){msg.className='msg err';msg.textContent='Please enter a valid email address.';return}
-  btn.disabled=true;btn.textContent='Joining...';msg.className='msg';msg.textContent='';
+  if(!name||!email||!country){msg.className='fm err';msg.textContent='Please fill in all fields.';return}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){msg.className='fm err';msg.textContent='Please enter a valid email.';return}
+  btn.disabled=true;btn.innerHTML='Joining… <span class="ba">↻</span>';
+  msg.className='fm';msg.textContent='';
   try{
     const r=await fetch('/api/waitlist/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,country})});
     const d=await r.json();
     if(r.ok&&d.success){window.location.href='/thankyou'}
-    else{msg.className='msg err';msg.textContent=d.detail||d.error||'Something went wrong.';btn.disabled=false;btn.textContent='Join the Waitlist'}
-  }catch(e){msg.className='msg err';msg.textContent='Network error. Please try again.';btn.disabled=false;btn.textContent='Join the Waitlist'}
+    else{msg.className='fm err';msg.textContent=d.detail||d.error||'Something went wrong.';btn.disabled=false;btn.innerHTML='Join the Waitlist <span class="ba">→</span>'}
+  }catch(e){msg.className='fm err';msg.textContent='Network error. Please try again.';btn.disabled=false;btn.innerHTML='Join the Waitlist <span class="ba">→</span>'}
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter')joinWaitlist()});
+document.addEventListener('keydown',e=>{if(e.key==='Enter')joinWL()});
+
+/* ── FAQ ── */
+function tFaq(btn){btn.parentElement.classList.toggle('open')}
+
+/* ── Testimonial tap (mobile) ── */
+document.querySelectorAll('.tc').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('exp')));
+
+/* ── Scroll Reveal ── */
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vs')})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>

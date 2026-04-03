@@ -3,265 +3,180 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chronis — Text Demo</title>
+<title>Try the Chronis AI Demo — Real-Time Conversation with a Digital Replica</title>
+<meta name="description" content="Experience Chronis before you commit. Upload a video or audio and talk to a pre-built AI replica in real time. See the voice cloning and lip-sync in action.">
+<link rel="canonical" href="https://chronis.in/demo">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#080808;--glass:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.09);--glass-hover:rgba(255,255,255,0.07);--text:#f0eeea;--muted:rgba(255,255,255,0.38);--chrome:rgba(255,255,255,0.72);--accent:#fff;--green:#4ade80;--red:#f87171;--blue:#60a5fa}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
-body::before{content:'';position:fixed;top:-20vh;left:50%;transform:translateX(-50%);width:70vw;height:50vh;background:radial-gradient(ellipse,rgba(255,255,255,0.025) 0%,transparent 70%);pointer-events:none;z-index:0}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;background:rgba(8,8,8,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border)}
-.nav-logo{font-size:12px;letter-spacing:6px;text-transform:uppercase;color:var(--chrome);text-decoration:none}
-.nav-badge{font-size:11px;letter-spacing:2px;text-transform:uppercase;background:var(--glass);border:1px solid var(--glass-border);color:var(--muted);padding:4px 12px;border-radius:20px}
-.app{display:flex;flex-direction:column;height:100vh;padding-top:56px;position:relative;z-index:1}
+:root{--bg:#060606;--sf:rgba(255,255,255,.035);--sf2:rgba(255,255,255,.06);--bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.16);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--gr:#4ade80;--rd:#f87171;--bl:#60a5fa;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;top:-20vh;left:50%;transform:translateX(-50%);width:70vw;height:50vh;background:radial-gradient(ellipse,rgba(255,255,255,.02) 0%,transparent 70%);pointer-events:none;z-index:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(6,6,6,.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
+.nl{font-family:var(--fd);font-size:18px;font-weight:400;letter-spacing:3px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.nb{font-size:11px;letter-spacing:2px;text-transform:uppercase;background:var(--sf);border:1px solid var(--bd);color:var(--mu);padding:5px 14px;border-radius:20px}
+.app{display:flex;flex-direction:column;height:100vh;padding-top:60px;position:relative;z-index:1}
 
 /* Upload panel */
-#upload-panel{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px}
-.panel-inner{width:100%;max-width:480px}
-.panel-title{font-size:22px;font-weight:300;letter-spacing:-.4px;margin-bottom:8px;text-align:center}
-.panel-sub{font-size:14px;color:var(--muted);text-align:center;line-height:1.65;margin-bottom:28px}
-.upload-zone{border:1.5px dashed var(--glass-border);border-radius:14px;padding:36px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;overflow:hidden;background:var(--glass);margin-bottom:10px}
-.upload-zone:hover{border-color:rgba(255,255,255,0.2);background:var(--glass-hover)}
-.upload-zone.has-file{border-color:var(--green);border-style:solid}
-.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-icon{font-size:28px;color:var(--muted);display:block;margin-bottom:10px}
-.upload-label{font-size:13px;color:var(--muted)}.upload-label strong{color:var(--chrome);display:block;margin-bottom:3px}
-.upload-filename{font-size:12px;color:var(--green);margin-top:8px}
-.field{width:100%;background:var(--glass);border:1px solid var(--glass-border);border-radius:11px;color:var(--text);font-size:14px;padding:13px 16px;outline:none;font-family:inherit;transition:border-color .2s;-webkit-appearance:none;margin-bottom:10px}
-.field:focus{border-color:rgba(255,255,255,0.2)}
-.field::placeholder{color:var(--muted)}
-.btn{width:100%;padding:14px;background:var(--accent);color:#000;border:none;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s;font-family:inherit}
-.btn:hover{opacity:.9}
-.btn:disabled{opacity:.35;cursor:not-allowed}
-.upload-msg{font-size:13px;min-height:18px;margin-top:8px;text-align:center}
-.upload-msg.err{color:var(--red)}.upload-msg.ok{color:var(--green)}
+#up{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+.pi{width:100%;max-width:460px}
+.pt{font-family:var(--fd);font-size:28px;font-weight:300;letter-spacing:-.3px;margin-bottom:8px;text-align:center}
+.ps{font-size:14px;color:var(--mu);text-align:center;line-height:1.65;margin-bottom:32px;font-weight:300}
+.uz{border:1.5px dashed var(--bd);border-radius:16px;padding:36px 20px;text-align:center;cursor:pointer;transition:.2s;position:relative;overflow:hidden;background:var(--sf);margin-bottom:12px}
+.uz:hover{border-color:rgba(255,255,255,.2);background:var(--sf2)}
+.uz.hf{border-color:var(--gr);border-style:solid;background:rgba(74,222,128,.04)}
+.uz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.ui{font-size:28px;color:var(--mu);display:block;margin-bottom:10px}
+.ul strong{color:var(--ch);display:block;margin-bottom:3px;font-size:14px;font-weight:500}
+.ul span{font-size:12px;color:var(--mu)}
+.uf{font-size:12px;color:var(--gr);margin-top:8px}
+.fi{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:11px;color:var(--tx);font-size:14px;font-weight:400;padding:13px 16px;outline:none;font-family:var(--fb);transition:.2s;-webkit-appearance:none;margin-bottom:10px}
+.fi:focus{border-color:rgba(255,255,255,.2);background:var(--sf2)}
+.fi::placeholder{color:var(--mu)}
+.bp{width:100%;padding:14px;background:var(--tx);color:#000;border:none;border-radius:11px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;font-family:var(--fb)}
+.bp:hover{opacity:.88;transform:translateY(-1px)}
+.bp:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.um{font-size:13px;min-height:18px;margin-top:10px;text-align:center}
+.um.err{color:var(--rd)}.um.ok{color:var(--gr)}
+
+/* Overlay */
+#ov{position:fixed;inset:0;z-index:200;background:rgba(6,6,6,.92);backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+#ov.act{display:flex}
+.ov-ring{width:60px;height:60px;border-radius:50%;border:1.5px solid var(--bd);border-top-color:var(--ne);animation:spin 1.2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ov-t{font-family:var(--fd);font-size:20px;font-weight:300;color:var(--mu);letter-spacing:2px}
+.ov-s{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(237,233,226,.2)}
 
 /* Chat panel */
-#chat-panel{display:none;flex:1;flex-direction:column;overflow:hidden}
-.chat-header{padding:12px 20px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:12px;background:rgba(8,8,8,0.6);backdrop-filter:blur(10px)}
-.avatar-initial{width:36px;height:36px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--chrome);flex-shrink:0}
-.chat-header-info{flex:1}
-.chat-name{font-size:14px;font-weight:500;color:var(--chrome)}
-.chat-status{font-size:12px;color:var(--green)}
-.chat-reset{color:var(--muted);font-size:12px;cursor:pointer;text-decoration:none;transition:color .2s}
-.chat-reset:hover{color:var(--text)}
-.messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.messages::-webkit-scrollbar{width:0}
-.bubble{max-width:78%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.65;word-break:break-word}
-.bubble.user{align-self:flex-end;background:rgba(255,255,255,0.08);border:1px solid var(--glass-border);color:var(--text);border-bottom-right-radius:4px}
-.bubble.assistant{align-self:flex-start;background:var(--glass);border:1px solid var(--glass-border);color:var(--text);border-bottom-left-radius:4px}
-.bubble.typing{color:var(--muted);font-style:italic}
-.chat-input-row{padding:12px 16px;border-top:1px solid var(--glass-border);display:flex;gap:10px;align-items:flex-end;background:rgba(8,8,8,0.6);backdrop-filter:blur(10px)}
-textarea#msg-input{flex:1;background:var(--glass);border:1px solid var(--glass-border);border-radius:11px;color:var(--text);font-size:14px;padding:12px 14px;outline:none;font-family:inherit;resize:none;min-height:44px;max-height:120px;line-height:1.5;transition:border-color .2s;-webkit-appearance:none}
-textarea#msg-input:focus{border-color:rgba(255,255,255,0.2)}
-textarea#msg-input::placeholder{color:var(--muted)}
-.send-btn{width:44px;height:44px;border-radius:10px;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .2s}
-.send-btn:hover{opacity:.85}
-.send-btn:disabled{opacity:.3;cursor:not-allowed}
-.send-icon{width:18px;height:18px;fill:#000}
-.limit-bar{background:rgba(248,113,113,0.08);border-top:1px solid rgba(248,113,113,0.12);padding:12px 20px;text-align:center;font-size:13px;color:var(--red);display:none}
-
-@media(max-width:480px){
-  .bubble{max-width:90%}
-  .messages{padding:14px}
-}
+#cp{display:none;flex:1;flex-direction:column;overflow:hidden}
+.ch{padding:14px 22px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;background:rgba(6,6,6,.7);backdrop-filter:blur(10px)}
+.av{width:38px;height:38px;border-radius:50%;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:16px;font-weight:400;color:var(--ch);flex-shrink:0}
+.ci{flex:1}.cn{font-size:14px;font-weight:500;color:var(--ch)}.cs{font-size:12px;color:var(--gr)}
+.cr{color:var(--mu);font-size:12px;cursor:pointer;text-decoration:none;transition:.2s}.cr:hover{color:var(--tx)}
+.msgs{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:12px}
+.msgs::-webkit-scrollbar{width:0}
+.bubble{max-width:78%;padding:13px 17px;border-radius:14px;font-size:14px;line-height:1.65;word-break:break-word;font-weight:300}
+.bubble.user{align-self:flex-end;background:rgba(255,255,255,.08);border:1px solid var(--bd);color:var(--tx);border-bottom-right-radius:4px}
+.bubble.assistant{align-self:flex-start;background:var(--sf);border:1px solid var(--bd);color:var(--tx);border-bottom-left-radius:4px}
+.bubble.typing{color:var(--mu);font-style:italic}
+.ir{padding:14px 18px;border-top:1px solid var(--bd);display:flex;gap:10px;align-items:flex-end;background:rgba(6,6,6,.7);backdrop-filter:blur(10px)}
+textarea#mi{flex:1;background:var(--sf);border:1px solid var(--bd);border-radius:11px;color:var(--tx);font-size:14px;font-weight:300;padding:12px 14px;outline:none;font-family:var(--fb);resize:none;min-height:44px;max-height:120px;line-height:1.5;transition:.2s;-webkit-appearance:none}
+textarea#mi:focus{border-color:rgba(255,255,255,.2);background:var(--sf2)}
+textarea#mi::placeholder{color:var(--mu)}
+.sb{width:44px;height:44px;border-radius:10px;background:var(--tx);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s}
+.sb:hover{opacity:.85}.sb:disabled{opacity:.3;cursor:not-allowed}
+.si2{width:18px;height:18px;fill:#000}
+.lb{background:rgba(248,113,113,.07);border-top:1px solid rgba(248,113,113,.12);padding:12px 22px;text-align:center;font-size:13px;color:var(--rd);display:none}
+@media(max-width:480px){.bubble{max-width:90%}.msgs{padding:16px}}
 </style>
 </head>
 <body>
-
+<div id="ov"><div class="ov-ring"></div><div class="ov-t">Analyzing</div><div class="ov-s">Building your replica</div></div>
 <nav>
-  <a href="/" class="nav-logo">Chronis</a>
-  <span class="nav-badge">Text Demo</span>
+  <a href="/" class="nl">Chronis</a>
+  <span class="nb">Text Demo</span>
 </nav>
-
 <div class="app">
-
-  <!-- Upload panel -->
-  <div id="upload-panel">
-    <div class="panel-inner">
-      <div class="panel-title">Start a conversation</div>
-      <p class="panel-sub">Upload a video or audio of someone, give them a name, and start talking.</p>
-
-      <div class="upload-zone" id="upload-zone">
-        <input type="file" id="file-input" accept="video/*,audio/*" onchange="onFileChange(this)">
-        <span class="upload-icon">◎</span>
-        <div class="upload-label"><strong>Upload video or audio</strong>Any format · up to 1GB</div>
-        <div class="upload-filename" id="upload-filename"></div>
+  <div id="up">
+    <div class="pi">
+      <div class="pt">Start a conversation</div>
+      <p class="ps">Upload a video or audio of someone you've lost, give them a name, and start talking.</p>
+      <div class="uz" id="uz">
+        <input type="file" id="fi" accept="video/*,audio/*" onchange="onFC(this)">
+        <span class="ui">◎</span>
+        <div class="ul"><strong>Upload video or audio</strong><span>Any format · up to 1GB</span></div>
+        <div class="uf" id="fn"></div>
       </div>
-
-      <input class="field" type="text" id="person-name" placeholder="Their name (e.g. Mom, Grandpa)">
-      <button class="btn" id="start-btn" onclick="startDemo()" disabled>Start Conversation</button>
-      <div class="upload-msg" id="upload-msg"></div>
+      <input class="fi" type="text" id="pn" placeholder="Their name (e.g. Mom, Grandpa)">
+      <button class="bp" id="sb2" onclick="startDemo()" disabled>Start Conversation</button>
+      <div class="um" id="um"></div>
     </div>
   </div>
-
-  <!-- Chat panel -->
-  <div id="chat-panel">
-    <div class="chat-header">
-      <div class="avatar-initial" id="avatar-initial">?</div>
-      <div class="chat-header-info">
-        <div class="chat-name" id="chat-name">—</div>
-        <div class="chat-status">Online</div>
-      </div>
-      <a class="chat-reset" onclick="resetDemo()">New chat</a>
+  <div id="cp">
+    <div class="ch">
+      <div class="av" id="av">?</div>
+      <div class="ci"><div class="cn" id="cn">—</div><div class="cs">Online</div></div>
+      <a class="cr" onclick="resetDemo()">New chat</a>
     </div>
-    <div class="messages" id="messages"></div>
-    <div class="limit-bar" id="limit-bar">
-      You've reached the free message limit.
-      <a href="/live" style="color:var(--red);margin-left:6px;text-decoration:underline">Try the Live V2 demo →</a>
-    </div>
-    <div class="chat-input-row">
-      <textarea id="msg-input" placeholder="Type a message…" rows="1" onkeydown="onKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="send-btn" id="send-btn" onclick="sendMessage()">
-        <svg class="send-icon" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
-      </button>
+    <div class="msgs" id="msgs"></div>
+    <div class="lb" id="lb">You've reached the free message limit. <a href="/live" style="color:var(--rd);margin-left:6px;text-decoration:underline">Try the Live V2 demo →</a></div>
+    <div class="ir">
+      <textarea id="mi" placeholder="Type a message…" rows="1" onkeydown="onK(event)" oninput="aR(this)"></textarea>
+      <button class="sb" id="sendb" onclick="sendMsg()"><svg class="si2" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
     </div>
   </div>
-
 </div>
-
 <script>
-let sessionId = null;
-let personName = '';
-let isTyping = false;
-
-function onFileChange(input) {
-  const file = input.files[0];
-  if (!file) return;
-  document.getElementById('upload-filename').textContent = file.name;
-  document.getElementById('upload-zone').classList.add('has-file');
-  checkReady();
+let sid=null,pn='',typing=false;
+function onFC(inp){
+  const f=inp.files[0];if(!f)return;
+  document.getElementById('fn').textContent=f.name;
+  document.getElementById('uz').classList.add('hf');
+  chkR();
 }
-
-document.getElementById('person-name').addEventListener('input', checkReady);
-
-function checkReady() {
-  const hasFile = !!document.getElementById('file-input').files[0];
-  const hasName = document.getElementById('person-name').value.trim().length > 0;
-  document.getElementById('start-btn').disabled = !(hasFile && hasName);
+document.getElementById('pn').addEventListener('input',chkR);
+function chkR(){
+  const hf=!!document.getElementById('fi').files[0];
+  const hn=document.getElementById('pn').value.trim().length>0;
+  document.getElementById('sb2').disabled=!(hf&&hn);
 }
-
-async function startDemo() {
-  const btn  = document.getElementById('start-btn');
-  const msg  = document.getElementById('upload-msg');
-  const file = document.getElementById('file-input').files[0];
-  personName = document.getElementById('person-name').value.trim();
-
-  btn.disabled = true; btn.textContent = 'Analyzing…';
-  msg.className = 'upload-msg'; msg.textContent = '';
-
-  const form = new FormData();
-  form.append('file', file);
-  form.append('person_name', personName);
-
-  try {
-    const r = await fetch('/api/analyze', {method:'POST', body:form});
-    const d = await r.json();
-
-    if (!r.ok || d.error) {
-      msg.className = 'upload-msg err';
-      msg.textContent = d.error || 'Analysis failed. Please try again.';
-      btn.disabled = false; btn.textContent = 'Start Conversation';
-      return;
-    }
-
-    sessionId = d.session_id;
-    document.getElementById('chat-name').textContent    = personName;
-    document.getElementById('avatar-initial').textContent = personName.charAt(0).toUpperCase();
-
-    document.getElementById('upload-panel').style.display = 'none';
-    document.getElementById('chat-panel').style.display   = 'flex';
-
-    appendMessage('assistant', `Hi, it's ${personName}. I'm so glad you reached out.`);
-
-  } catch(e) {
-    msg.className = 'upload-msg err'; msg.textContent = 'Network error. Please try again.';
-    btn.disabled = false; btn.textContent = 'Start Conversation';
-  }
+async function startDemo(){
+  const btn=document.getElementById('sb2'),msg=document.getElementById('um');
+  const file=document.getElementById('fi').files[0];
+  pn=document.getElementById('pn').value.trim();
+  btn.disabled=true;btn.textContent='Analyzing…';
+  msg.className='um';msg.textContent='';
+  document.getElementById('ov').classList.add('act');
+  const form=new FormData();form.append('file',file);form.append('person_name',pn);
+  try{
+    const r=await fetch('/api/analyze',{method:'POST',body:form});
+    const d=await r.json();
+    document.getElementById('ov').classList.remove('act');
+    if(!r.ok||d.error){msg.className='um err';msg.textContent=d.error||'Analysis failed. Please try again.';btn.disabled=false;btn.textContent='Start Conversation';return}
+    sid=d.session_id;
+    document.getElementById('cn').textContent=pn;
+    document.getElementById('av').textContent=pn.charAt(0).toUpperCase();
+    document.getElementById('up').style.display='none';
+    document.getElementById('cp').style.display='flex';
+    addMsg('assistant',`Hi, it's ${pn}. I'm so glad you reached out.`);
+  }catch(e){document.getElementById('ov').classList.remove('act');msg.className='um err';msg.textContent='Network error. Please try again.';btn.disabled=false;btn.textContent='Start Conversation'}
 }
-
-async function sendMessage() {
-  const input = document.getElementById('msg-input');
-  const text  = input.value.trim();
-  if (!text || isTyping || !sessionId) return;
-
-  input.value = ''; autoResize(input);
-  appendMessage('user', text);
-  isTyping = true;
-  document.getElementById('send-btn').disabled = true;
-
-  const typingEl = appendMessage('assistant', '…', true);
-
-  try {
-    const r = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({session_id: sessionId, message: text}),
-    });
-    const d = await r.json();
-
-    typingEl.remove();
-    isTyping = false;
-    document.getElementById('send-btn').disabled = false;
-
-    if (r.status === 402) {
-      document.getElementById('limit-bar').style.display = 'block';
-      return;
-    }
-
-    if (!r.ok || d.error) {
-      appendMessage('assistant', d.error || 'Something went wrong.');
-      return;
-    }
-
-    appendMessage('assistant', d.reply);
-
-    if (d.limit_reached) {
-      document.getElementById('limit-bar').style.display = 'block';
-    }
-
-  } catch(e) {
-    typingEl.remove();
-    isTyping = false;
-    document.getElementById('send-btn').disabled = false;
-    appendMessage('assistant', 'Network error. Please try again.');
-  }
+async function sendMsg(){
+  const inp=document.getElementById('mi');
+  const txt=inp.value.trim();
+  if(!txt||typing||!sid)return;
+  inp.value='';aR(inp);addMsg('user',txt);typing=true;
+  document.getElementById('sendb').disabled=true;
+  const tel=addMsg('assistant','…',true);
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:sid,message:txt})});
+    const d=await r.json();
+    tel.remove();typing=false;document.getElementById('sendb').disabled=false;
+    if(r.status===402){document.getElementById('lb').style.display='block';return}
+    if(!r.ok||d.error){addMsg('assistant',d.error||'Something went wrong.');return}
+    addMsg('assistant',d.reply);
+    if(d.limit_reached)document.getElementById('lb').style.display='block';
+  }catch(e){tel.remove();typing=false;document.getElementById('sendb').disabled=false;addMsg('assistant','Network error. Please try again.')}
 }
-
-function appendMessage(role, text, isTypingMsg=false) {
-  const msgs = document.getElementById('messages');
-  const el   = document.createElement('div');
-  el.className = 'bubble ' + role + (isTypingMsg ? ' typing' : '');
-  el.textContent = text;
-  msgs.appendChild(el);
-  msgs.scrollTop = msgs.scrollHeight;
-  return el;
+function addMsg(role,txt,isTy=false){
+  const msgs=document.getElementById('msgs');
+  const el=document.createElement('div');
+  el.className='bubble '+role+(isTy?' typing':'');
+  el.textContent=txt;msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;return el;
 }
-
-function onKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
-
-function resetDemo() {
-  sessionId = null; personName = '';
-  document.getElementById('messages').innerHTML = '';
-  document.getElementById('upload-panel').style.display = '';
-  document.getElementById('chat-panel').style.display   = 'none';
-  document.getElementById('limit-bar').style.display    = 'none';
-  document.getElementById('start-btn').disabled = true;
-  document.getElementById('start-btn').textContent = 'Start Conversation';
-  document.getElementById('upload-msg').textContent = '';
-  document.getElementById('upload-filename').textContent = '';
-  document.getElementById('upload-zone').classList.remove('has-file');
-  document.getElementById('file-input').value = '';
-  document.getElementById('person-name').value = '';
+function onK(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}}
+function aR(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px'}
+function resetDemo(){
+  sid=null;pn='';
+  document.getElementById('msgs').innerHTML='';
+  document.getElementById('up').style.display='';
+  document.getElementById('cp').style.display='none';
+  document.getElementById('lb').style.display='none';
+  document.getElementById('sb2').disabled=true;document.getElementById('sb2').textContent='Start Conversation';
+  document.getElementById('um').textContent='';document.getElementById('fn').textContent='';
+  document.getElementById('uz').classList.remove('hf');document.getElementById('fi').value='';document.getElementById('pn').value='';
 }
 </script>
 </body>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Chronis Works — AI Video Memory Preservation</title>
+<meta name="description" content="Learn how Chronis builds a real-time AI video replica of your loved one from a single video. The technology behind voice cloning, face animation, and personality reconstruction.">
+<link rel="canonical" href="https://chronis.in/static/how-it-works.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#060606;--bg2:#0a0a0a;--sf:rgba(255,255,255,.033);--sf2:rgba(255,255,255,.058);--bd:rgba(255,255,255,.076);--bd2:rgba(255,255,255,.15);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--ne2:#a78bfa;--gr:#4ade80;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(6,6,6,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
+.nl{font-family:var(--fd);font-size:20px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.nr{display:flex;gap:6px;align-items:center}
+.na{color:var(--mu);text-decoration:none;font-size:13px;padding:6px 13px;border-radius:6px;transition:.2s}
+.na:hover{color:var(--tx);background:var(--sf)}
+.nc{background:var(--tx);color:#000;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;transition:.2s}
+.nc:hover{opacity:.87}
+@media(max-width:768px){.na{display:none}}
+.hero{padding:140px 24px 80px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 30%,rgba(94,234,212,.04) 0%,transparent 70%);pointer-events:none;animation:breathe 6s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.6}50%{opacity:1}}
+.ey{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:var(--mu);background:var(--sf);border:1px solid var(--bd);border-radius:40px;padding:7px 18px;margin-bottom:36px;font-weight:500}
+h1{font-family:var(--fd);font-size:clamp(42px,7vw,80px);font-weight:300;line-height:1.04;letter-spacing:-1px;max-width:780px;margin:0 auto 24px}
+h1 em{font-style:italic;color:var(--mu)}
+.hs{font-size:16px;color:var(--mu);line-height:1.8;max-width:500px;margin:0 auto;font-weight:300}
+.sec{padding:80px 24px;max-width:900px;margin:0 auto}
+.se{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:14px;display:block}
+.st{font-family:var(--fd);font-size:clamp(30px,4.5vw,52px);font-weight:300;line-height:1.1;letter-spacing:-.4px;color:var(--tx);margin-bottom:18px}
+.ss{font-size:15px;color:var(--mu);line-height:1.78;font-weight:300;max-width:560px}
+.step-big{display:grid;grid-template-columns:80px 1fr;gap:40px;padding:48px 0;border-bottom:1px solid var(--bd);align-items:start}
+.step-big:last-child{border-bottom:none}
+.sn{font-family:var(--fd);font-size:52px;font-weight:300;color:rgba(255,255,255,.08);line-height:1}
+.sc h2{font-size:22px;font-weight:500;color:var(--ch);margin-bottom:12px}
+.sc p{font-size:15px;color:var(--mu);line-height:1.75;font-weight:300;margin-bottom:16px}
+.tag{display:inline-block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ne);background:rgba(94,234,212,.07);border:1px solid rgba(94,234,212,.15);padding:5px 12px;border-radius:20px;margin-top:4px}
+.tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:48px}
+.tc{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:28px;transition:.3s}
+.tc:hover{border-color:var(--bd2);background:var(--sf2)}
+.tc h3{font-size:15px;font-weight:500;color:var(--ch);margin-bottom:10px}
+.tc p{font-size:13.5px;color:var(--mu);line-height:1.65;font-weight:300}
+.cta-strip{background:var(--bg2);border:1px solid var(--bd);border-radius:20px;padding:52px 40px;text-align:center;margin:80px auto;max-width:600px}
+.cta-strip h2{font-family:var(--fd);font-size:clamp(28px,4vw,42px);font-weight:300;line-height:1.12;margin-bottom:16px}
+.cta-strip h2 em{font-style:italic;color:var(--mu)}
+.cta-strip p{font-size:14px;color:var(--mu);line-height:1.75;margin-bottom:32px;font-weight:300}
+.bgs{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#000;font-family:var(--fb);font-size:14px;font-weight:600;padding:14px 28px;border-radius:10px;text-decoration:none;transition:.2s}
+.bgs:hover{opacity:.88;transform:translateY(-2px)}
+footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.fb{font-family:var(--fd);font-size:18px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.fc{font-size:12px;color:rgba(237,233,226,.2)}
+.rv{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.rv.vs{opacity:1;transform:translateY(0)}
+@media(max-width:768px){.step-big{grid-template-columns:50px 1fr;gap:20px}.sn{font-size:38px}.tech-grid{grid-template-columns:1fr}.cta-strip{padding:36px 24px}footer{padding:24px 20px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nl">Chronis</a>
+  <div class="nr">
+    <a href="/" class="na">Home</a>
+    <a href="/static/ethics.html" class="na">Ethics</a>
+    <a href="/demo" class="na">Demo</a>
+    <a href="/#waitlist" class="nc">Get Started →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="ey">The Technology</div>
+  <h1>From one video<br>to a <em>living conversation.</em></h1>
+  <p class="hs">Here's exactly how Chronis works — from the moment you upload to the moment you hear their voice again.</p>
+</section>
+
+<div class="sec rv">
+  <span class="se">Step by step</span>
+  <div class="step-big">
+    <div class="sn">01</div>
+    <div class="sc">
+      <h2>Upload any video</h2>
+      <p>Your video becomes the raw material for everything that follows. We accept any common format — MP4, MOV, AVI, MKV. We accept any quality — even old family footage or low-resolution WhatsApp clips. You need at least 30 seconds of them speaking, but anything up to 10 minutes gives us significantly more to work with.</p>
+      <p>The video doesn't need to be a direct-to-camera monologue. A conversation, a speech, a birthday video — all work perfectly. The only requirement is that their voice is audible and their face is visible for at least part of the clip.</p>
+      <span class="tag">MP4 · MOV · AVI · MKV · any format</span>
+    </div>
+  </div>
+  <div class="step-big">
+    <div class="sn">02</div>
+    <div class="sc">
+      <h2>Face extraction and animation</h2>
+      <p>Our pipeline isolates their face geometry and expression range from your video. This becomes the visual foundation for the real-time avatar — the face that will speak when you start a conversation. We reconstruct facial structure, skin tone, micro-expressions, and blinking patterns.</p>
+      <p>The lip-sync system then animates this face in real time based on the voice output. The result is a face that moves as they speak — not a static image, not a puppet-on-screen, but a natural-feeling video presence.</p>
+      <span class="tag">Real-time lip sync · face geometry · expression map</span>
+    </div>
+  </div>
+  <div class="step-big">
+    <div class="sn">03</div>
+    <div class="sc">
+      <h2>Voice cloning</h2>
+      <p>We extract acoustic signatures from the audio in your video — their specific tonal characteristics, accent, speech cadence, pause patterns, and vocal texture. This becomes a clone of their voice that can generate new speech, not just replay recorded audio.</p>
+      <p>When the replica responds to you, it speaks in their cloned voice. New sentences, new words — in their voice. For Indian languages and accents, our system is specifically tuned to preserve the characteristics that make a voice recognizable to family members.</p>
+      <span class="tag">Voice cloning · accent preservation · real-time TTS</span>
+    </div>
+  </div>
+  <div class="step-big">
+    <div class="sn">04</div>
+    <div class="sc">
+      <h2>Personality and language modeling</h2>
+      <p>The language model is grounded in contextual information about who this person was — their speech patterns from the video, any memories or context you choose to provide, and a persona framework that prevents the AI from drifting into generic responses. The replica should sound like them, not like a helpful AI assistant.</p>
+      <p>You can optionally add written memories, descriptions, or recorded context to make the personality richer. The more you provide, the more textured and authentic the conversation feels.</p>
+      <span class="tag">Personality grounding · memory context · speech pattern analysis</span>
+    </div>
+  </div>
+  <div class="step-big">
+    <div class="sn">05</div>
+    <div class="sc">
+      <h2>Real-time video conversation</h2>
+      <p>When you start a session, everything runs simultaneously — your voice is transcribed, passed to the language model, which generates a response, which is spoken in the cloned voice, which drives the lip-sync animation, all in under two seconds. This is what makes Chronis different: it's a live conversation, not a pre-recorded response tree.</p>
+      <p>You can say anything. Ask about memories. Ask what they'd think about something happening in your life. Tell them what you've been wanting to say. The conversation is open-ended, real-time, and yours.</p>
+      <span class="tag">Live conversation · under 2s latency · open-ended</span>
+    </div>
+  </div>
+</div>
+
+<div class="sec rv">
+  <span class="se">Under the hood</span>
+  <h2 class="st">The technical stack</h2>
+  <p class="ss">Four specialized systems work together to create a coherent, emotionally real experience.</p>
+  <div class="tech-grid">
+    <div class="tc"><h3>Face pipeline</h3><p>Face geometry extraction, expression modeling, and real-time lip sync. The visual system that makes their face move naturally as they speak.</p></div>
+    <div class="tc"><h3>Voice cloning engine</h3><p>Acoustic signature extraction, TTS synthesis in the cloned voice. Preserves accent and cadence characteristics that are unique to that person.</p></div>
+    <div class="tc"><h3>Language model</h3><p>Personality-grounded conversation model. Trained to respond in their speech style, not in generic AI prose. Memory-persistent across sessions.</p></div>
+    <div class="tc"><h3>Real-time orchestration</h3><p>The system that connects voice input to transcription to LLM to TTS to avatar in under two seconds. Built for low-latency emotional conversation.</p></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="cta-strip rv">
+    <h2>Ready to begin?<br><em>Join the waitlist.</em></h2>
+    <p>Early access is free. We'll email you when your session is ready — usually within a few days.</p>
+    <a href="/#waitlist" class="bgs">Get Started →</a>
+  </div>
+</div>
+
+<footer>
+  <a href="/" class="fb">Chronis</a>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <a href="/static/ethics.html" style="font-size:12px;color:var(--mu);text-decoration:none">Ethics</a>
+    <a href="/static/privacy.html" style="font-size:12px;color:var(--mu);text-decoration:none">Privacy</a>
+    <a href="/static/comparison.html" style="font-size:12px;color:var(--mu);text-decoration:none">Compare</a>
+    <a href="/static/blog.html" style="font-size:12px;color:var(--mu);text-decoration:none">Resources</a>
+  </div>
+  <span class="fc">© 2026 Chronis</span>
+</footer>
+
+<script>
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vs')})},{threshold:.1,rootMargin:'0 0 -40px 0'});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

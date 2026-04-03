@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /static/
+Disallow: /admin
+Disallow: /api/
+Disallow: /ws/
+Disallow: /static/test.html
+Disallow: /static/live.html
+Disallow: /static/dashboard.html
+Disallow: /static/indx.html
+Disallow: /smoke_tests/
+
+Sitemap: https://chronis.in/sitemap.xml
+
+# Respectful crawl delay
+Crawl-delay: 2

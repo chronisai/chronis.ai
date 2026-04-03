@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ethics — Chronis AI Grief Technology</title>
+<meta name="description" content="How Chronis approaches the ethical dimensions of AI-powered grief technology. Consent, privacy, psychological wellbeing, and responsible use.">
+<link rel="canonical" href="https://chronis.in/static/ethics.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#060606;--bg2:#0a0a0a;--sf:rgba(255,255,255,.033);--sf2:rgba(255,255,255,.055);--bd:rgba(255,255,255,.076);--bd2:rgba(255,255,255,.15);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--ne2:#a78bfa;--gr:#4ade80;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(6,6,6,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
+.nl{font-family:var(--fd);font-size:20px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.nr{display:flex;gap:6px;align-items:center}
+.na{color:var(--mu);text-decoration:none;font-size:13px;padding:6px 13px;border-radius:6px;transition:.2s}
+.na:hover{color:var(--tx);background:var(--sf)}
+.nc{background:var(--tx);color:#000;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;transition:.2s}
+.nc:hover{opacity:.87}
+@media(max-width:768px){.na{display:none}}
+.hero{padding:140px 24px 80px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 30%,rgba(167,139,250,.03) 0%,transparent 70%);pointer-events:none}
+.ey{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:var(--mu);background:var(--sf);border:1px solid var(--bd);border-radius:40px;padding:7px 18px;margin-bottom:36px;font-weight:500}
+h1{font-family:var(--fd);font-size:clamp(42px,7vw,80px);font-weight:300;line-height:1.04;letter-spacing:-1px;max-width:780px;margin:0 auto 24px}
+h1 em{font-style:italic;color:var(--mu)}
+.hs{font-size:16px;color:var(--mu);line-height:1.8;max-width:520px;margin:0 auto;font-weight:300}
+.prose-wrap{max-width:700px;margin:0 auto;padding:60px 24px 80px}
+.prose-wrap h2{font-family:var(--fd);font-size:clamp(26px,3.5vw,38px);font-weight:300;line-height:1.15;letter-spacing:-.3px;color:var(--ch);margin:56px 0 18px}
+.prose-wrap h2:first-child{margin-top:0}
+.prose-wrap p{font-size:15px;color:var(--mu);line-height:1.82;font-weight:300;margin-bottom:18px}
+.prose-wrap p strong{color:var(--ch);font-weight:500}
+.prin{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:40px 0}
+.pc{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:24px}
+.pc h3{font-size:15px;font-weight:500;color:var(--ch);margin-bottom:8px}
+.pc p{font-size:13.5px;color:var(--mu);line-height:1.65;font-weight:300;margin:0}
+.quote-block{border-left:2px solid rgba(94,234,212,.3);padding:20px 24px;margin:32px 0;background:rgba(94,234,212,.03);border-radius:0 10px 10px 0}
+.quote-block p{font-family:var(--fd);font-size:18px;font-style:italic;font-weight:300;color:var(--ch);line-height:1.65;margin:0}
+.crisis-card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;margin:40px 0}
+.crisis-card h3{font-size:15px;font-weight:500;color:var(--ch);margin-bottom:12px}
+.crisis-card p{font-size:14px;color:var(--mu);line-height:1.7;font-weight:300;margin-bottom:0}
+.crisis-card a{color:var(--ne);text-decoration:none}
+.crisis-card a:hover{text-decoration:underline}
+.rv{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.rv.vs{opacity:1;transform:translateY(0)}
+footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.fb{font-family:var(--fd);font-size:18px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.fc{font-size:12px;color:rgba(237,233,226,.2)}
+@media(max-width:768px){.prin{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nl">Chronis</a>
+  <div class="nr">
+    <a href="/" class="na">Home</a>
+    <a href="/static/how-it-works.html" class="na">How it works</a>
+    <a href="/demo" class="na">Demo</a>
+    <a href="/#waitlist" class="nc">Get Started →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="ey">Our ethics framework</div>
+  <h1>We built this with our<br>eyes <em>wide open.</em></h1>
+  <p class="hs">Creating AI replicas of deceased people raises real ethical questions. Here is how we think about them — honestly, without corporate deflection.</p>
+</section>
+
+<div class="prose-wrap">
+
+  <div class="rv">
+    <h2>The core tension</h2>
+    <p>Technology that allows people to interact with AI representations of deceased loved ones offers real psychological benefit to some people, and real harm to others. This is not a hypothetical. Grief is one of the most vulnerable states a human being can be in. We are building a tool that people will use while in exactly that state.</p>
+    <p>We cannot resolve this tension by pretending it doesn't exist. We've chosen to build Chronis because we believe, when used responsibly, this technology can genuinely help people. But that belief carries obligations.</p>
+  </div>
+
+  <div class="rv">
+    <h2>Our principles</h2>
+    <div class="prin">
+      <div class="pc"><h3>Informed consent</h3><p>No replica is created without explicit informed consent from the person initiating the process. We explain clearly what the technology does and doesn't do before any upload.</p></div>
+      <div class="pc"><h3>Psychological safety</h3><p>We include grief resource referrals throughout the product. Chronis is not a replacement for grief support. We say this clearly, often, without hiding it in footnotes.</p></div>
+      <div class="pc"><h3>Data sovereignty</h3><p>Your memories belong to you. Your data is never used to train any AI models. You can delete your replica and all associated data permanently, at any time, immediately.</p></div>
+      <div class="pc"><h3>Honest framing</h3><p>We never describe Chronis as a way to "bring back" the deceased. The replica is an AI — a sophisticated, emotionally resonant AI, but an AI. We don't obscure this.</p></div>
+    </div>
+  </div>
+
+  <div class="rv">
+    <div class="quote-block">
+      <p>"Grief does not end on a schedule. For some people, continued conversation with a thoughtful simulation of who they've lost is a genuine act of healing. For others, it may not be. We trust people to know the difference — and we build in safeguards for those who are uncertain."</p>
+    </div>
+  </div>
+
+  <div class="rv">
+    <h2>What Chronis is not</h2>
+    <p>Chronis is <strong>not a replacement for grief therapy</strong>. It is not a way to avoid the grief process. It is not a product that will make loss hurt less. What it may offer — for some people, in some circumstances — is a space for conversations that weren't finished, for questions that went unasked, for presence that grief makes feel impossibly absent.</p>
+    <p>We are building for adults who approach this technology thoughtfully, with support networks in place. If you are in acute crisis, please reach out to a mental health professional before using Chronis.</p>
+  </div>
+
+  <div class="rv">
+    <h2>The question of consent from the deceased</h2>
+    <p>This is the hardest ethical question in our product space, and we won't pretend to have a clean answer. The person being replicated cannot consent to their replica existing. We require consent from the living person uploading the video — but that is not the same thing.</p>
+    <p>Our current position: we believe family members who have legitimate access to video of a deceased loved one, creating a private replica for personal grief processing, is ethically different from commercial use, public use, or use that misrepresents the deceased's beliefs or character. We prohibit the latter uses in our Terms of Service and actively enforce this.</p>
+    <p>We expect this conversation to evolve as the technology and cultural norms around it mature. We commit to revisiting our policies as they do.</p>
+  </div>
+
+  <div class="rv">
+    <h2>The 2Wai controversy and what we learned</h2>
+    <p>In November 2025, the AI grief app 2Wai faced significant public backlash — described variously as "demonic" and "dystopian" by critics. We watched this closely. What it demonstrated is that the framing, ethics, and consent architecture of grief tech products matters enormously — not just for public reception, but for the genuine wellbeing of users.</p>
+    <p>Chronis was built with this conversation already happening in our product team. Consent flows, ethics disclosures, crisis referrals, and honest framing are not add-ons. They are load-bearing walls.</p>
+  </div>
+
+  <div class="rv">
+    <div class="crisis-card">
+      <h3>If you are in grief crisis</h3>
+      <p>If you are experiencing acute grief, suicidal thoughts, or a mental health crisis, please reach out to a professional before using Chronis. In India, iCall offers free mental health support: <a href="https://icallhelpline.org" target="_blank" rel="noopener">icallhelpline.org</a> · 9152987821. Vandrevala Foundation Helpline: <a href="tel:18602662345">1860-2662-345</a> (24/7).</p>
+    </div>
+  </div>
+
+  <div class="rv">
+    <h2>Ongoing commitments</h2>
+    <p>We commit to publishing an annual ethics review. We commit to maintaining a public ethics advisory — including voices from grief counselors, ethicists, and bereaved families. We commit to responding to user concerns about the product's psychological impact on an individual case basis.</p>
+    <p>Ethics is not a document you write once. It is a practice. We are learning as we build.</p>
+  </div>
+
+</div>
+
+<footer>
+  <a href="/" class="fb">Chronis</a>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <a href="/static/how-it-works.html" style="font-size:12px;color:var(--mu);text-decoration:none">How it works</a>
+    <a href="/static/privacy.html" style="font-size:12px;color:var(--mu);text-decoration:none">Privacy</a>
+    <a href="/static/blog.html" style="font-size:12px;color:var(--mu);text-decoration:none">Resources</a>
+  </div>
+  <span class="fc">© 2026 Chronis</span>
+</footer>
+<script>
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vs')})},{threshold:.1,rootMargin:'0 0 -40px 0'});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
