@@ -12,7 +12,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#060606;--sf:rgba(255,255,255,.035);--bd:rgba(255,255,255,.08);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--gr:#4ade80;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
-body{background:var(--bg);color:var(--tx);font-family:var(--fb);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased;text-align:center;position:relative;overflow:hidden}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:88px 24px 24px;-webkit-font-smoothing:antialiased;text-align:center;position:relative;overflow:hidden}
 canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
 .wrap{position:relative;z-index:1;max-width:480px;width:100%}
 .check-ring{width:72px;height:72px;border-radius:50%;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 36px;position:relative;animation:popIn .6s cubic-bezier(.34,1.56,.64,1) both}
@@ -36,8 +36,10 @@ h1{font-family:var(--fd);font-size:clamp(36px,6vw,56px);font-weight:300;letter-s
 @keyframes breathe{0%,100%{opacity:.6}50%{opacity:1}}
 footer{position:fixed;bottom:0;left:0;right:0;padding:16px;text-align:center;font-size:12px;color:rgba(237,233,226,.15);z-index:1}
 </style>
+  <script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
+<nav id="cn-nav"></nav>
 <div class="radial"></div>
 <canvas id="c"></canvas>
 <div class="wrap">
@@ -53,7 +55,7 @@ footer{position:fixed;bottom:0;left:0;right:0;padding:16px;text-align:center;fon
     <a href="/" class="la lg2">Back to home</a>
   </div>
 </div>
-<footer>© 2026 Chronis</footer>
+<footer id="cn-footer"></footer>
 <script>
 fetch('/api/waitlist/count').then(r=>r.json()).then(d=>{
   const n=Math.max(93,d.count||0);

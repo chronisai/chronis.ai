@@ -21,7 +21,7 @@
   --fb:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;background:rgba(5,5,5,.9);backdrop-filter:blur(28px);border-bottom:1px solid var(--bd)}
@@ -141,13 +141,11 @@ footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-con
 .rv{opacity:0;transform:translateY(22px);transition:opacity .72s ease,transform .72s ease}
 .rv.vs{opacity:1;transform:translateY(0)}
 </style>
+  <script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
 
-<nav>
-  <a href="/" class="nl">Chronis</a>
-  <a href="/#waitlist" class="nc">Waitlist →</a>
-</nav>
+<nav id="cn-nav"></nav>
 
 <section id="hero">
   <canvas id="c3"></canvas>
@@ -275,14 +273,7 @@ footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-con
   </div>
 </div>
 
-<footer>
-  <a href="/" class="fb">Chronis</a>
-  <div style="display:flex;gap:14px">
-    <a href="/static/ethics.html" style="font-size:11.5px;color:var(--mu);text-decoration:none">Ethics</a>
-    <a href="/static/privacy.html" style="font-size:11.5px;color:var(--mu);text-decoration:none">Privacy</a>
-  </div>
-  <span class="fc">© 2026 Chronis</span>
-</footer>
+<footer id="cn-footer"></footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>

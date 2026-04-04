@@ -13,7 +13,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#060606;--bg2:#0a0a0a;--sf:rgba(255,255,255,.033);--sf2:rgba(255,255,255,.055);--bd:rgba(255,255,255,.076);--bd2:rgba(255,255,255,.15);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--ne2:#a78bfa;--gr:#4ade80;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased}
+body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased}
 nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(6,6,6,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
 .nl{font-family:var(--fd);font-size:20px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
 .nr{display:flex;gap:6px;align-items:center}
@@ -51,17 +51,10 @@ footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-con
 .fc{font-size:12px;color:rgba(237,233,226,.2)}
 @media(max-width:768px){.prin{grid-template-columns:1fr}}
 </style>
+  <script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
-<nav>
-  <a href="/" class="nl">Chronis</a>
-  <div class="nr">
-    <a href="/" class="na">Home</a>
-    <a href="/static/how-it-works.html" class="na">How it works</a>
-    <a href="/demo" class="na">Demo</a>
-    <a href="/#waitlist" class="nc">Get Started →</a>
-  </div>
-</nav>
+<nav id="cn-nav"></nav>
 
 <section class="hero">
   <div class="ey">Our ethics framework</div>
@@ -127,15 +120,7 @@ footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-con
 
 </div>
 
-<footer>
-  <a href="/" class="fb">Chronis</a>
-  <div style="display:flex;gap:16px;flex-wrap:wrap">
-    <a href="/static/how-it-works.html" style="font-size:12px;color:var(--mu);text-decoration:none">How it works</a>
-    <a href="/static/privacy.html" style="font-size:12px;color:var(--mu);text-decoration:none">Privacy</a>
-    <a href="/static/blog.html" style="font-size:12px;color:var(--mu);text-decoration:none">Resources</a>
-  </div>
-  <span class="fc">© 2026 Chronis</span>
-</footer>
+<footer id="cn-footer"></footer>
 <script>
 const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vs')})},{threshold:.1,rootMargin:'0 0 -40px 0'});
 document.querySelectorAll('.rv').forEach(el=>obs.observe(el));

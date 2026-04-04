@@ -29,7 +29,7 @@
   --fb:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 #bgc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
 
 /* NAV */
@@ -207,21 +207,13 @@ footer{position:relative;z-index:1;border-top:1px solid var(--bd);padding:40px;d
 @keyframes pp{0%,100%{opacity:.4}50%{opacity:.9}}
 .ps{position:relative;z-index:1;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:rgba(237,233,226,.2)}
 </style>
+  <script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
 <canvas id="bgc"></canvas>
 <div id="ov"><canvas id="ec"></canvas><div class="pt">Analyzing</div><div class="ps">Processing memory signal</div></div>
 
-<nav>
-  <a href="/" class="nl">Chronis</a>
-  <div class="nr">
-    <a href="/static/how-it-works.html" class="na">How it works</a>
-    <a href="/static/ethics.html" class="na">Ethics</a>
-    <a href="/static/blog.html" class="na">Resources</a>
-    <a href="/demo" class="na">Demo</a>
-    <a href="#waitlist" class="nc">Get Started →</a>
-  </div>
-</nav>
+<nav id="cn-nav"></nav>
 
 <section class="hero">
   <div class="hr-rad"></div>
@@ -403,24 +395,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--bd);padding:40px;d
   <a href="#waitlist" class="bgs">Get Started <span class="ga">→</span></a>
 </section>
 
-<footer>
-  <div>
-    <a href="/" class="fb">Chronis</a>
-    <span class="ft2">Digital memory preservation · India-first · Est. 2026</span>
-  </div>
-  <div class="fl2">
-    <a href="/static/how-it-works.html" class="fa">How it works</a>
-    <a href="/static/ethics.html" class="fa">Ethics</a>
-    <a href="/static/privacy.html" class="fa">Privacy</a>
-    <a href="/static/comparison.html" class="fa">Compare</a>
-    <a href="/static/blog.html" class="fa">Resources</a>
-    <a href="/demo" class="fa">Demo</a>
-  </div>
-  <div class="fbot">
-    <span class="fc2">© 2026 Chronis · Preserving humanity, one voice at a time</span>
-    <span class="fi3">Made in India</span>
-  </div>
-</footer>
+<footer id="cn-footer"></footer>
 
 <script>
 /* ── BG Canvas ── */

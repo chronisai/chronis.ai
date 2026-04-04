@@ -16,7 +16,7 @@
       --muted:rgba(240,237,232,0.4);--faint:rgba(240,237,232,0.13);
     }
     html{scroll-behavior:smooth}
-    body{
+    body{padding-top:64px;
       font-family:'Geist Mono',monospace;background:var(--black);
       color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100vh;
     }
@@ -150,6 +150,7 @@
 
     @media(max-width:600px){input,select{font-size:16px}.steps{grid-template-columns:1fr}footer{flex-direction:column;text-align:center}.demo-pill{bottom:20px;right:20px}}
   </style>
+  <script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
   <div id="loader"><div class="ring"></div></div>
@@ -160,10 +161,7 @@
     Try Demo
   </a>
 
-  <nav>
-    <div class="logo">CHRONIS</div>
-    <a href="https://instagram.com/chronis.in" target="_blank" class="nav-ig">@chronis.in</a>
-  </nav>
+  <nav id="cn-nav"></nav>
 
   <section class="hero">
     <div class="glow"></div>
@@ -202,14 +200,7 @@
     </div>
   </div>
 
-  <footer>
-    <div class="footer-logo">CHRONIS</div>
-    <div style="display:flex;gap:24px;align-items:center">
-      <a href="https://instagram.com/chronis.in" target="_blank" class="footer-link">Instagram</a>
-      <a href="/demo" class="footer-link">Try Demo</a>
-      <span class="footer-link" style="cursor:default">© 2026</span>
-    </div>
-  </footer>
+  <footer id="cn-footer"></footer>
 
   <script>
     window.addEventListener('load',()=>setTimeout(()=>document.getElementById('loader').classList.add('gone'),600));

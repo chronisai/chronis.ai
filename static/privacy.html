@@ -12,7 +12,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#060606;--sf:rgba(255,255,255,.033);--bd:rgba(255,255,255,.076);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
-body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased}
+body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased}
 nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(6,6,6,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
 .nl{font-family:var(--fd);font-size:20px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
 .nc{background:var(--tx);color:#000;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;transition:.2s}
@@ -35,12 +35,10 @@ footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-con
 .fb{font-family:var(--fd);font-size:18px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:var(--ch);text-decoration:none}
 .fc{font-size:12px;color:rgba(237,233,226,.2)}
 </style>
+  <script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
-<nav>
-  <a href="/" class="nl">Chronis</a>
-  <a href="/#waitlist" class="nc">Get Started →</a>
-</nav>
+<nav id="cn-nav"></nav>
 <section class="hero">
   <div class="ey">Privacy Policy</div>
   <h1>Your memories.<br>Your data.</h1>
@@ -76,10 +74,6 @@ footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-con
   <h2>Contact</h2>
   <p>For any privacy questions or data requests: <strong>privacy@chronis.in</strong></p>
 </div>
-<footer>
-  <a href="/" class="fb">Chronis</a>
-  <div style="display:flex;gap:16px"><a href="/static/ethics.html" style="font-size:12px;color:var(--mu);text-decoration:none">Ethics</a><a href="/" style="font-size:12px;color:var(--mu);text-decoration:none">Home</a></div>
-  <span class="fc">© 2026 Chronis</span>
-</footer>
+<footer id="cn-footer"></footer>
 </body>
 </html>
