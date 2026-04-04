@@ -4,7 +4,7 @@
  * across every static page. One source of truth for the entire site.
  * v3.0 — April 2026
  */
-(function (w, d) {
+ (function (w, d) {
   'use strict';
 
   /* ─────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@
         --c-tx:    #ede9e2;
         --c-mu:    rgba(237,233,226,.4);
         --c-ch:    rgba(237,233,226,.75);
-        --c-ne:    #5eead4;
+        --c-ne:    #a78bfa;
         --c-ne2:   #a78bfa;
         --c-gr:    #4ade80;
         --c-rd:    #f87171;
@@ -94,13 +94,20 @@
       #cn-nav .cn-link:hover { color: var(--c-tx); background: var(--c-sf); }
       #cn-nav .cn-link.active {
         color: var(--c-tx);
-        background: var(--c-sf);
+        background: rgba(167,139,250,.10);
+        box-shadow: inset 0 0 0 1px rgba(167,139,250,.12);
       }
       #cn-nav .cn-link.active::after {
-        content: ''; position: absolute; bottom: -1px; left: 50%;
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
         transform: translateX(-50%);
-        width: 16px; height: 1px;
-        background: var(--c-ne); border-radius: 2px;
+        width: 18px;
+        height: 1.5px;
+        background: var(--c-ne);
+        border-radius: 999px;
+        box-shadow: 0 0 10px rgba(167,139,250,.75), 0 0 18px rgba(167,139,250,.35);
       }
       #cn-nav .cn-cta {
         background: var(--c-tx); color: #000;
@@ -145,8 +152,15 @@
         color: var(--c-mu); text-decoration: none; font-size: 15px;
         border-bottom: 1px solid var(--c-bd); transition: .15s;
       }
-      #cn-drawer a:hover { color: var(--c-tx); background: var(--c-sf); }
-      #cn-drawer a.active { color: var(--c-tx); }
+      #cn-drawer a:hover {
+        color: var(--c-tx);
+        background: rgba(167,139,250,.06);
+      }
+      #cn-drawer a.active {
+        color: var(--c-ne);
+        background: rgba(167,139,250,.08);
+        box-shadow: inset 0 0 0 1px rgba(167,139,250,.10);
+      }
       #cn-drawer .cn-drawer-cta {
         margin: 16px 28px 20px;
         display: block; text-align: center;
@@ -274,7 +288,6 @@
       d.body.insertBefore(nav, d.body.firstChild);
     }
     nav.id = 'cn-nav';
-    // Remove old nav classes that might conflict
     nav.className = '';
     nav.setAttribute('role', 'navigation');
     nav.innerHTML = navHTML;
@@ -299,6 +312,7 @@
         burger.setAttribute('aria-expanded', String(!isOpen));
         drawer.setAttribute('aria-hidden', String(isOpen));
       });
+
       // Close on outside click
       d.addEventListener('click', (e) => {
         if (!nav.contains(e.target) && !drawer.contains(e.target)) {
@@ -325,7 +339,7 @@
       <div class="cn-footer-grid">
         <div class="cn-footer-brand">
           <a href="/" class="cn-f-logo">Chronis</a>
-          <p>India's first real-time AI video memory platform. Preserve the voice, face, and presence of those you've lost.</p>
+          <p>World's first real-time AI twin. To remember today, for tommorow.</p>
         </div>
         <div class="cn-f-col">
           <h4>Product</h4>
@@ -357,7 +371,6 @@
       </div>
     `;
 
-    // Replace or create footer
     let footer = d.querySelector('footer');
     if (!footer) {
       footer = d.createElement('footer');
@@ -374,25 +387,22 @@
   overlay.id = 'cn-transition';
   d.body.appendChild(overlay);
 
-  // Fade in on load
   w.addEventListener('load', () => {
-    // small delay lets the page paint first
     requestAnimationFrame(() => {
       overlay.style.opacity = '0';
     });
   });
 
-  // Intercept internal navigation links for smooth transitions
   d.addEventListener('click', (e) => {
     const a = e.target.closest('a[href]');
     if (!a) return;
     const href = a.getAttribute('href');
     if (!href || href.startsWith('#') || href.startsWith('mailto:') ||
         href.startsWith('tel:') || a.target === '_blank') return;
-    // Only intercept same-origin, .html or / links
-    const isSameOrigin = !href.startsWith('http') ||
-      href.startsWith(w.location.origin);
+
+    const isSameOrigin = !href.startsWith('http') || href.startsWith(w.location.origin);
     if (!isSameOrigin) return;
+
     e.preventDefault();
     overlay.style.transition = 'opacity .18s ease';
     overlay.style.opacity = '1';
@@ -431,6 +441,7 @@
       if (!el.classList.contains('vs')) revealObserver.observe(el);
     });
   }
+
   if (d.readyState === 'loading') {
     d.addEventListener('DOMContentLoaded', initReveal);
   } else {
@@ -441,19 +452,17 @@
      GLOBAL NAMESPACE — window.Chronis
   ───────────────────────────────────────────────────────────── */
   w.Chronis = {
-    version:     '3.0',
+    version: '3.0',
     currentPage: currentKey,
-    site:        SITE,
-    toast:       toast,
+    site: SITE,
+    toast: toast,
 
-    /** Navigate with transition */
     navigate(url, delay = 180) {
       overlay.style.transition = 'opacity .18s ease';
       overlay.style.opacity = '1';
       setTimeout(() => { w.location.href = url; }, delay);
     },
 
-    /** Fire a lightweight analytics ping (no-op if no collector) */
     event(name, data = {}) {
       try {
         if (w.gtag) w.gtag('event', name, data);
@@ -461,20 +470,20 @@
       } catch (_) {}
     },
 
-    /** Get URL for a page key */
     url(key) {
       return SITE[key]?.url || '/';
     },
 
-    /** Check if a page is current */
     isPage(key) {
       return currentKey === key;
     },
 
-    /** Share API with clipboard fallback */
     async share(data) {
       if (navigator.share) {
-        try { await navigator.share(data); return true; } catch (_) {}
+        try {
+          await navigator.share(data);
+          return true;
+        } catch (_) {}
       }
       if (data.url) {
         await navigator.clipboard.writeText(data.url).catch(() => {});
