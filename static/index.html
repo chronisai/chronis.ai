@@ -61,7 +61,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200}
   align-items:center;
   justify-content:center;
   overflow:hidden;
-  padding:48px 24px clamp(200px,31vh,330px);
+  padding:56px 24px 120px;
 }
 .hero::before{
   content:'';position:absolute;inset:0;
@@ -71,17 +71,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200}
   pointer-events:none;
 }
 .hero::after{
-  content:'';position:absolute;left:50%;bottom:0;transform:translateX(-50%);
-  width:min(860px,88vw);height:clamp(170px,28vh,280px);
-  background:radial-gradient(ellipse at center, rgba(167,139,250,.18) 0%, rgba(124,58,237,.10) 34%, rgba(124,58,237,.04) 58%, transparent 76%);
-  filter:blur(28px);
-  opacity:.9;
+  content:'';position:absolute;left:50%;top:-38px;transform:translateX(-50%);
+  width:min(900px,92vw);height:clamp(220px,34vh,320px);
+  background:radial-gradient(ellipse at center, rgba(167,139,250,.18) 0%, rgba(124,58,237,.11) 34%, rgba(124,58,237,.04) 58%, transparent 76%);
+  filter:blur(30px);
+  opacity:.92;
   animation:heroGlow 7.5s ease-in-out infinite;
   pointer-events:none;
 }
 @keyframes heroGlow{0%,100%{transform:translateX(-50%) scale(1);opacity:.78}50%{transform:translateX(-50%) scale(1.08);opacity:1}}
 
-.hero-inner{position:relative;z-index:3;width:100%;max-width:920px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.hero-inner{position:relative;z-index:3;width:100%;max-width:920px;text-align:center;display:flex;flex-direction:column;align-items:center;padding-top:clamp(48px,8vh,108px)}
 .hero-ey{
   display:inline-flex;align-items:center;gap:8px;
   font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);
@@ -107,6 +107,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200}
 
 .waitlist-shell{
   width:min(620px,100%);
+  margin-top:clamp(18px,3vh,30px);
   border:1px solid rgba(255,255,255,.09);
   background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.018));
   border-radius:22px;padding:18px;
@@ -164,7 +165,7 @@ select.fi option{background:#121212}
 .hero-scroll-btn span:last-child{font-size:14px;transition:transform .2s}
 .hero-scroll-btn:hover span:last-child{transform:translateY(2px)}
 
-.hero-stage{position:absolute;left:0;right:0;bottom:0;height:clamp(190px,31vh,320px);z-index:1;pointer-events:none;overflow:hidden}
+.hero-stage{position:absolute;left:0;right:0;top:0;bottom:auto;height:clamp(260px,45vh,430px);z-index:1;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 74%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 74%,transparent 100%)}
 .hero-neon-diffuse,
 .hero-neon-diffuse-2,
 .hero-neon-arc{
@@ -237,17 +238,17 @@ footer{position:relative;z-index:1}
   .discover-copy{justify-self:start}
 }
 @media(max-width:768px){
-  .hero{padding-top:30px;padding-bottom:clamp(180px,30vh,260px)}
+  .hero{padding-top:34px;padding-bottom:110px}
   .hero h1{max-width:640px}
   .waitlist-shell{padding:14px;border-radius:18px}
   .wl-form{grid-template-columns:1fr}
-  .hero-stage{height:clamp(170px,27vh,230px)}
+  .hero-stage{height:clamp(220px,36vh,300px)}
   .hero-neon-diffuse{width:140vw}
   .card{min-height:auto}
 }
 @media(max-width:560px){
   body{padding-top:60px}
-  .hero{min-height:calc(100svh - 60px);padding-left:18px;padding-right:18px}
+  .hero{min-height:calc(100svh - 60px);padding-left:18px;padding-right:18px;padding-top:28px;padding-bottom:94px}
   .hero-ey{font-size:9px;letter-spacing:3px;padding:7px 12px;margin-bottom:22px}
   .hero-sub{margin-bottom:24px}
   .wl-top{flex-direction:column;gap:10px;margin-bottom:12px}
@@ -648,7 +649,7 @@ document.querySelectorAll('.liquid-card').forEach(card=>{
     G.rotation.x=curRotX;
     G.rotation.y=curRotY;
     floatOffset=Math.sin(t*.52)*.06;
-    G.position.set(0,3.10+floatOffset,0);
+    G.position.set(0,2.18+floatOffset,0);
     camera.position.x=Math.sin(t*.18)*.08;
     camera.position.y=.10+Math.cos(t*.26)*.08;
     camera.lookAt(0,.24,0);
