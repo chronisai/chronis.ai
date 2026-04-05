@@ -3,77 +3,987 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy Policy — Chronis AI</title>
-<meta name="description" content="How Chronis handles, stores, and protects your personal data and the memories you upload. India's DPDP Act 2023 compliant.">
+<title>Privacy — Chronis · Your Data, Your Architecture</title>
+<meta name="description" content="How Chronis protects biometric data, self-quantification signals, voice replicas, and behavioral models. End-to-end encryption, DPDP Act 2023 compliance, and three privacy modes designed around you.">
 <link rel="canonical" href="https://chronis.in/static/privacy.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#060606;--sf:rgba(255,255,255,.033);--bd:rgba(255,255,255,.076);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
-body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased}
-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(6,6,6,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
+:root{
+  --bg:#050505;--bg2:#0b0b0b;--bg3:#111111;
+  --sf:rgba(255,255,255,.024);--sf2:rgba(255,255,255,.044);
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.14);
+  --tx:#ece8e2;--mu:rgba(236,232,226,.38);--mu2:rgba(236,232,226,.62);--ch:rgba(236,232,226,.84);
+  --ne:#7c3aed;--ne2:#a78bfa;--ne3:#c4b5fd;
+  --gr:#4ade80;--am:#f59e0b;--rd:#f87171;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+
+/* ── STAR FIELD ── */
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.42}
+main,footer,nav{position:relative;z-index:1}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(5,5,5,.88);backdrop-filter:blur(28px);border-bottom:1px solid var(--bd)}
 .nl{font-family:var(--fd);font-size:20px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.nr{display:flex;gap:6px;align-items:center}
+.na{color:var(--mu);text-decoration:none;font-size:13px;padding:6px 13px;border-radius:6px;transition:.2s}
+.na:hover{color:var(--tx);background:var(--sf)}
 .nc{background:var(--tx);color:#000;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;transition:.2s}
 .nc:hover{opacity:.87}
-.hero{padding:140px 24px 60px;text-align:center}
-.ey{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:var(--mu);background:var(--sf);border:1px solid var(--bd);border-radius:40px;padding:7px 18px;margin-bottom:36px;font-weight:500}
-h1{font-family:var(--fd);font-size:clamp(42px,7vw,76px);font-weight:300;line-height:1.04;letter-spacing:-.8px;margin-bottom:16px}
-.hs{font-size:14px;color:var(--mu);font-weight:300}
-.prose{max-width:700px;margin:0 auto;padding:50px 24px 100px}
-.prose h2{font-family:var(--fd);font-size:26px;font-weight:300;line-height:1.2;color:var(--ch);margin:44px 0 14px}
-.prose h2:first-child{margin-top:0}
-.prose p{font-size:14px;color:var(--mu);line-height:1.82;font-weight:300;margin-bottom:16px}
-.prose p strong{color:var(--ch);font-weight:500}
-.prose ul{padding-left:0;margin-bottom:16px}
-.prose ul li{font-size:14px;color:var(--mu);line-height:1.7;font-weight:300;padding:4px 0;display:flex;gap:8px}
-.prose ul li::before{content:'—';color:rgba(237,233,226,.2);flex-shrink:0}
-.info-box{background:rgba(94,234,212,.04);border:1px solid rgba(94,234,212,.12);border-radius:12px;padding:20px 24px;margin:20px 0}
-.info-box p{margin:0;font-size:14px;color:var(--ch);font-weight:300;line-height:1.7}
-footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+@media(max-width:768px){.na{display:none}.nr .nc{display:flex}}
+
+/* ── HERO ── */
+.hero{
+  position:relative;min-height:calc(100svh - 64px);
+  display:flex;align-items:center;justify-content:center;
+  padding:80px 24px 120px;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 65% at 50% 20%, rgba(124,58,237,.09) 0%, rgba(124,58,237,.03) 46%, transparent 74%),
+    linear-gradient(180deg, rgba(255,255,255,.013) 0%, transparent 28%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;left:50%;top:-44px;transform:translateX(-50%);
+  width:min(920px,90vw);height:clamp(210px,32vh,310px);
+  background:radial-gradient(ellipse at center, rgba(167,139,250,.17) 0%, rgba(124,58,237,.1) 36%, rgba(124,58,237,.03) 60%, transparent 78%);
+  filter:blur(32px);opacity:.88;
+  animation:heroGlow 8s ease-in-out infinite;pointer-events:none;
+}
+@keyframes heroGlow{0%,100%{transform:translateX(-50%) scale(1);opacity:.76}50%{transform:translateX(-50%) scale(1.07);opacity:1}}
+
+.hero-inner{position:relative;z-index:3;width:100%;max-width:840px;text-align:center;display:flex;flex-direction:column;align-items:center;padding-top:clamp(32px,6vh,88px)}
+.hero-ey{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);
+  background:var(--sf);border:1px solid var(--bd);border-radius:999px;
+  padding:8px 18px;margin-bottom:30px;font-weight:500;backdrop-filter:blur(12px);
+  animation:fadeUp .85s ease both;
+}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:var(--ne2);box-shadow:0 0 10px rgba(167,139,250,.9);animation:dotPulse 2.2s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.32}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+.hero h1{
+  font-family:var(--fd);font-size:clamp(44px,8.5vw,96px);font-weight:300;line-height:.96;
+  letter-spacing:-1.5px;margin:0 auto 22px;animation:fadeUp .95s .07s ease both;
+}
+.hero h1 .soft{color:var(--mu2);font-style:italic}
+.hero-sub{
+  max-width:580px;font-size:clamp(14px,1.85vw,16px);line-height:1.86;color:var(--mu);font-weight:300;
+  margin:0 auto 44px;animation:fadeUp 1.05s .15s ease both;
+}
+.hero-meta{
+  display:flex;gap:24px;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp 1.1s .22s ease both;
+}
+.hero-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(236,232,226,.24);font-weight:500}
+.hero-tag span{color:var(--ne2);margin-right:6px}
+
+/* scroll hint */
+.scroll-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;animation:fadeUp 1.2s .4s ease both}
+.scroll-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(236,232,226,.18)}
+.scroll-line{width:1px;height:40px;background:linear-gradient(180deg,rgba(167,139,250,.3),transparent);animation:scPulse 2.2s ease-in-out infinite}
+@keyframes scPulse{0%,100%{transform:scaleY(1);opacity:.4}50%{transform:scaleY(1.3);opacity:1}}
+
+/* ── STRUCTURE ── */
+.blk{padding:100px 24px;max-width:1080px;margin:0 auto}
+.blk-narrow{padding:100px 24px;max-width:740px;margin:0 auto}
+.sec-label{display:block;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:14px}
+.sec-title{font-family:var(--fd);font-size:clamp(34px,5.5vw,62px);font-weight:300;line-height:1.02;letter-spacing:-.7px;color:var(--tx);margin-bottom:14px}
+.sec-title em{font-style:italic;color:var(--mu2)}
+.sec-copy{font-size:15px;line-height:1.84;color:var(--mu);font-weight:300;max-width:600px;margin-bottom:0}
+.divider{border:none;border-top:1px solid var(--bd);margin:0}
+
+/* ── PULL QUOTE ── */
+.pq{border-left:2px solid rgba(167,139,250,.32);padding:24px 30px;background:rgba(124,58,237,.025);border-radius:0 12px 12px 0;margin:52px 0}
+.pq-text{font-family:var(--fd);font-size:clamp(18px,3.2vw,26px);font-weight:300;font-style:italic;color:var(--ch);line-height:1.6;margin-bottom:12px}
+.pq-attr{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu);font-weight:500}
+
+/* ── LIQUID BORDER CARDS ── */
+.lc{position:relative;isolation:isolate;overflow:hidden}
+.lc::after{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;z-index:0;
+  background:radial-gradient(circle 160px at var(--gx,-300px) var(--gy,-300px), rgba(167,139,250,.6) 0%, rgba(124,58,237,.24) 44%, transparent 68%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;transition:opacity .35s ease;
+}
+.lc:hover::after{opacity:1}
+
+/* ── DATA SIGNAL GRID ── */
+.signal-intro{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:end;margin-bottom:52px}
+@media(max-width:700px){.signal-intro{grid-template-columns:1fr}}
+.signal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:700px){.signal-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.signal-grid{grid-template-columns:1fr}}
+
+.signal-card{
+  position:relative;isolation:isolate;
+  border:1px solid var(--bd);border-radius:20px;padding:28px 22px 24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.026),rgba(255,255,255,.010));
+  transition:transform .3s,border-color .3s;
+}
+.signal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.28),transparent)}
+.signal-card:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.22)}
+
+.signal-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;
+  padding:4px 10px;border-radius:999px;margin-bottom:18px;
+}
+.signal-badge.bio{color:#f472b6;background:rgba(244,114,182,.07);border:1px solid rgba(244,114,182,.18)}
+.signal-badge.behav{color:var(--ne2);background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.18)}
+.signal-badge.ambient{color:#34d399;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.18)}
+.signal-badge.struct{color:var(--am);background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18)}
+.signal-badge.model{color:#60a5fa;background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.18)}
+.signal-badge.meta{color:rgba(236,232,226,.45);background:rgba(255,255,255,.04);border:1px solid var(--bd)}
+
+.signal-card h3{font-size:14px;font-weight:500;color:var(--ch);margin-bottom:8px;position:relative;z-index:1;letter-spacing:-.1px}
+.signal-card p{font-size:12.5px;color:var(--mu);line-height:1.68;font-weight:300;position:relative;z-index:1;margin-bottom:14px}
+.signal-list{list-style:none;display:flex;flex-direction:column;gap:5px;position:relative;z-index:1}
+.signal-list li{font-size:11.5px;color:rgba(236,232,226,.32);font-weight:300;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.signal-list li::before{content:'·';color:rgba(167,139,250,.4);flex-shrink:0;font-size:14px;line-height:1.2}
+
+/* ── ARCHITECTURE DIAGRAM ── */
+.arch-wrap{margin-top:52px;border:1px solid var(--bd);border-radius:24px;overflow:hidden;position:relative}
+.arch-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.5),transparent)}
+.arch-header{padding:32px 32px 0;border-bottom:1px solid var(--bd)}
+.arch-header-inner{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:24px;gap:20px;flex-wrap:wrap}
+.arch-title{font-family:var(--fd);font-size:clamp(20px,3.5vw,28px);font-weight:300;color:var(--ch);margin-bottom:6px}
+.arch-sub{font-size:12.5px;color:var(--mu);font-weight:300;line-height:1.6;max-width:380px}
+.arch-body{padding:32px}
+
+/* flow steps */
+.flow{display:flex;flex-direction:column;gap:0}
+.flow-step{display:grid;grid-template-columns:52px 1fr;gap:0;position:relative}
+.flow-step:not(:last-child)::before{
+  content:'';position:absolute;left:25px;top:52px;bottom:-1px;width:1px;
+  background:linear-gradient(180deg,rgba(167,139,250,.3),rgba(167,139,250,.06));
+}
+.flow-num{width:52px;display:flex;flex-direction:column;align-items:center;padding-top:4px}
+.flow-circle{
+  width:38px;height:38px;border-radius:50%;background:rgba(124,58,237,.1);
+  border:1px solid rgba(167,139,250,.22);display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:16px;font-weight:300;color:var(--ne2);flex-shrink:0;
+}
+.flow-content{padding:4px 0 40px 20px}
+.flow-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:8px}
+.flow-title{font-size:14.5px;font-weight:500;color:var(--ch);margin-bottom:8px}
+.flow-desc{font-size:13px;color:var(--mu);line-height:1.72;font-weight:300}
+.flow-tag{
+  display:inline-block;margin-top:10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ne2);background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.16);
+  padding:3px 10px;border-radius:999px;font-weight:500;
+}
+.flow-tag.safe{color:#4ade80;background:rgba(74,222,128,.07);border-color:rgba(74,222,128,.16)}
+.flow-tag.enc{color:#60a5fa;background:rgba(96,165,250,.07);border-color:rgba(96,165,250,.16)}
+.flow-tag.lock{color:var(--am);background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.16)}
+
+/* ── THREE MODES ── */
+.modes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
+@media(max-width:820px){.modes-grid{grid-template-columns:1fr}}
+.mode-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  border:1px solid var(--bd);border-radius:22px;padding:34px 26px 28px;
+  transition:transform .3s,border-color .3s;
+}
+.mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.28),transparent)}
+.mode-card.featured{border-color:rgba(167,139,250,.28);background:linear-gradient(180deg,rgba(124,58,237,.07),rgba(124,58,237,.02))}
+.mode-card.featured::before{background:linear-gradient(90deg,transparent,rgba(167,139,250,.56),transparent)}
+.mode-card:not(.featured){background:linear-gradient(180deg,rgba(255,255,255,.026),rgba(255,255,255,.010))}
+.mode-card:hover{transform:translateY(-4px);border-color:rgba(167,139,250,.22)}
+.mode-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;color:var(--ne3);
+  background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.18);
+  padding:4px 11px;border-radius:999px;margin-bottom:20px;
+}
+.mode-dot{width:4px;height:4px;border-radius:50%;background:var(--ne2);box-shadow:0 0 6px var(--ne2);animation:dotPulse 2.2s ease-in-out infinite}
+.mode-dot.dim{background:rgba(236,232,226,.3);box-shadow:none;animation:none}
+.mode-dot.mid{background:var(--mu2);box-shadow:none;animation:none}
+.mode-card h3{font-family:var(--fd);font-size:clamp(20px,3vw,26px);font-weight:300;color:var(--ch);line-height:1.15;margin-bottom:12px}
+.mode-desc{font-size:13px;color:var(--mu);line-height:1.72;font-weight:300;margin-bottom:18px}
+.mode-pts{display:flex;flex-direction:column;gap:6px}
+.mode-pt{font-size:12px;color:rgba(236,232,226,.38);font-weight:300;display:flex;align-items:flex-start;gap:9px;line-height:1.55}
+.mode-pt::before{content:'—';color:rgba(167,139,250,.44);flex-shrink:0}
+
+/* ── RIGHTS GRID ── */
+.rights-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:44px}
+@media(max-width:600px){.rights-grid{grid-template-columns:1fr}}
+.right-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.026),rgba(255,255,255,.010));
+  border:1px solid var(--bd);border-radius:18px;padding:28px 24px;
+  transition:transform .28s,border-color .28s;
+}
+.right-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.24),transparent)}
+.right-card:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.18)}
+.right-icon{font-family:var(--fd);font-size:32px;color:rgba(167,139,250,.22);margin-bottom:14px;display:block;line-height:1}
+.right-card h3{font-size:14px;font-weight:500;color:var(--ch);margin-bottom:8px;letter-spacing:-.1px}
+.right-card p{font-size:13px;color:var(--mu);line-height:1.72;font-weight:300}
+.right-action{margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ne2);font-weight:600;cursor:default}
+.right-action::after{content:'→';transition:transform .2s}
+.right-card:hover .right-action::after{transform:translateX(4px)}
+
+/* ── TECH SPEC TABLE ── */
+.spec-table{margin-top:44px;border:1px solid var(--bd);border-radius:18px;overflow:hidden}
+.spec-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--bd)}
+.spec-row:last-child{border-bottom:none}
+.spec-row.hdr{background:rgba(255,255,255,.02)}
+.spec-cell{padding:16px 20px;font-size:13px;color:var(--mu);border-right:1px solid var(--bd);line-height:1.5;font-weight:300}
+.spec-cell:last-child{border-right:none}
+.spec-row.hdr .spec-cell{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ch)}
+.spec-cell.hi{color:var(--ne2);font-weight:400}
+.spec-cell.green{color:#4ade80;font-weight:400}
+@media(max-width:600px){
+  .spec-row{grid-template-columns:1fr 1fr}
+  .spec-cell:nth-child(3){display:none}
+  .spec-row.hdr .spec-cell:nth-child(3){display:none}
+}
+
+/* ── LEGAL COMPLIANCE ── */
+.compliance-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:44px}
+@media(max-width:600px){.compliance-grid{grid-template-columns:1fr}}
+.comp-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:26px 22px;
+  transition:border-color .28s;
+}
+.comp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.2),transparent)}
+.comp-card:hover{border-color:rgba(167,139,250,.18)}
+.comp-flag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ne2);background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.16);padding:3px 10px;border-radius:999px;display:inline-block;margin-bottom:14px;font-weight:600}
+.comp-card h3{font-size:14px;font-weight:500;color:var(--ch);margin-bottom:8px}
+.comp-card p{font-size:12.5px;color:var(--mu);line-height:1.68;font-weight:300}
+
+/* ── DELETION CALLOUT ── */
+.del-callout{
+  margin-top:44px;background:rgba(248,113,113,.025);border:1px solid rgba(248,113,113,.12);
+  border-radius:20px;padding:36px;position:relative;overflow:hidden;
+}
+.del-callout::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 10% 50%,rgba(248,113,113,.04) 0%,transparent 65%);pointer-events:none}
+.del-title{font-family:var(--fd);font-size:clamp(22px,4vw,32px);font-weight:300;color:var(--ch);margin-bottom:12px;line-height:1.15}
+.del-title em{font-style:italic;color:rgba(248,113,113,.7)}
+.del-body{font-size:13.5px;color:var(--mu);line-height:1.8;font-weight:300;max-width:560px;margin-bottom:20px}
+.del-pts{display:flex;flex-direction:column;gap:7px}
+.del-pt{font-size:12.5px;color:rgba(236,232,226,.38);font-weight:300;display:flex;align-items:flex-start;gap:9px;line-height:1.55}
+.del-pt::before{content:'—';color:rgba(248,113,113,.38);flex-shrink:0}
+
+/* ── CONTACT TRUST STRIP ── */
+.trust-strip{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;
+  border:1px solid var(--bd);border-radius:18px;padding:32px 36px;margin-top:44px;
+  background:var(--bg2);position:relative;overflow:hidden;
+}
+.trust-strip::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.45),transparent)}
+.trust-left h3{font-family:var(--fd);font-size:clamp(20px,3.5vw,28px);font-weight:300;color:var(--ch);margin-bottom:6px}
+.trust-left p{font-size:13px;color:var(--mu);font-weight:300;line-height:1.65}
+.trust-email{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:500;color:var(--ne2);
+  border:1px solid rgba(167,139,250,.22);padding:10px 22px;border-radius:999px;
+  text-decoration:none;transition:.25s;white-space:nowrap;
+}
+.trust-email:hover{background:rgba(167,139,250,.07);border-color:rgba(167,139,250,.4)}
+
+/* ── SCROLL REVEAL ── */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .72s ease,transform .72s ease}
+.rv.vs{opacity:1;transform:translateY(0)}
+
+/* ── TOOLTIP ── */
+.tip{position:relative;display:inline-block;cursor:help;border-bottom:1px dashed rgba(167,139,250,.36);color:var(--ne3)}
+.tip-box{
+  position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);
+  background:#1a1a2e;border:1px solid rgba(167,139,250,.22);border-radius:10px;
+  padding:10px 14px;font-size:11px;color:rgba(236,232,226,.65);line-height:1.6;
+  white-space:nowrap;pointer-events:none;opacity:0;transition:.2s;z-index:50;font-style:normal;
+  max-width:240px;white-space:normal;text-align:center;font-family:var(--fb);font-weight:300;
+}
+.tip:hover .tip-box{opacity:1}
+
+/* ── LAST UPDATED BADGE ── */
+.updated-badge{
+  display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;color:rgba(236,232,226,.24);background:var(--sf);
+  border:1px solid var(--bd);border-radius:999px;padding:6px 14px;margin-top:20px;
+}
+.green-dot{width:4px;height:4px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80;animation:dotPulse 3s ease-in-out infinite}
+
+footer{border-top:1px solid var(--bd);padding:32px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:60px}
 .fb{font-family:var(--fd);font-size:18px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:var(--ch);text-decoration:none}
-.fc{font-size:12px;color:rgba(237,233,226,.2)}
+.fc{font-size:11.5px;color:rgba(236,232,226,.2)}
+.flinks{display:flex;gap:20px;flex-wrap:wrap}
+.flink{font-size:11.5px;color:rgba(236,232,226,.2);text-decoration:none;transition:.2s}
+.flink:hover{color:var(--mu2)}
 </style>
-  <script src="/static/js/chronis-nav.js" defer></script>
+<script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
+
+<canvas id="bgc"></canvas>
 <nav id="cn-nav"></nav>
+
+<main>
+
+<!-- ── HERO ── -->
 <section class="hero">
-  <div class="ey">Privacy Policy</div>
-  <h1>Your memories.<br>Your data.</h1>
-  <p class="hs">Last updated: April 2026 · Compliant with India's DPDP Act 2023</p>
+  <div class="hero-inner">
+    <div class="hero-ey"><span class="hero-dot"></span>Privacy Architecture</div>
+    <h1>Your data is yours.<br><span class="soft">Not a commodity.</span></h1>
+    <p class="hero-sub">Chronis captures the deepest signals of a human life — voice, biometrics, behavioral patterns, decision rhythms. This document explains exactly what we collect, where it lives, who can access it, and what happens to it. No buried clauses.</p>
+    <div class="hero-meta">
+      <span class="hero-tag"><span>●</span>DPDP Act 2023 Compliant</span>
+      <span class="hero-tag"><span>●</span>AES-256 at Rest</span>
+      <span class="hero-tag"><span>●</span>Zero Third-Party Data Sale</span>
+    </div>
+    <div class="updated-badge"><span class="green-dot"></span>Last reviewed April 2026</div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-label">Read below</div>
+    <div class="scroll-line"></div>
+  </div>
 </section>
-<div class="prose">
-  <div class="info-box"><p><strong>The short version:</strong> Your data is never used to train AI models. You can delete everything permanently at any time. We store data encrypted. We don't sell or share personal data. Full stop.</p></div>
-  <h2>What we collect</h2>
-  <p>When you use Chronis, we collect:</p>
-  <ul>
-    <li>Your name and email address (for the waitlist and account)</li>
-    <li>Video and audio files you upload (stored encrypted, used only to build your replica)</li>
-    <li>Conversation history from sessions with your replica</li>
-    <li>Basic usage data (page views, session duration) via standard analytics</li>
-    <li>Payment information — processed by Razorpay, never stored on Chronis servers</li>
-  </ul>
-  <h2>What we never do</h2>
-  <ul>
-    <li>Use your video, audio, or conversation data to train any AI model</li>
-    <li>Share or sell your personal data to any third party</li>
-    <li>Allow advertisers access to your data or behavior</li>
-    <li>Retain data after you request deletion</li>
-  </ul>
-  <h2>How we store your data</h2>
-  <p>All uploaded video and audio files are stored encrypted at rest using AES-256 encryption. Conversation data is stored in encrypted databases. Replicas are associated only with your account and are not accessible to any other user or to Chronis staff except for technical support purposes, and only with your explicit permission.</p>
-  <h2>Deletion</h2>
-  <p>You can permanently delete your account, your replica, and all associated data at any time. Deletion is immediate and irreversible. We retain no backups of deleted data after 30 days. To delete your account, email <strong>privacy@chronis.in</strong> or use the in-product deletion option.</p>
-  <h2>India's DPDP Act 2023</h2>
-  <p>Chronis is compliant with India's Digital Personal Data Protection Act 2023. As a data fiduciary processing personal data of Indian citizens, we maintain appropriate security safeguards, respond to data principal requests within statutory timelines, and have appointed a point of contact for privacy concerns.</p>
-  <p>For privacy requests or concerns: <strong>privacy@chronis.in</strong></p>
-  <h2>Cookies</h2>
-  <p>We use minimal cookies — session authentication and basic analytics only. We do not use advertising cookies or cross-site tracking.</p>
-  <h2>Contact</h2>
-  <p>For any privacy questions or data requests: <strong>privacy@chronis.in</strong></p>
-</div>
-<footer id="cn-footer"></footer>
+
+<hr class="divider">
+
+<!-- ── WHAT CHRONIS CAPTURES ── -->
+<section class="blk rv">
+  <span class="sec-label">What we collect</span>
+  <div class="signal-intro">
+    <div>
+      <h2 class="sec-title">The signals that<br><em>make you, you.</em></h2>
+    </div>
+    <p class="sec-copy">Chronis is not a messaging app. It captures the depth of a human being — biometric, behavioral, environmental, structural. Every data type is listed here with full transparency. Nothing is collected that is not on this list.</p>
+  </div>
+
+  <div class="signal-grid">
+    <div class="signal-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="signal-badge bio">Biometric</span>
+      <h3>Voice & Acoustic Identity</h3>
+      <p>Full-spectrum voice recordings processed into a neural vocal signature — pitch contours, prosody, micro-pauses, emotional inflection, accent drift over time.</p>
+      <ul class="signal-list">
+        <li>Raw audio waveforms (locket microphone)</li>
+        <li>Extracted vocal embeddings (not reversible to audio)</li>
+        <li>Heart-rate variability from locket BPM sensor</li>
+        <li>Breathing rhythm patterns during conversation</li>
+      </ul>
+    </div>
+
+    <div class="signal-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="signal-badge bio">Biometric</span>
+      <h3>Facial & Visual Presence</h3>
+      <p>Video frames captured by the locket camera when open. Facial geometry is processed locally on-device into embeddings for replica fidelity — raw frames are never permanently stored unless you elect Full Dataset mode.</p>
+      <ul class="signal-list">
+        <li>Facial landmark geometry (468 points)</li>
+        <li>Micro-expression temporal sequences</li>
+        <li>Eye movement and gaze direction</li>
+        <li>Lighting-normalized skin tone reference</li>
+      </ul>
+    </div>
+
+    <div class="signal-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="signal-badge behav">Behavioural</span>
+      <h3>Motion & Somatic Patterns</h3>
+      <p>The locket accelerometer and gyroscope record how you move through the world — walking cadence, gesture vocabulary, rest stillness, posture shifts during speech.</p>
+      <ul class="signal-list">
+        <li>6-axis IMU data (3-axis accel + 3-axis gyro)</li>
+        <li>Walking rhythm and cadence fingerprint</li>
+        <li>Gestural emphasis during conversation</li>
+        <li>Rest vs. active state classification</li>
+      </ul>
+    </div>
+
+    <div class="signal-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="signal-badge ambient">Ambient</span>
+      <h3>Environmental Context</h3>
+      <p>Where and when moments occur gives them meaning. Ambient audio, time-of-day, and location context (opt-in, coarse) tag your data with the texture of your life.</p>
+      <ul class="signal-list">
+        <li>Ambient sound environment classification</li>
+        <li>Time-of-day and day-of-week metadata</li>
+        <li>Coarse location (city-level, opt-in only)</li>
+        <li>Social context detection (alone / group)</li>
+      </ul>
+    </div>
+
+    <div class="signal-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="signal-badge model">AI Model</span>
+      <h3>Conversation & Linguistic DNA</h3>
+      <p>Every session with your Chronis replica generates a conversation record — not just words, but the structure of how you think, argue, comfort, and question.</p>
+      <ul class="signal-list">
+        <li>Full session transcripts (your words + replica's)</li>
+        <li>Topic and emotional arc metadata</li>
+        <li>Linguistic pattern vectors (vocabulary, syntax)</li>
+        <li>Decision and reasoning pattern signatures</li>
+      </ul>
+    </div>
+
+    <div class="signal-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="signal-badge struct">Structural</span>
+      <h3>Account & Operational Data</h3>
+      <p>The administrative layer that makes Chronis function — identity, payment processing, support interactions, and minimal usage telemetry for product reliability.</p>
+      <ul class="signal-list">
+        <li>Name, email, phone (account registration)</li>
+        <li>Payment tokens (Razorpay — never stored by us)</li>
+        <li>Device identifiers (locket serial + app UUID)</li>
+        <li>Anonymised crash and error telemetry</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── DATA FLOW ARCHITECTURE ── -->
+<section class="blk rv">
+  <span class="sec-label">How data flows</span>
+  <h2 class="sec-title">From locket<br><em>to vault.</em></h2>
+  <p class="sec-copy" style="margin-bottom:0">The journey of every signal captured by the Chronis locket — from sensor to encrypted storage to model training. Every step is described here, with the privacy control applied at each stage.</p>
+
+  <div class="arch-wrap" style="margin-top:44px">
+    <div class="arch-header">
+      <div class="arch-header-inner">
+        <div>
+          <div class="arch-title">End-to-end data pipeline</div>
+          <div class="arch-sub">Six stages from sensor capture to model inference. Your privacy mode governs what survives past stage three.</div>
+        </div>
+        <span style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);font-weight:600">AES-256 · TLS 1.3</span>
+      </div>
+    </div>
+    <div class="arch-body">
+      <div class="flow">
+
+        <div class="flow-step">
+          <div class="flow-num"><div class="flow-circle">1</div></div>
+          <div class="flow-content">
+            <div class="flow-label">On-device</div>
+            <div class="flow-title">Sensor capture & local pre-processing</div>
+            <div class="flow-desc">The locket's hardware sensors — microphone, camera, IMU, photoplethysmograph — capture raw signals. Initial feature extraction (vocal embeddings, facial landmarks, motion primitives) runs on the locket's secure enclave chip. Raw pixels and raw audio are not transmitted in this stage.</div>
+            <span class="flow-tag safe">On-device only</span>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-num"><div class="flow-circle">2</div></div>
+          <div class="flow-content">
+            <div class="flow-label">Transmission</div>
+            <div class="flow-title">Encrypted transit over TLS 1.3</div>
+            <div class="flow-desc">Extracted features (not raw data) are transmitted from locket to Chronis servers over TLS 1.3 with certificate pinning. Payload is additionally encrypted with your user-specific key before leaving the device. No plaintext data ever traverses the network.</div>
+            <span class="flow-tag enc">TLS 1.3 + payload encryption</span>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-num"><div class="flow-circle">3</div></div>
+          <div class="flow-content">
+            <div class="flow-label">Privacy Gate</div>
+            <div class="flow-title">Mode-based routing — your choice governs what continues</div>
+            <div class="flow-desc">At our ingestion layer, your elected privacy mode determines what happens next. <strong style="color:var(--ch);font-weight:500">Raw Vault</strong>: data is encrypted with your key and written to cold storage — no processing occurs. <strong style="color:var(--ch);font-weight:500">Skimmed Dataset</strong>: only sessions you've explicitly approved proceed to training. <strong style="color:var(--ch);font-weight:500">Full Dataset</strong>: all signals proceed to model training infrastructure.</div>
+            <span class="flow-tag lock">Your mode controls this</span>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-num"><div class="flow-circle">4</div></div>
+          <div class="flow-content">
+            <div class="flow-label">Model Training</div>
+            <div class="flow-title">Isolated per-user model infrastructure</div>
+            <div class="flow-desc">If your mode permits training, your data enters a <span class="tip">federated training enclave<span class="tip-box">An isolated compute environment where your model trains on only your data — no shared weights, no data leakage to other users' models.</span></span> with zero shared weights across users. Your model architecture is dedicated to your account. Chronis staff have no access to model internals; only your account can trigger inference.</div>
+            <span class="flow-tag">Isolated per-user compute</span>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-num"><div class="flow-circle">5</div></div>
+          <div class="flow-content">
+            <div class="flow-label">Encrypted Storage</div>
+            <div class="flow-title">AES-256 encrypted vault, key held by you</div>
+            <div class="flow-desc">All stored data — raw signals (if applicable), feature vectors, conversation transcripts, and model weights — is encrypted at rest with AES-256-GCM. For Full Vault mode users, the master decryption key is derived from your credentials and never held by Chronis in plaintext. We are architecturally incapable of reading your vault without your active authentication.</div>
+            <span class="flow-tag enc">AES-256-GCM at rest</span>
+          </div>
+        </div>
+
+        <div class="flow-step">
+          <div class="flow-num"><div class="flow-circle">6</div></div>
+          <div class="flow-content">
+            <div class="flow-label">Inference</div>
+            <div class="flow-title">Replica sessions run in ephemeral compute</div>
+            <div class="flow-desc">When you open a session, your model is loaded into an ephemeral compute instance that terminates when the session ends. No session state persists between conversations unless you have enabled persistent memory. Conversation logs are written back to your encrypted vault only — never to shared infrastructure.</div>
+            <span class="flow-tag safe">Ephemeral compute · no cross-session leak</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── THREE PRIVACY MODES ── -->
+<section class="blk rv">
+  <span class="sec-label">Privacy modes</span>
+  <h2 class="sec-title">You choose the<br><em>depth of exposure.</em></h2>
+  <p class="sec-copy" style="margin-bottom:0">Three modes — chosen at setup, changeable anytime. Your mode is not a setting buried in a menu. It is the foundation of what Chronis is allowed to do with your data. Changing it triggers a model rebuild from your approved dataset.</p>
+
+  <div class="modes-grid">
+
+    <div class="mode-card featured lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <div class="mode-badge"><span class="mode-dot"></span>Full Dataset</div>
+      <h3>Train your own AI.<br>On everything.</h3>
+      <p class="mode-desc">Every signal the locket captures builds a model that has only ever seen you. Not fine-tuned. Not a persona layer. Built from scratch on your data alone. The richest self-quantification possible.</p>
+      <div class="mode-pts">
+        <div class="mode-pt">Dedicated model architecture — zero shared weights with any other user, ever</div>
+        <div class="mode-pt">Biological fusion: BPM and motion tag every moment with emotional and physical context</div>
+        <div class="mode-pt">Real-time conversation + legacy access for family members you designate</div>
+        <div class="mode-pt">Model weights stored in your vault — Chronis cannot execute inference without your active permission</div>
+        <div class="mode-pt">Full behavioral pattern library — decision rhythms, linguistic signature, somatic tells</div>
+      </div>
+    </div>
+
+    <div class="mode-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <div class="mode-badge"><span class="mode-dot mid"></span>Skimmed Dataset</div>
+      <h3>Your AI.<br>Only what you choose.</h3>
+      <p class="mode-desc">Granular session-level consent. Include Sunday mornings. Exclude the hospital room. The model learns only what you consciously let through — nothing is assumed included.</p>
+      <div class="mode-pts">
+        <div class="mode-pt">Signal-type toggles: voice, video, motion, BPM each independently includable</div>
+        <div class="mode-pt">Session redaction — flag any window of time as off-record before it is processed</div>
+        <div class="mode-pt">Re-scope training at any point; model rebuilds cleanly from the updated approved dataset</div>
+        <div class="mode-pt">Voice and face reconstruction available even on minimal datasets</div>
+        <div class="mode-pt">Behavioral patterns learn from approved sessions only — no inference across redacted gaps</div>
+      </div>
+    </div>
+
+    <div class="mode-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <div class="mode-badge"><span class="mode-dot dim"></span>Raw Vault</div>
+      <h3>Sealed.<br>Nothing touches it.</h3>
+      <p class="mode-desc">End-to-end encrypted. Nothing is processed. No AI is trained. A sealed chronological record of your life — readable only by you, invisible to every system including ours.</p>
+      <div class="mode-pts">
+        <div class="mode-pt">Zero inference, zero processing — client-side encryption before data leaves the locket hardware</div>
+        <div class="mode-pt">Chronis has no technical pathway to your vault contents — enforced by architecture, not policy</div>
+        <div class="mode-pt">Upgrade to Full or Skimmed at any time; archived data becomes the training foundation immediately</div>
+        <div class="mode-pt">Permanent deletion is cryptographically verifiable and physically irreversible — proof on request</div>
+        <div class="mode-pt">Use as a personal archive of your life even with no intention of AI training</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── WHAT WE NEVER DO ── -->
+<section class="blk-narrow rv">
+  <span class="sec-label">Hard limits</span>
+  <h2 class="sec-title">What Chronis will<br><em>never do.</em></h2>
+
+  <div class="pq">
+    <p class="pq-text">We are building a system that holds the most intimate data that has ever been collected about a human being. That is either the most trustworthy thing ever built, or the most dangerous. The hard limits below are not policy — they are architectural constraints enforced in code.</p>
+    <div class="pq-attr">Chronis Design Principle · Privacy-First Architecture</div>
+  </div>
+
+  <div class="spec-table" style="margin-top:44px">
+    <div class="spec-row hdr">
+      <div class="spec-cell">Action</div>
+      <div class="spec-cell">Status</div>
+      <div class="spec-cell">Enforcement</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Sell or transfer personal data to any third party</div>
+      <div class="spec-cell hi">Never · Ever</div>
+      <div class="spec-cell green">Contractual + architectural</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Use your data to train any shared AI model</div>
+      <div class="spec-cell hi">Prohibited</div>
+      <div class="spec-cell green">Isolated per-user infra</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Allow advertisers access to your data or behavior</div>
+      <div class="spec-cell hi">Prohibited</div>
+      <div class="spec-cell green">Zero ad infrastructure</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Allow government access without valid legal process</div>
+      <div class="spec-cell hi">Prohibited</div>
+      <div class="spec-cell green">Legal challenge + user notice*</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Retain data after deletion request is confirmed</div>
+      <div class="spec-cell hi">Prohibited</div>
+      <div class="spec-cell green">30-day purge window</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Share voice or facial data with any third party</div>
+      <div class="spec-cell hi">Prohibited</div>
+      <div class="spec-cell green">Vault isolation</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Access your vault without active user authentication</div>
+      <div class="spec-cell hi">Architecturally impossible</div>
+      <div class="spec-cell green">Key derivation from your credentials</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Collect data from users under 18</div>
+      <div class="spec-cell hi">Prohibited</div>
+      <div class="spec-cell green">Age verification at signup</div>
+    </div>
+  </div>
+  <p style="font-size:11.5px;color:rgba(236,232,226,.2);margin-top:14px;line-height:1.6">* We will resist unlawful requests, notify affected users when legally permitted, and publish a transparency report annually.</p>
+</section>
+
+<hr class="divider">
+
+<!-- ── YOUR RIGHTS ── -->
+<section class="blk rv">
+  <span class="sec-label">Your rights</span>
+  <h2 class="sec-title">Data principal rights<br><em>under DPDP 2023.</em></h2>
+  <p class="sec-copy" style="margin-bottom:0">India's Digital Personal Data Protection Act 2023 gives you specific rights over your personal data. Chronis is built to honour all of them — and in several cases, goes further than what the Act requires.</p>
+
+  <div class="rights-grid">
+
+    <div class="right-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="right-icon">I</span>
+      <h3>Right to Access & Summary</h3>
+      <p>Request a complete summary of all personal data Chronis holds about you — including data types, processing purposes, third parties engaged, and the basis for processing. Delivered within 72 hours.</p>
+      <div class="right-action">Request access</div>
+    </div>
+
+    <div class="right-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="right-icon">II</span>
+      <h3>Right to Correction</h3>
+      <p>Request correction of inaccurate or incomplete personal data. For biometric data, this means the ability to re-record voice or video to update the model's training foundation.</p>
+      <div class="right-action">Request correction</div>
+    </div>
+
+    <div class="right-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="right-icon">III</span>
+      <h3>Right to Erasure</h3>
+      <p>Permanent deletion of your account, all stored signals, your trained model weights, and all associated metadata. Deletion is cryptographically verifiable and complete within 30 days with proof provided on request.</p>
+      <div class="right-action">Initiate deletion</div>
+    </div>
+
+    <div class="right-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="right-icon">IV</span>
+      <h3>Right to Data Portability</h3>
+      <p>Export your full data vault in open formats — audio files, transcripts, motion logs, and model metadata — to take elsewhere. Your model belongs to you. We provide export tooling at any time.</p>
+      <div class="right-action">Export data</div>
+    </div>
+
+    <div class="right-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="right-icon">V</span>
+      <h3>Right to Withdraw Consent</h3>
+      <p>Change your privacy mode at any time without consequence. Withdraw consent for AI training and your data immediately stops being processed. The model freezes at its last state until you re-consent or delete.</p>
+      <div class="right-action">Manage consent</div>
+    </div>
+
+    <div class="right-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="right-icon">VI</span>
+      <h3>Right to Grievance Redressal</h3>
+      <p>Contact our Data Protection Officer with any privacy concern. We respond within 48 hours. You may also escalate to India's Data Protection Board if you believe your rights have been violated.</p>
+      <div class="right-action">Contact DPO</div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── TECHNICAL ENCRYPTION ── -->
+<section class="blk-narrow rv">
+  <span class="sec-label">Technical safeguards</span>
+  <h2 class="sec-title">The technical<br><em>architecture of trust.</em></h2>
+  <p class="sec-copy">Privacy is only as strong as the code that enforces it. Below is the technical implementation of our security posture — not marketing language, but the actual mechanisms.</p>
+
+  <div class="spec-table" style="margin-top:44px">
+    <div class="spec-row hdr">
+      <div class="spec-cell">Layer</div>
+      <div class="spec-cell">Technology</div>
+      <div class="spec-cell">Standard</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Data at rest</div>
+      <div class="spec-cell hi">AES-256-GCM</div>
+      <div class="spec-cell">FIPS 140-2</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Data in transit</div>
+      <div class="spec-cell hi">TLS 1.3 + cert pinning</div>
+      <div class="spec-cell">RFC 8446</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Key derivation (vault)</div>
+      <div class="spec-cell hi">Argon2id from user credentials</div>
+      <div class="spec-cell">PHC winner</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">On-device processing</div>
+      <div class="spec-cell hi">Secure Enclave (ARM TrustZone)</div>
+      <div class="spec-cell">ISO/IEC 19790</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Model training isolation</div>
+      <div class="spec-cell hi">Per-user compute enclaves</div>
+      <div class="spec-cell">Zero shared weights</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Authentication</div>
+      <div class="spec-cell hi">TOTP + device binding</div>
+      <div class="spec-cell">RFC 6238</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Deletion verification</div>
+      <div class="spec-cell hi">Cryptographic proof of deletion</div>
+      <div class="spec-cell">Merkle tree audit log</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Penetration testing</div>
+      <div class="spec-cell hi">Bi-annual third-party audit</div>
+      <div class="spec-cell">OWASP ASVS L3</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── LEGAL COMPLIANCE ── -->
+<section class="blk rv">
+  <span class="sec-label">Legal framework</span>
+  <h2 class="sec-title">Compliance is the<br><em>floor, not the ceiling.</em></h2>
+  <p class="sec-copy" style="margin-bottom:0">We comply with all applicable law. We also go further — because the sensitivity of what Chronis holds demands it.</p>
+
+  <div class="compliance-grid">
+
+    <div class="comp-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="comp-flag">India · DPDP 2023</span>
+      <h3>Digital Personal Data Protection Act 2023</h3>
+      <p>Chronis is registered as a Data Fiduciary under the DPDP Act. We maintain a Data Protection Officer, respond to Data Principal requests within statutory timelines, and have implemented all Significant Data Fiduciary obligations including impact assessments and algorithmic audits.</p>
+    </div>
+
+    <div class="comp-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="comp-flag">India · IT Act 2000</span>
+      <h3>Information Technology Act & SPDI Rules</h3>
+      <p>All Sensitive Personal Data and Information (SPDI) — including biometric and health data — is processed under our published Privacy Policy in accordance with the IT (Amendment) Act 2008 and the IT (SPDI) Rules 2011, with explicit written consent obtained before collection.</p>
+    </div>
+
+    <div class="comp-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="comp-flag">Global · EU Reference</span>
+      <h3>GDPR-Aligned Practices (International)</h3>
+      <p>Although India-incorporated, Chronis voluntarily aligns with GDPR Articles 9 (special category data) and 25 (data protection by design) given the biometric nature of our data. International users benefit from these protections as a baseline standard.</p>
+    </div>
+
+    <div class="comp-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="comp-flag">Global · Biometrics</span>
+      <h3>Biometric Data Special Handling</h3>
+      <p>Voice prints, facial geometry, and BPM patterns are classified as special category biometric data requiring explicit consent, purpose limitation, storage minimisation, and enhanced security measures. These are never used beyond replica construction without separate explicit consent.</p>
+    </div>
+
+    <div class="comp-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="comp-flag">Global · Children</span>
+      <h3>Children's Data Protection</h3>
+      <p>Chronis is not available to persons under 18 years of age anywhere. We verify age at registration using government-ID validation. Any account discovered to belong to a minor is immediately suspended and all associated data deleted without retention.</p>
+    </div>
+
+    <div class="comp-card lc" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="comp-flag">Cross-border</span>
+      <h3>Data Localisation & Transfer</h3>
+      <p>Personal data of Indian citizens is stored on servers located within India. Cross-border data transfers (if required for technical operations) occur only to countries with adequate protection frameworks, under Standard Contractual Clauses, and with user notification.</p>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── DELETION ── -->
+<section class="blk-narrow rv">
+  <span class="sec-label">Deletion & exit</span>
+
+  <div class="del-callout">
+    <h2 class="del-title">Deletion is<br><em>genuinely permanent.</em></h2>
+    <p class="del-body">Most companies say "we delete your data" and then keep backups for 90 days. That is not deletion. Chronis deletion is cryptographically enforced — when you delete, we destroy the encryption key. The ciphertext becomes permanently inaccessible, not just inaccessible to us.</p>
+    <div class="del-pts">
+      <div class="del-pt">Deletion request triggers immediate key destruction — vault content becomes permanently inaccessible</div>
+      <div class="del-pt">Backup copies (which hold only ciphertext) are purged within 30 days — a cryptographic proof of deletion is issued on request</div>
+      <div class="del-pt">Your trained model weights, conversation transcripts, signal data, and account metadata are all included in deletion scope</div>
+      <div class="del-pt">We send one confirmation email 7 days before permanent deletion is finalised — after which there is no technical path to recovery</div>
+      <div class="del-pt">To initiate: email privacy@chronis.in with subject line "Account Deletion Request" or use the in-app deletion option under Settings → Privacy → Delete everything</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── THIRD PARTIES ── -->
+<section class="blk-narrow rv">
+  <span class="sec-label">Third-party processors</span>
+  <h2 class="sec-title">Who else<br><em>touches your data.</em></h2>
+  <p class="sec-copy">We engage a small number of third-party processors. None of them receive personal data in identifiable form. All are bound by data processing agreements under DPDP 2023 and GDPR-aligned standards.</p>
+
+  <div class="spec-table" style="margin-top:44px">
+    <div class="spec-row hdr">
+      <div class="spec-cell">Processor</div>
+      <div class="spec-cell">Purpose</div>
+      <div class="spec-cell">Data Shared</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Razorpay</div>
+      <div class="spec-cell">Payment processing</div>
+      <div class="spec-cell green">Payment tokens only — no biometrics</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">AWS India (ap-south-1)</div>
+      <div class="spec-cell">Encrypted vault storage & compute</div>
+      <div class="spec-cell green">AES-256 ciphertext only</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Twilio (India)</div>
+      <div class="spec-cell">SMS notifications (opt-in)</div>
+      <div class="spec-cell green">Phone number only</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Mixpanel (anonymised)</div>
+      <div class="spec-cell">Product analytics</div>
+      <div class="spec-cell green">Anonymous event metadata</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Sentry</div>
+      <div class="spec-cell">Error and crash reporting</div>
+      <div class="spec-cell green">Sanitised stack traces — no personal data</div>
+    </div>
+  </div>
+
+  <p style="font-size:11.5px;color:rgba(236,232,226,.2);margin-top:14px;line-height:1.6">No personal data is shared with any AI model vendor, data broker, government entity (except under valid legal compulsion), advertiser, or analytics provider in identifiable form.</p>
+</section>
+
+<hr class="divider">
+
+<!-- ── COOKIES ── -->
+<section class="blk-narrow rv">
+  <span class="sec-label">Cookies & tracking</span>
+  <h2 class="sec-title">Minimal. Declared.<br><em>No surveillance.</em></h2>
+  <p class="sec-copy" style="margin-bottom:32px">We use three categories of cookies. That is all. No advertising networks. No cross-site tracking. No behavioural fingerprinting.</p>
+
+  <div class="spec-table">
+    <div class="spec-row hdr">
+      <div class="spec-cell">Cookie Type</div>
+      <div class="spec-cell">Purpose</div>
+      <div class="spec-cell">Deletable?</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Session authentication</div>
+      <div class="spec-cell">Keep you logged in securely</div>
+      <div class="spec-cell green">Yes — logs you out</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Privacy mode preference</div>
+      <div class="spec-cell">Remember your elected data mode</div>
+      <div class="spec-cell green">Yes — resets to default</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-cell">Anonymous analytics</div>
+      <div class="spec-cell">Product improvement (opt-out available)</div>
+      <div class="spec-cell green">Yes — opt-out in settings</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── CONTACT ── -->
+<section class="blk-narrow rv">
+  <span class="sec-label">Contact & oversight</span>
+
+  <div class="trust-strip">
+    <div class="trust-left">
+      <h3>Questions about<br>your privacy?</h3>
+      <p>Contact our Data Protection Officer directly. We respond within 48 hours. No automated replies, no ticket queues — a human helping you over your request.</p>
+    </div>
+    <a href="mailto:privacy@chronis.in" class="trust-email">privacy@chronis.in →</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+    <div class="comp-card">
+      <span class="comp-flag">DPO</span>
+      <h3>Data Protection Officer</h3>
+      <p>Chronis <br>privacy@chronis.in · Response: 48 hours</p>
+    </div>
+    <div class="comp-card">
+      <span class="comp-flag">Escalation</span>
+      <h3>Data protection, mail to our CEO.</h3>
+      <p>If you believe your rights under DPDP 2023 have been violated and we have not resolved your concern, or you find the issue wasn't addressed well mail us at. founders@chronis.in</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer id="cn-footer">
+  <a href="/" class="fb">Chronis</a>
+  <div class="flinks">
+    <a href="/static/ethics.html" class="flink">Ethics</a>
+    <a href="/static/how-it-works.html" class="flink">How it works</a>
+    <a href="mailto:privacy@chronis.in" class="flink">privacy@chronis.in</a>
+  </div>
+  <span class="fc">© 2026 Chronis AI Pvt. Ltd. · DPDP 2023 Compliant</span>
+</footer>
+
+<script>
+/* ── STAR FIELD ── */
+(function(){
+  var c=document.getElementById('bgc');
+  var ctx=c.getContext('2d');
+  var stars=[];
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<140;i++){
+    stars.push({
+      x:Math.random(),y:Math.random(),
+      r:Math.random()*1.1+.2,
+      a:Math.random(),
+      s:Math.random()*.6+.2,
+      p:Math.random()*Math.PI*2
+    });
+  }
+  var t=0;
+  function draw(){
+    t+=.012;
+    ctx.clearRect(0,0,c.width,c.height);
+    for(var i=0;i<stars.length;i++){
+      var st=stars[i];
+      var al=st.a*(0.5+0.5*Math.sin(t*st.s+st.p));
+      ctx.beginPath();
+      ctx.arc(st.x*c.width,st.y*c.height,st.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+al+')';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── LIQUID BORDER ── */
+function lm(e,el){
+  var r=el.getBoundingClientRect();
+  el.style.setProperty('--gx',(e.clientX-r.left)+'px');
+  el.style.setProperty('--gy',(e.clientY-r.top)+'px');
+}
+function ll(el){
+  el.style.setProperty('--gx','-400px');
+  el.style.setProperty('--gy','-400px');
+}
+
+/* ── SCROLL REVEAL ── */
+var obs=new IntersectionObserver(function(es){
+  es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('vs');});
+},{threshold:.07,rootMargin:'0px 0px -28px 0px'});
+document.querySelectorAll('.rv').forEach(function(el){obs.observe(el);});
+</script>
 </body>
 </html>

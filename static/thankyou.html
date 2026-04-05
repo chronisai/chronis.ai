@@ -3,72 +3,554 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>You're on the list — Chronis</title>
-<meta name="description" content="Welcome to the Chronis waitlist. We'll email you when your access is ready.">
+<title>You're in — Chronis</title>
+<meta name="description" content="You're on the Chronis waitlist. We'll be in touch soon.">
 <link rel="canonical" href="https://chronis.in/thankyou">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#060606;--sf:rgba(255,255,255,.035);--bd:rgba(255,255,255,.08);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--gr:#4ade80;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
-body{background:var(--bg);color:var(--tx);font-family:var(--fb);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:88px 24px 24px;-webkit-font-smoothing:antialiased;text-align:center;position:relative;overflow:hidden}
-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
-.wrap{position:relative;z-index:1;max-width:480px;width:100%}
-.check-ring{width:72px;height:72px;border-radius:50%;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 36px;position:relative;animation:popIn .6s cubic-bezier(.34,1.56,.64,1) both}
-@keyframes popIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
-.check-ring::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(74,222,128,.07);animation:pulse 2.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:.2;transform:scale(1.15)}}
-.check-icon{font-size:28px;color:var(--gr)}
-h1{font-family:var(--fd);font-size:clamp(36px,6vw,56px);font-weight:300;letter-spacing:-.5px;line-height:1.1;margin-bottom:16px;animation:fadeUp .7s .2s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.sub{font-size:15px;color:var(--mu);line-height:1.78;margin-bottom:36px;font-weight:300;animation:fadeUp .7s .3s ease both}
-.pos-card{display:inline-block;background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:18px 32px;margin-bottom:44px;animation:fadeUp .7s .4s ease both}
-.pos-num{font-family:var(--fd);font-size:38px;font-weight:300;color:var(--ch);display:block;line-height:1;margin-bottom:4px}
-.pos-label{font-size:12px;color:var(--mu);letter-spacing:.5px}
-.links{display:flex;flex-direction:column;gap:10px;animation:fadeUp .7s .5s ease both}
-.la{padding:14px 22px;border-radius:10px;font-size:14px;text-decoration:none;font-weight:500;font-family:var(--fb);transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.lp{background:var(--tx);color:#000}
-.lp:hover{opacity:.88;transform:translateY(-1px)}
-.lg2{background:var(--sf);border:1px solid var(--bd);color:var(--mu)}
-.lg2:hover{border-color:rgba(255,255,255,.18);color:var(--tx)}
-.radial{position:fixed;top:-20vh;left:50%;transform:translateX(-50%);width:80vw;height:60vh;background:radial-gradient(ellipse,rgba(74,222,128,.04) 0%,transparent 70%);pointer-events:none;z-index:0;animation:breathe 7s ease-in-out infinite}
-@keyframes breathe{0%,100%{opacity:.6}50%{opacity:1}}
-footer{position:fixed;bottom:0;left:0;right:0;padding:16px;text-align:center;font-size:12px;color:rgba(237,233,226,.15);z-index:1}
+:root{
+  --bg:#050505;--bg2:#0b0b0b;--bg3:#111111;
+  --sf:rgba(255,255,255,.024);--sf2:rgba(255,255,255,.044);
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.14);
+  --tx:#ece8e2;--mu:rgba(236,232,226,.38);--mu2:rgba(236,232,226,.62);--ch:rgba(236,232,226,.84);
+  --ne:#7c3aed;--ne2:#a78bfa;--ne3:#c4b5fd;
+  --gr:#4ade80;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh;
+  padding-top:64px;
+}
+
+/* ── STAR FIELD ── */
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
+main,footer,nav{position:relative;z-index:1}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;
+  justify-content:space-between;padding:0 40px;height:64px;
+  background:rgba(5,5,5,.88);backdrop-filter:blur(28px);border-bottom:1px solid var(--bd)}
+.nl{font-family:var(--fd);font-size:20px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
+.nc{background:var(--tx);color:#000;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;transition:.2s}
+.nc:hover{opacity:.87}
+
+/* ── HERO ── */
+.hero{
+  min-height:calc(100svh - 64px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:60px 24px 80px;
+  position:relative;overflow:hidden;
+}
+
+/* purple crown glow */
+.hero::after{
+  content:'';position:absolute;left:50%;top:-60px;transform:translateX(-50%);
+  width:min(760px,90vw);height:clamp(260px,38vh,360px);
+  background:radial-gradient(ellipse at center,rgba(167,139,250,.22) 0%,rgba(124,58,237,.12) 36%,rgba(124,58,237,.04) 60%,transparent 78%);
+  filter:blur(36px);opacity:.88;
+  animation:crownGlow 7s ease-in-out infinite;pointer-events:none;
+}
+@keyframes crownGlow{0%,100%{transform:translateX(-50%) scale(1);opacity:.7}50%{transform:translateX(-50%) scale(1.08);opacity:1}}
+
+.hero-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;max-width:560px}
+
+/* ── BURST RING ── */
+.burst-wrap{position:relative;width:110px;height:110px;margin:0 auto 44px;animation:popIn .7s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes popIn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+
+/* outer pulse rings */
+.burst-wrap::before,.burst-wrap::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  border:1px solid rgba(74,222,128,.15);
+  animation:ringPulse 2.8s ease-in-out infinite;
+}
+.burst-wrap::after{
+  inset:-14px;
+  border-color:rgba(74,222,128,.07);
+  animation-delay:.55s;
+}
+@keyframes ringPulse{
+  0%,100%{transform:scale(1);opacity:.8}
+  50%{transform:scale(1.12);opacity:.22}
+}
+
+/* inner ring */
+.check-ring{
+  position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(ellipse at 40% 36%,rgba(74,222,128,.14),rgba(74,222,128,.04));
+  border:1px solid rgba(74,222,128,.28);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* svg check */
+.check-ring svg{width:36px;height:36px}
+.check-path{
+  stroke:#4ade80;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+  fill:none;stroke-dasharray:40;stroke-dashoffset:40;
+  animation:drawCheck .55s .55s ease forwards;
+}
+@keyframes drawCheck{to{stroke-dashoffset:0}}
+
+/* ── HEADLINE ── */
+.hero h1{
+  font-family:var(--fd);font-size:clamp(44px,9vw,80px);font-weight:300;
+  line-height:.97;letter-spacing:-1.2px;margin-bottom:18px;
+  animation:fadeUp .75s .35s ease both;
+}
+.hero h1 em{font-style:italic;color:var(--mu2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+.hero-sub{
+  font-size:15px;line-height:1.84;color:var(--mu);font-weight:300;
+  margin-bottom:44px;max-width:420px;
+  animation:fadeUp .8s .44s ease both;
+}
+
+/* ── POSITION CARD ── */
+.pos-shell{
+  display:flex;align-items:stretch;gap:0;
+  border:1px solid var(--bd);border-radius:18px;overflow:hidden;
+  margin-bottom:40px;width:100%;max-width:360px;
+  background:var(--bg2);
+  animation:fadeUp .85s .52s ease both;
+  position:relative;
+}
+.pos-shell::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(167,139,250,.45),transparent);
+}
+.pos-left{
+  flex:1;padding:22px 24px;border-right:1px solid var(--bd);
+}
+.pos-num{
+  font-family:var(--fd);font-size:44px;font-weight:300;color:var(--ne2);
+  line-height:1;display:block;margin-bottom:4px;
+}
+.pos-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--mu);font-weight:500}
+.pos-right{
+  padding:22px 20px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:10px;
+  min-width:140px;
+}
+.pos-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:600;
+  padding:4px 10px;border-radius:999px;
+}
+.pos-tag.green{color:#4ade80;background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.18)}
+.pos-tag.purple{color:var(--ne3);background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.18)}
+.pos-dot{width:4px;height:4px;border-radius:50%}
+.pos-dot.g{background:#4ade80;box-shadow:0 0 6px #4ade80;animation:dotPulse 2s ease-in-out infinite}
+.pos-dot.p{background:var(--ne2);box-shadow:0 0 6px var(--ne2);animation:dotPulse 2.4s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.28}}
+
+/* ── CTAs ── */
+.ctas{
+  display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px;
+  animation:fadeUp .9s .62s ease both;
+}
+.btn-primary{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:15px 22px;border-radius:12px;
+  background:var(--tx);color:#000;
+  font-family:var(--fb);font-size:14px;font-weight:600;letter-spacing:.1px;
+  text-decoration:none;transition:.22s;
+}
+.btn-primary:hover{opacity:.88;transform:translateY(-2px)}
+.btn-ghost{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:13px 22px;border-radius:12px;
+  background:none;border:1px solid var(--bd);color:var(--mu);
+  font-family:var(--fb);font-size:13px;font-weight:400;
+  text-decoration:none;transition:.22s;
+}
+.btn-ghost:hover{border-color:var(--bd2);color:var(--tx)}
+
+/* ── SCROLL HINT ── */
+.scroll-down{
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  pointer-events:none;animation:fadeUp 1s .9s ease both;
+}
+.sd-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(236,232,226,.16)}
+.sd-line{width:1px;height:38px;background:linear-gradient(180deg,rgba(167,139,250,.28),transparent);animation:scPulse 2.2s ease-in-out infinite}
+@keyframes scPulse{0%,100%{transform:scaleY(1);opacity:.4}50%{transform:scaleY(1.32);opacity:1}}
+
+/* ── DIVIDER ── */
+.divider{border:none;border-top:1px solid var(--bd);margin:0}
+
+/* ── WHAT NEXT ── */
+.next-wrap{max-width:640px;margin:0 auto;padding:100px 24px}
+
+.sec-label{display:block;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:14px}
+.sec-title{font-family:var(--fd);font-size:clamp(34px,6vw,58px);font-weight:300;line-height:1.03;letter-spacing:-.6px;color:var(--tx);margin-bottom:14px}
+.sec-title em{font-style:italic;color:var(--mu2)}
+
+/* timeline */
+.timeline{margin-top:52px;position:relative;padding-left:20px}
+.timeline::before{
+  content:'';position:absolute;left:0;top:10px;bottom:32px;width:1px;
+  background:linear-gradient(180deg,var(--ne2),rgba(167,139,250,.12),rgba(255,255,255,.03));
+}
+.tl-item{position:relative;margin-bottom:44px;padding-left:28px}
+.tl-item::before{
+  content:'';position:absolute;left:-4.5px;top:10px;
+  width:9px;height:9px;border-radius:50%;
+  background:var(--ne2);box-shadow:0 0 10px rgba(167,139,250,.6);
+  transition:.3s;
+}
+.tl-item:last-child{margin-bottom:0}
+.tl-item.dim::before{background:rgba(255,255,255,.12);box-shadow:none}
+.tl-item.dim{opacity:.36}
+.tl-when{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:6px}
+.tl-title{font-size:15px;font-weight:500;color:var(--ch);margin-bottom:5px;letter-spacing:-.1px}
+.tl-desc{font-size:13px;color:var(--mu);line-height:1.72;font-weight:300}
+
+/* ── EXPLORE WHILE YOU WAIT ── */
+.explore-wrap{max-width:1000px;margin:0 auto;padding:0 24px 100px}
+.explore-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:44px}
+@media(max-width:600px){.explore-grid{grid-template-columns:1fr}}
+
+.ex-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.026),rgba(255,255,255,.010));
+  border:1px solid var(--bd);border-radius:20px;padding:30px 26px;
+  text-decoration:none;display:block;
+  transition:transform .28s,border-color .28s;
+}
+.ex-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.24),transparent)}
+.ex-card::after{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;z-index:0;
+  background:radial-gradient(circle 160px at var(--gx,-300px) var(--gy,-300px),rgba(167,139,250,.6) 0%,rgba(124,58,237,.24) 44%,transparent 68%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;transition:opacity .35s;
+}
+.ex-card:hover{transform:translateY(-4px);border-color:rgba(167,139,250,.22)}
+.ex-card:hover::after{opacity:1}
+
+.ex-eyebrow{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);font-weight:600;margin-bottom:14px;display:block;position:relative;z-index:1}
+.ex-card h3{font-family:var(--fd);font-size:clamp(22px,3.5vw,28px);font-weight:300;line-height:1.15;color:var(--ch);margin-bottom:10px;position:relative;z-index:1}
+.ex-card h3 em{font-style:italic;color:var(--mu2)}
+.ex-card p{font-size:13px;color:var(--mu);line-height:1.72;font-weight:300;margin-bottom:18px;position:relative;z-index:1}
+.ex-arrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(167,139,250,.5);font-weight:600;display:flex;align-items:center;gap:6px;position:relative;z-index:1;transition:.2s}
+.ex-card:hover .ex-arrow{color:var(--ne2);gap:10px}
+
+/* ── SHARE STRIP ── */
+.share-wrap{max-width:640px;margin:0 auto;padding:0 24px 100px}
+.share-card{
+  background:var(--bg2);border:1px solid var(--bd);border-radius:22px;
+  padding:36px 32px;text-align:center;position:relative;overflow:hidden;
+}
+.share-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.5),transparent)}
+.share-glow{
+  position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+  width:300px;height:200px;
+  background:radial-gradient(ellipse,rgba(124,58,237,.07),transparent 70%);
+  pointer-events:none;
+}
+.share-ey{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:18px;display:block;position:relative;z-index:1}
+.share-title{font-family:var(--fd);font-size:clamp(26px,5vw,40px);font-weight:300;line-height:1.1;color:var(--tx);margin-bottom:12px;position:relative;z-index:1}
+.share-title em{font-style:italic;color:var(--mu2)}
+.share-sub{font-size:13.5px;color:var(--mu);line-height:1.75;font-weight:300;margin-bottom:28px;position:relative;z-index:1}
+.share-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.share-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 22px;border-radius:999px;font-size:12px;font-weight:500;
+  letter-spacing:.5px;text-decoration:none;transition:.22s;cursor:pointer;
+  font-family:var(--fb);border:none;
+}
+.share-btn.copy{background:var(--sf);border:1px solid var(--bd);color:var(--mu)}
+.share-btn.copy:hover{border-color:var(--bd2);color:var(--tx)}
+.share-btn.wa{background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.22);color:#25d366}
+.share-btn.wa:hover{background:rgba(37,211,102,.14)}
+.share-btn.tw{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(236,232,226,.6)}
+.share-btn.tw:hover{border-color:rgba(255,255,255,.22);color:var(--tx)}
+
+/* copy confirm */
+.copy-confirm{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);
+  z-index:9000;background:var(--bg2);border:1px solid var(--bd2);
+  color:var(--ch);font-family:var(--fb);font-size:13px;
+  padding:12px 26px;border-radius:100px;
+  opacity:0;transition:opacity .3s,transform .3s;
+  pointer-events:none;white-space:nowrap;
+}
+.copy-confirm.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── PULL QUOTE ── */
+.quote-wrap{max-width:680px;margin:0 auto 100px;padding:0 24px}
+.pq{border-left:2px solid rgba(167,139,250,.28);padding:24px 30px;background:rgba(124,58,237,.022);border-radius:0 14px 14px 0}
+.pq-text{font-family:var(--fd);font-size:clamp(19px,3.5vw,27px);font-weight:300;font-style:italic;color:var(--ch);line-height:1.62;margin-bottom:12px}
+.pq-attr{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu);font-weight:500}
+
+/* scroll reveal */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .72s ease,transform .72s ease}
+.rv.vs{opacity:1;transform:translateY(0)}
 </style>
-  <script src="/static/js/chronis-nav.js" defer></script>
+<script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
+
+<canvas id="bgc"></canvas>
 <nav id="cn-nav"></nav>
-<div class="radial"></div>
-<canvas id="c"></canvas>
-<div class="wrap">
-  <div class="check-ring"><span class="check-icon">✓</span></div>
-  <h1>You're on the list.</h1>
-  <p class="sub">We'll email you the moment your access is ready.<br>Usually within a few days.</p>
-  <div class="pos-card">
-    <span class="pos-num" id="pos">—</span>
-    <span class="pos-label">on the waitlist</span>
+
+<main>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-inner">
+
+    <!-- animated check ring -->
+    <div class="burst-wrap">
+      <div class="check-ring">
+        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polyline class="check-path" points="9,20 16,27 29,12"/>
+        </svg>
+      </div>
+    </div>
+
+    <h1>You're in.<br><em>Welcome.</em></h1>
+    <p class="hero-sub">We'll email you the moment your access is ready. Until then — explore what Chronis is becoming.</p>
+
+    <!-- position card -->
+    <div class="pos-shell">
+      <div class="pos-left">
+        <span class="pos-num" id="pos-num">—</span>
+        <span class="pos-label">Your position</span>
+      </div>
+      <div class="pos-right">
+        <span class="pos-tag green"><span class="pos-dot g"></span>Waitlist open</span>
+        <span class="pos-tag purple"><span class="pos-dot p"></span>Early access</span>
+      </div>
+    </div>
+
+    <div class="ctas">
+      <a href="/demo" class="btn-primary">Try the text demo now →</a>
+      <a href="/static/how-it-works.html" class="btn-ghost">See how Chronis works</a>
+    </div>
+
   </div>
-  <div class="links">
-    <a href="/demo" class="la lp">Try the text demo now →</a>
-    <a href="/" class="la lg2">Back to home</a>
+
+  <div class="scroll-down">
+    <div class="sd-label">What happens next</div>
+    <div class="sd-line"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── WHAT HAPPENS NEXT ── -->
+<div class="next-wrap rv">
+  <span class="sec-label">What happens next</span>
+  <h2 class="sec-title">Three steps to<br><em>your first session.</em></h2>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-when">Right now</div>
+      <div class="tl-title">Confirmation email on its way</div>
+      <div class="tl-desc">Check your inbox — we've sent a confirmation with your waitlist details. If you don't see it within five minutes, check spam and mark us as safe so you don't miss the access notification.</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-when">In the coming weeks</div>
+      <div class="tl-title">Access granted in batches</div>
+      <div class="tl-desc">We're onboarding in careful waves — not to create artificial scarcity, but because each new user gets a real human setup walkthrough. We're not scaling before we're ready. Your position in the list is preserved.</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-when">Your first week</div>
+      <div class="tl-title">Upload, record, begin</div>
+      <div class="tl-desc">Once you're in, you'll upload voice recordings, photos, videos — whatever you have. Chronis begins learning immediately. The first version of your replica is ready within 48 hours. The model deepens every day.</div>
+    </div>
+
+    <div class="tl-item dim">
+      <div class="tl-when">Ongoing</div>
+      <div class="tl-title">Chronis grows with you</div>
+      <div class="tl-desc">If you choose the locket, it learns from every conversation, every moment you choose to share. Over months, it builds a picture of your patterns, your reasoning, your voice — that no one else has ever had.</div>
+    </div>
+
   </div>
 </div>
+
+<hr class="divider">
+
+<!-- ── EXPLORE WHILE YOU WAIT ── -->
+<div class="explore-wrap rv">
+  <span class="sec-label">Explore while you wait</span>
+  <h2 class="sec-title">Understand what<br><em>you've signed up for.</em></h2>
+
+  <div class="explore-grid">
+
+    <a href="/static/how-it-works.html" class="ex-card" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="ex-eyebrow">How it works</span>
+      <h3>The architecture of<br><em>a human signature.</em></h3>
+      <p>How Chronis captures voice, movement, pattern, and decision-making to build something that thinks like you — not just sounds like you.</p>
+      <div class="ex-arrow">Read the full breakdown <span>→</span></div>
+    </a>
+
+    <a href="/static/locket.html" class="ex-card" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="ex-eyebrow">The Locket</span>
+      <h3>A physical object for<br><em>your digital self.</em></h3>
+      <p>Precision-machined. OLED face. Worn against your chest. The locket captures life as it happens — passively, privately, continuously.</p>
+      <div class="ex-arrow">See the hardware <span>→</span></div>
+    </a>
+
+    <a href="/static/ethics.html" class="ex-card" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="ex-eyebrow">Ethics</span>
+      <h3>The questions we<br><em>refuse to avoid.</em></h3>
+      <p>What does it mean to preserve a person? Who owns a replica? What are the psychological stakes? We've written our answers — honestly, without polish.</p>
+      <div class="ex-arrow">Read our ethics position <span>→</span></div>
+    </a>
+
+    <a href="/static/blog.html" class="ex-card" onmousemove="lm(event,this)" onmouseleave="ll(this)">
+      <span class="ex-eyebrow">Resources</span>
+      <h3>The science of<br><em>remembering yourself.</em></h3>
+      <p>Memory science, self-quantification, pattern intelligence, and the frontier of what it means to understand a human mind. Dispatches from the Chronis team.</p>
+      <div class="ex-arrow">Browse the journal <span>→</span></div>
+    </a>
+
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ── SHARE ── -->
+<div class="share-wrap rv">
+  <div class="share-card">
+    <div class="share-glow"></div>
+    <span class="share-ey">Tell someone</span>
+    <h2 class="share-title">Know someone who<br><em>should be here?</em></h2>
+    <p class="share-sub">Chronis is most meaningful when the people who matter to you are part of it. If someone comes to mind — someone whose voice, stories, and patterns deserve to be preserved — send them here.</p>
+    <div class="share-btns">
+      <button class="share-btn copy" id="copyBtn" onclick="copyLink()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 9H2.5A1.5 1.5 0 011 7.5V2.5A1.5 1.5 0 012.5 1h5A1.5 1.5 0 019 2.5V3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Copy link
+      </button>
+      <a class="share-btn wa" id="waBtn" href="#" onclick="shareWA(event)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+      <a class="share-btn tw" id="twBtn" href="#" onclick="shareTwitter(event)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.258 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Share on X
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ── PULL QUOTE ── -->
+<div class="quote-wrap rv">
+  <div class="pq">
+    <p class="pq-text">The most important things about a person — how they reason, what they care about, how their voice sounds when they're certain — these have always disappeared. Chronis exists so they don't disappear anymore.</p>
+    <div class="pq-attr">Why Chronis exists · The founding idea</div>
+  </div>
+</div>
+
+</main>
+
+<div class="copy-confirm" id="copyConfirm">Link copied to clipboard</div>
+
 <footer id="cn-footer"></footer>
+
 <script>
-fetch('/api/waitlist/count').then(r=>r.json()).then(d=>{
-  const n=Math.max(93,d.count||0);
-  document.getElementById('pos').textContent='#'+n;
-}).catch(()=>{});
+/* ── STAR FIELD ── */
 (function(){
-  const c=document.getElementById('c'),ctx=c.getContext('2d');
-  let W,H,P=[];
-  function R(){W=c.width=innerWidth;H=c.height=innerHeight}R();addEventListener('resize',R);
-  for(let i=0;i<60;i++)P.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()+.3,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12,a:Math.random()*.3+.08,da:(Math.random()-.5)*.002});
-  function draw(){ctx.clearRect(0,0,W,H);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.da;if(p.a<.05||p.a>.4)p.da*=-1;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${p.a})`;ctx.fill()});requestAnimationFrame(draw)}
-  draw();
+  var c=document.getElementById('bgc');
+  var ctx=c.getContext('2d');
+  var stars=[];
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<160;i++){
+    stars.push({
+      x:Math.random(),y:Math.random(),
+      r:Math.random()*1.2+.18,
+      a:Math.random()*.28+.04,
+      s:Math.random()*.5+.15,
+      p:Math.random()*Math.PI*2
+    });
+  }
+  var t=0;
+  (function draw(){
+    t+=.014;
+    ctx.clearRect(0,0,c.width,c.height);
+    for(var i=0;i<stars.length;i++){
+      var st=stars[i];
+      var al=st.a*(0.55+0.45*Math.sin(t*st.s+st.p));
+      ctx.beginPath();
+      ctx.arc(st.x*c.width,st.y*c.height,st.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+al+')';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  })();
+  c.style.opacity='.46';
 })();
+
+/* ── WAITLIST POSITION ── */
+fetch('/api/waitlist/count')
+  .then(function(r){return r.json()})
+  .then(function(d){
+    var n=Math.max(93,d.count||0);
+    var el=document.getElementById('pos-num');
+    // count-up animation
+    var start=Math.max(1,n-28);
+    var cur=start;
+    var step=function(){
+      cur=Math.min(n,cur+1);
+      el.textContent='#'+cur;
+      if(cur<n)requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  })
+  .catch(function(){
+    // graceful fallback — show a plausible number
+    document.getElementById('pos-num').textContent='#—';
+  });
+
+/* ── LIQUID BORDER ── */
+function lm(e,el){
+  var r=el.getBoundingClientRect();
+  el.style.setProperty('--gx',(e.clientX-r.left)+'px');
+  el.style.setProperty('--gy',(e.clientY-r.top)+'px');
+}
+function ll(el){
+  el.style.setProperty('--gx','-400px');
+  el.style.setProperty('--gy','-400px');
+}
+
+/* ── SHARE ── */
+var SHARE_URL='https://chronis.in';
+var SHARE_TEXT='Just joined the Chronis waitlist — an AI that learns to think like you. Worth exploring.';
+
+function copyLink(){
+  navigator.clipboard.writeText(SHARE_URL).then(function(){
+    var c=document.getElementById('copyConfirm');
+    c.classList.add('show');
+    setTimeout(function(){c.classList.remove('show')},2800);
+  }).catch(function(){});
+}
+
+function shareWA(e){
+  e.preventDefault();
+  window.open('https://wa.me/?text='+encodeURIComponent(SHARE_TEXT+' '+SHARE_URL),'_blank');
+}
+
+function shareTwitter(e){
+  e.preventDefault();
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(SHARE_TEXT)+'&url='+encodeURIComponent(SHARE_URL),'_blank');
+}
+
+/* ── SCROLL REVEAL ── */
+var obs=new IntersectionObserver(function(es){
+  es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('vs')});
+},{threshold:.08,rootMargin:'0px 0px -28px 0px'});
+document.querySelectorAll('.rv').forEach(function(el){obs.observe(el)});
 </script>
 </body>
 </html>

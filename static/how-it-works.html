@@ -3,145 +3,509 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>How Chronis Works — AI Video Memory Preservation</title>
-<meta name="description" content="Learn how Chronis builds a real-time AI video replica of your loved one from a single video. The technology behind voice cloning, face animation, and personality reconstruction.">
+<title>How Chronis Works — A Signature of Your Existence</title>
+<meta name="description" content="Chronis captures the full depth of a human being — voice, movement, rhythm, decision patterns — and preserves it with radical privacy. Your AI, built only by you.">
 <link rel="canonical" href="https://chronis.in/static/how-it-works.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#060606;--bg2:#0a0a0a;--sf:rgba(255,255,255,.033);--sf2:rgba(255,255,255,.058);--bd:rgba(255,255,255,.076);--bd2:rgba(255,255,255,.15);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--ne2:#a78bfa;--gr:#4ade80;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
+:root{
+  --bg:#050505;--bg2:#0b0b0b;--bg3:#111111;
+  --sf:rgba(255,255,255,.024);--sf2:rgba(255,255,255,.045);
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.14);
+  --tx:#ece8e2;--mu:rgba(236,232,226,.38);--mu2:rgba(236,232,226,.62);--ch:rgba(236,232,226,.84);
+  --ne:#7c3aed;--ne2:#a78bfa;--ne3:#c4b5fd;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Plus Jakarta Sans',system-ui,sans-serif;
+}
 html{scroll-behavior:smooth}
-body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(6,6,6,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
+body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.52}
+main,footer,nav{position:relative;z-index:1}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(5,5,5,.82);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
 .nl{font-family:var(--fd);font-size:20px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
 .nr{display:flex;gap:6px;align-items:center}
 .na{color:var(--mu);text-decoration:none;font-size:13px;padding:6px 13px;border-radius:6px;transition:.2s}
 .na:hover{color:var(--tx);background:var(--sf)}
 .nc{background:var(--tx);color:#000;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;transition:.2s}
 .nc:hover{opacity:.87}
-@media(max-width:768px){.na{display:none}}
-.hero{padding:140px 24px 80px;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 30%,rgba(94,234,212,.04) 0%,transparent 70%);pointer-events:none;animation:breathe 6s ease-in-out infinite}
-@keyframes breathe{0%,100%{opacity:.6}50%{opacity:1}}
-.ey{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:var(--mu);background:var(--sf);border:1px solid var(--bd);border-radius:40px;padding:7px 18px;margin-bottom:36px;font-weight:500}
-h1{font-family:var(--fd);font-size:clamp(42px,7vw,80px);font-weight:300;line-height:1.04;letter-spacing:-1px;max-width:780px;margin:0 auto 24px}
-h1 em{font-style:italic;color:var(--mu)}
-.hs{font-size:16px;color:var(--mu);line-height:1.8;max-width:500px;margin:0 auto;font-weight:300}
-.sec{padding:80px 24px;max-width:900px;margin:0 auto}
-.se{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:14px;display:block}
-.st{font-family:var(--fd);font-size:clamp(30px,4.5vw,52px);font-weight:300;line-height:1.1;letter-spacing:-.4px;color:var(--tx);margin-bottom:18px}
-.ss{font-size:15px;color:var(--mu);line-height:1.78;font-weight:300;max-width:560px}
-.step-big{display:grid;grid-template-columns:80px 1fr;gap:40px;padding:48px 0;border-bottom:1px solid var(--bd);align-items:start}
-.step-big:last-child{border-bottom:none}
-.sn{font-family:var(--fd);font-size:52px;font-weight:300;color:rgba(255,255,255,.08);line-height:1}
-.sc h2{font-size:22px;font-weight:500;color:var(--ch);margin-bottom:12px}
-.sc p{font-size:15px;color:var(--mu);line-height:1.75;font-weight:300;margin-bottom:16px}
-.tag{display:inline-block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ne);background:rgba(94,234,212,.07);border:1px solid rgba(94,234,212,.15);padding:5px 12px;border-radius:20px;margin-top:4px}
-.tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:48px}
-.tc{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:28px;transition:.3s}
+@media(max-width:768px){.na{display:none}.nr .nc{display:flex}}
+
+/* ─── HERO ─── */
+.hero{
+  position:relative;min-height:calc(100svh - 64px);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;padding:56px 24px 120px;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 72% 62% at 50% 22%, rgba(124,58,237,.09) 0%, rgba(124,58,237,.03) 44%, transparent 72%),
+    linear-gradient(180deg, rgba(255,255,255,.015) 0%, transparent 24%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;left:50%;top:-38px;transform:translateX(-50%);
+  width:min(900px,92vw);height:clamp(220px,34vh,320px);
+  background:radial-gradient(ellipse at center, rgba(167,139,250,.18) 0%, rgba(124,58,237,.11) 34%, rgba(124,58,237,.04) 58%, transparent 76%);
+  filter:blur(30px);opacity:.92;
+  animation:heroGlow 7.5s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes heroGlow{0%,100%{transform:translateX(-50%) scale(1);opacity:.78}50%{transform:translateX(-50%) scale(1.08);opacity:1}}
+
+.hero-inner{position:relative;z-index:3;width:100%;max-width:860px;text-align:center;display:flex;flex-direction:column;align-items:center;padding-top:clamp(48px,8vh,108px)}
+.hero-ey{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);
+  background:var(--sf);border:1px solid var(--bd);border-radius:999px;
+  padding:8px 16px;margin-bottom:30px;font-weight:500;
+  backdrop-filter:blur(12px);
+  animation:fadeUp .85s ease both;
+}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:var(--ne2);box-shadow:0 0 10px rgba(167,139,250,.9);animation:dotPulse 2.2s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.38}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+.hero h1{
+  font-family:var(--fd);font-size:clamp(42px,8.1vw,88px);font-weight:300;line-height:.96;letter-spacing:-1.25px;
+  max-width:860px;margin:0 auto 22px;animation:fadeUp .95s .06s ease both;
+}
+.hero h1 .soft{color:var(--mu2);font-style:italic}
+.hero-sub{
+  max-width:600px;margin:0 auto 38px;
+  font-size:clamp(14px,1.9vw,16px);line-height:1.85;color:var(--mu);font-weight:300;
+  animation:fadeUp 1.05s .14s ease both;
+}
+.hero-cta{animation:fadeUp 1.1s .22s ease both}
+.hero-cta a{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 28px;border-radius:999px;border:1px solid rgba(167,139,250,.36);
+  color:#f4efff;background:linear-gradient(180deg, rgba(167,139,250,.22), rgba(124,58,237,.16));
+  box-shadow:0 0 0 1px rgba(167,139,250,.06), 0 0 28px rgba(124,58,237,.16), inset 0 1px 0 rgba(255,255,255,.08);
+  font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;text-decoration:none;
+  transition:transform .2s,box-shadow .2s;
+}
+.hero-cta a:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(167,139,250,.10), 0 0 38px rgba(124,58,237,.22), inset 0 1px 0 rgba(255,255,255,.10)}
+.hero-cta a span:last-child{font-size:15px;transition:transform .2s}
+.hero-cta a:hover span:last-child{transform:translateY(3px)}
+
+/* ─── SECTION COMMON ─── */
+section.blk{padding:96px 24px;max-width:1120px;margin:0 auto}
+.sec-label{display:block;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:16px}
+.sec-title{font-family:var(--fd);font-size:clamp(34px,5.3vw,60px);font-weight:300;line-height:1.02;letter-spacing:-.7px;color:var(--tx)}
+.sec-copy{font-size:15px;line-height:1.8;color:var(--mu);font-weight:300;max-width:480px}
+
+/* ─── SIGNAL SECTION ─── */
+.signal-intro{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:28px;align-items:end;margin-bottom:48px}
+.signal-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.card{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,.014));
+  border:1px solid var(--bd);border-radius:20px;padding:26px 22px 24px;
+  min-height:230px;transition:transform .28s ease,border-color .28s ease,background .28s ease;
+}
+.card:hover{transform:translateY(-4px);border-color:rgba(167,139,250,.17);background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.018))}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.32),transparent)}
+.card::after{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;z-index:0;
+  background:radial-gradient(circle 160px at var(--gx,-320px) var(--gy,-320px), rgba(167,139,250,.68) 0%, rgba(124,58,237,.28) 42%, transparent 70%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  transition:opacity .35s ease;
+}
+.card:hover::after{opacity:1}
+.card-top,.card h3,.card p,.card-meta{position:relative;z-index:1}
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.card-kicker{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--mu);font-weight:600}
+.card-index{font-family:var(--fd);font-size:22px;color:rgba(167,139,250,.8);line-height:1}
+.card h3{font-family:var(--fd);font-size:26px;font-weight:300;line-height:1.1;color:var(--ch);margin-bottom:12px}
+.card p{font-size:13.5px;line-height:1.76;color:var(--mu);font-weight:300}
+.card-meta{margin-top:18px;font-size:10px;letter-spacing:2.3px;text-transform:uppercase;color:rgba(167,139,250,.5);font-weight:600}
+
+/* ─── PIPELINE / STEP SECTION ─── */
+.pipeline-wrap{padding:0 24px 96px;max-width:1120px;margin:0 auto}
+.pipeline-head{margin-bottom:56px}
+.step-row{
+  display:grid;grid-template-columns:56px 1fr;gap:36px;
+  padding:48px 0;border-bottom:1px solid rgba(255,255,255,.055);align-items:start;
+  opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;
+}
+.step-row.vs{opacity:1;transform:translateY(0)}
+.step-row:last-child{border-bottom:none}
+.step-num{font-family:var(--fd);font-size:46px;font-weight:300;color:rgba(167,139,250,.18);line-height:1;padding-top:4px}
+.step-body h2{font-size:21px;font-weight:500;color:var(--ch);margin-bottom:12px;letter-spacing:-.1px}
+.step-body p{font-size:14.5px;color:var(--mu);line-height:1.78;font-weight:300;margin-bottom:14px;max-width:640px}
+.step-body p:last-of-type{margin-bottom:0}
+.step-tag{
+  display:inline-block;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ne2);background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.16);
+  padding:5px 12px;border-radius:20px;margin-top:8px;
+}
+
+/* ─── PRIVACY TIERS ─── */
+.tiers-section{padding:0 24px 96px;max-width:1120px;margin:0 auto}
+.tier-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:48px}
+.tier{
+  position:relative;border-radius:22px;padding:36px 28px;
+  border:1px solid var(--bd);background:linear-gradient(180deg, rgba(255,255,255,.026), rgba(255,255,255,.012));
+  overflow:hidden;transition:transform .28s,border-color .28s;
+}
+.tier:hover{transform:translateY(-4px);border-color:rgba(167,139,250,.22)}
+.tier::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.28),transparent)}
+.tier-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;
+  padding:6px 12px;border-radius:999px;border:1px solid rgba(167,139,250,.18);
+  color:var(--ne3);background:rgba(167,139,250,.06);
+  margin-bottom:22px;
+}
+.tier-dot{width:4px;height:4px;border-radius:50%;background:var(--ne2);box-shadow:0 0 8px rgba(167,139,250,.9)}
+.tier h3{font-family:var(--fd);font-size:30px;font-weight:300;color:var(--ch);line-height:1.06;margin-bottom:14px}
+.tier p{font-size:13.5px;line-height:1.76;color:var(--mu);font-weight:300;margin-bottom:18px}
+.tier-list{list-style:none;display:flex;flex-direction:column;gap:9px}
+.tier-list li{font-size:12.5px;color:var(--mu);font-weight:300;display:flex;align-items:flex-start;gap:9px;line-height:1.5}
+.tier-list li::before{content:'—';color:rgba(167,139,250,.5);flex-shrink:0;margin-top:1px}
+.tier.featured{border-color:rgba(167,139,250,.28);background:linear-gradient(180deg, rgba(124,58,237,.06), rgba(124,58,237,.02))}
+.tier.featured::before{background:linear-gradient(90deg,transparent,rgba(167,139,250,.56),transparent)}
+
+/* ─── TECH STACK ─── */
+.tech-section{padding:0 24px 96px;max-width:1120px;margin:0 auto}
+.tech-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:48px}
+.tc{
+  background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:26px;
+  transition:.3s;
+}
 .tc:hover{border-color:var(--bd2);background:var(--sf2)}
-.tc h3{font-size:15px;font-weight:500;color:var(--ch);margin-bottom:10px}
-.tc p{font-size:13.5px;color:var(--mu);line-height:1.65;font-weight:300}
-.cta-strip{background:var(--bg2);border:1px solid var(--bd);border-radius:20px;padding:52px 40px;text-align:center;margin:80px auto;max-width:600px}
-.cta-strip h2{font-family:var(--fd);font-size:clamp(28px,4vw,42px);font-weight:300;line-height:1.12;margin-bottom:16px}
-.cta-strip h2 em{font-style:italic;color:var(--mu)}
-.cta-strip p{font-size:14px;color:var(--mu);line-height:1.75;margin-bottom:32px;font-weight:300}
-.bgs{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#000;font-family:var(--fb);font-size:14px;font-weight:600;padding:14px 28px;border-radius:10px;text-decoration:none;transition:.2s}
-.bgs:hover{opacity:.88;transform:translateY(-2px)}
-footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.tc h3{font-size:14px;font-weight:500;color:var(--ch);margin-bottom:10px}
+.tc p{font-size:13px;color:var(--mu);line-height:1.65;font-weight:300}
+.tc-icon{font-family:var(--fd);font-size:26px;color:rgba(167,139,250,.6);margin-bottom:14px;display:block}
+
+/* ─── CTA ─── */
+.cta-wrap{padding:0 24px 120px;max-width:640px;margin:0 auto;text-align:center}
+.cta-inner{
+  background:linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,.014));
+  border:1px solid var(--bd);border-radius:24px;padding:56px 44px;
+  position:relative;overflow:hidden;
+}
+.cta-inner::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.36),transparent)}
+.cta-inner::after{
+  content:'';position:absolute;left:50%;top:-40px;transform:translateX(-50%);
+  width:320px;height:160px;
+  background:radial-gradient(ellipse at center, rgba(124,58,237,.14) 0%, transparent 70%);
+  filter:blur(20px);pointer-events:none;
+}
+.cta-inner h2{font-family:var(--fd);font-size:clamp(30px,4.5vw,48px);font-weight:300;line-height:1.08;margin-bottom:16px;position:relative;z-index:1}
+.cta-inner h2 em{font-style:italic;color:var(--mu2)}
+.cta-inner p{font-size:14px;color:var(--mu);line-height:1.75;margin-bottom:32px;font-weight:300;position:relative;z-index:1}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:10px;
+  background:#f3efe9;color:#060606;font-family:var(--fb);font-size:14px;font-weight:600;
+  padding:14px 30px;border-radius:12px;text-decoration:none;border:none;cursor:pointer;
+  transition:transform .2s,opacity .2s,box-shadow .2s;
+  position:relative;z-index:1;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(255,255,255,.08)}
+.ba{transition:transform .2s}
+.btn-primary:hover .ba{transform:translateX(3px)}
+
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--bd);padding:28px 40px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
 .fb{font-family:var(--fd);font-size:18px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:var(--ch);text-decoration:none}
 .fc{font-size:12px;color:rgba(237,233,226,.2)}
-.rv{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
-.rv.vs{opacity:1;transform:translateY(0)}
-@media(max-width:768px){.step-big{grid-template-columns:50px 1fr;gap:20px}.sn{font-size:38px}.tech-grid{grid-template-columns:1fr}.cta-strip{padding:36px 24px}footer{padding:24px 20px}}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1024px){
+  .signal-intro{grid-template-columns:1fr;gap:18px}
+  .signal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tech-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tier-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .signal-grid{grid-template-columns:1fr}
+  .tech-grid{grid-template-columns:1fr}
+  .step-row{grid-template-columns:44px 1fr;gap:20px}
+  .step-num{font-size:34px}
+  .cta-inner{padding:38px 24px}
+  footer{padding:24px 20px}
+  nav{padding:0 20px}
+}
+@media(max-width:560px){
+  .hero{min-height:calc(100svh - 64px);padding:28px 18px 100px}
+  .hero-ey{font-size:9px;letter-spacing:3px;padding:7px 12px;margin-bottom:22px}
+  .tier-grid{grid-template-columns:1fr}
+}
 </style>
-  <script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
-<nav id="cn-nav"></nav>
 
-<section class="hero">
-  <div class="ey">The Technology</div>
-  <h1>From one video<br>to a <em>living conversation.</em></h1>
-  <p class="hs">Here's exactly how Chronis works — from the moment you upload to the moment you hear their voice again.</p>
+<!-- ── Animated star field ── -->
+<canvas id="bgc"></canvas>
+
+<nav>
+  <a href="/" class="nl">Chronis</a>
+  <div class="nr">
+    <a href="/static/how-it-works.html" class="na">How it works</a>
+    <a href="/static/locket.html" class="na">The Locket</a>
+    <a href="/#waitlist" class="nc">Join waitlist →</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-ey"><span class="hero-dot"></span>The Framework</div>
+    <h1>a signature of<br><span class="soft">human existence.</span></h1>
+    <p class="hero-sub">Chronis is not a backup service. It is a framework for capturing the full depth of a human being — and preserving it, in this life and beyond, on your terms alone.</p>
+    <div class="hero-cta">
+      <a href="#signals"><span>See how it works</span><span>↓</span></a>
+    </div>
+  </div>
 </section>
 
-<div class="sec rv">
-  <span class="se">Step by step</span>
-  <div class="step-big">
-    <div class="sn">01</div>
-    <div class="sc">
-      <h2>Upload any video</h2>
-      <p>Your video becomes the raw material for everything that follows. We accept any common format — MP4, MOV, AVI, MKV. We accept any quality — even old family footage or low-resolution WhatsApp clips. You need at least 30 seconds of them speaking, but anything up to 10 minutes gives us significantly more to work with.</p>
-      <p>The video doesn't need to be a direct-to-camera monologue. A conversation, a speech, a birthday video — all work perfectly. The only requirement is that their voice is audible and their face is visible for at least part of the clip.</p>
-      <span class="tag">MP4 · MOV · AVI · MKV · any format</span>
+<!-- ─── WHAT CHRONIS CAPTURES ─── -->
+<section class="blk" id="signals">
+  <div class="signal-intro">
+    <div>
+      <span class="sec-label">01 · What we capture</span>
+      <h2 class="sec-title">Not just memory.<br>The full signal<br>of a person.</h2>
+    </div>
+    <p class="sec-copy" style="align-self:end">The Chronis Locket is a data instrument. It listens, watches, and feels — continuously — so that who you truly are can be known, not just archived.</p>
+  </div>
+  <div class="signal-grid">
+    <article class="card liquid-card">
+      <div class="card-top"><span class="card-kicker">01 · Voice</span><span class="card-index">◈</span></div>
+      <h3>The way you<br>speak and pause.</h3>
+      <p>Continuous ambient audio captures how you phrase things, what you repeat, how you argue, how you laugh, how you comfort. Not quotes — cadence.</p>
+      <div class="card-meta">voice · tone · accent · speech rhythm</div>
+    </article>
+    <article class="card liquid-card">
+      <div class="card-top"><span class="card-kicker">02 · Vision</span><span class="card-index">◈</span></div>
+      <h3>Expressions that<br>words never carry.</h3>
+      <p>Video capture across your day builds a visual atlas — micro-expressions, gestures, the way your face moves when you are genuinely curious versus politely pretending.</p>
+      <div class="card-meta">video · face geometry · expression map</div>
+    </article>
+    <article class="card liquid-card">
+      <div class="card-top"><span class="card-kicker">03 · Motion</span><span class="card-index">◈</span></div>
+      <h3>How a body<br>moves through the world.</h3>
+      <p>Gyroscope and accelerometer data encode your physical presence — how you walk, how still you are when you think, the nervous energy before a hard conversation.</p>
+      <div class="card-meta">gyro · accelerometer · movement signature</div>
+    </article>
+    <article class="card liquid-card">
+      <div class="card-top"><span class="card-kicker">04 · Rhythm</span><span class="card-index">◈</span></div>
+      <h3>The biological<br>pulse of your days.</h3>
+      <p>Heart-rate data adds an emotional layer no other system has — where your body spiked when you were deciding something hard, where it calmed when you were at peace.</p>
+      <div class="card-meta">bpm · biological state · stress cadence</div>
+    </article>
+  </div>
+</section>
+
+<!-- ─── THE PIPELINE ─── -->
+<div class="pipeline-wrap" id="pipeline">
+  <div class="pipeline-head">
+    <span class="sec-label">02 · The journey</span>
+    <h2 class="sec-title" style="max-width:600px">From locket to<br>living intelligence.</h2>
+  </div>
+
+  <div class="step-row">
+    <div class="step-num">01</div>
+    <div class="step-body">
+      <h2>The Locket collects your world</h2>
+      <p>Worn passively, the Chronis Locket is always capturing. Voice, video, movement, and biological rhythm accumulate across your days — not as isolated files, but as a continuous, contextual record of life being lived. No buttons. No modes. No effort on your part.</p>
+      <p>This is the raw material for everything that follows: not footage to scroll through, but signal to understand.</p>
+      <span class="step-tag">ambient capture · continuous · passive</span>
     </div>
   </div>
-  <div class="step-big">
-    <div class="sn">02</div>
-    <div class="sc">
-      <h2>Face extraction and animation</h2>
-      <p>Our pipeline isolates their face geometry and expression range from your video. This becomes the visual foundation for the real-time avatar — the face that will speak when you start a conversation. We reconstruct facial structure, skin tone, micro-expressions, and blinking patterns.</p>
-      <p>The lip-sync system then animates this face in real time based on the voice output. The result is a face that moves as they speak — not a static image, not a puppet-on-screen, but a natural-feeling video presence.</p>
-      <span class="tag">Real-time lip sync · face geometry · expression map</span>
+
+  <div class="step-row">
+    <div class="step-num">02</div>
+    <div class="step-body">
+      <h2>Data flows into the most private database on the planet</h2>
+      <p>Nothing you generate ever leaves your control. The Locket syncs to an encrypted personal vault — architecturally isolated, legally protected under India's DPDP Act, and designed so that even Chronis cannot access what is inside without explicit, revocable permission.</p>
+      <p>This is not a cloud you share. It is a vault you own.</p>
+      <span class="step-tag">end-to-end encrypted · DPDP compliant · zero-access architecture</span>
     </div>
   </div>
-  <div class="step-big">
-    <div class="sn">03</div>
-    <div class="sc">
-      <h2>Voice cloning</h2>
-      <p>We extract acoustic signatures from the audio in your video — their specific tonal characteristics, accent, speech cadence, pause patterns, and vocal texture. This becomes a clone of their voice that can generate new speech, not just replay recorded audio.</p>
-      <p>When the replica responds to you, it speaks in their cloned voice. New sentences, new words — in their voice. For Indian languages and accents, our system is specifically tuned to preserve the characteristics that make a voice recognizable to family members.</p>
-      <span class="tag">Voice cloning · accent preservation · real-time TTS</span>
+
+  <div class="step-row">
+    <div class="step-num">03</div>
+    <div class="step-body">
+      <h2>You choose what happens next</h2>
+      <p>Your data. Your decision. Chronis offers three paths — each with a fundamentally different relationship between your information and the intelligence built from it. No defaults. No fine print. You choose before anything runs.</p>
+      <span class="step-tag">user-controlled · three modes · no defaults</span>
     </div>
   </div>
-  <div class="step-big">
-    <div class="sn">04</div>
-    <div class="sc">
-      <h2>Personality and language modeling</h2>
-      <p>The language model is grounded in contextual information about who this person was — their speech patterns from the video, any memories or context you choose to provide, and a persona framework that prevents the AI from drifting into generic responses. The replica should sound like them, not like a helpful AI assistant.</p>
-      <p>You can optionally add written memories, descriptions, or recorded context to make the personality richer. The more you provide, the more textured and authentic the conversation feels.</p>
-      <span class="tag">Personality grounding · memory context · speech pattern analysis</span>
+
+  <div class="step-row">
+    <div class="step-num">04</div>
+    <div class="step-body">
+      <h2>Chronis AI — built on your data, not borrowed from the world</h2>
+      <p>When you choose to activate it, the Chronis AI is not a general language model wearing your personality like a costume. It is trained specifically on you — your voice, your reasoning patterns, your contradictions, your values. Built from your signal alone. Not fine-tuned. Built.</p>
+      <p>This is what makes Chronis different from every AI product that exists today. The model that represents you has never seen anyone else.</p>
+      <span class="step-tag">purpose-built AI · no shared training · your signal only</span>
     </div>
   </div>
-  <div class="step-big">
-    <div class="sn">05</div>
-    <div class="sc">
-      <h2>Real-time video conversation</h2>
-      <p>When you start a session, everything runs simultaneously — your voice is transcribed, passed to the language model, which generates a response, which is spoken in the cloned voice, which drives the lip-sync animation, all in under two seconds. This is what makes Chronis different: it's a live conversation, not a pre-recorded response tree.</p>
-      <p>You can say anything. Ask about memories. Ask what they'd think about something happening in your life. Tell them what you've been wanting to say. The conversation is open-ended, real-time, and yours.</p>
-      <span class="tag">Live conversation · under 2s latency · open-ended</span>
+
+  <div class="step-row">
+    <div class="step-num">05</div>
+    <div class="step-body">
+      <h2>A presence that persists — in this life, and beyond it</h2>
+      <p>For the living, Chronis is a mirror — a way to know yourself more completely, to revisit your own reasoning, to pass wisdom to children and grandchildren without losing its texture. For those who are gone, it is something more: the difference between a fading voice and a conversation that can still happen.</p>
+      <p>Chronis is not grief technology. It is continuity technology. A signature that says: I existed, and this is how.</p>
+      <span class="step-tag">legacy · continuity · real-time conversation</span>
     </div>
   </div>
 </div>
 
-<div class="sec rv">
-  <span class="se">Under the hood</span>
-  <h2 class="st">The technical stack</h2>
-  <p class="ss">Four specialized systems work together to create a coherent, emotionally real experience.</p>
+<!-- ─── PRIVACY TIERS ─── -->
+<div class="tiers-section" id="privacy">
+  <span class="sec-label">03 · Your choice</span>
+  <h2 class="sec-title" style="margin-bottom:12px">Three modes.<br>Total control.</h2>
+  <p class="sec-copy" style="margin-bottom:0">You decide what Chronis does with your signal. Nothing is assumed. Nothing is defaulted. These are not settings — they are promises.</p>
+
+  <div class="tier-grid">
+    <div class="tier featured">
+      <div class="tier-badge"><span class="tier-dot"></span>Full Dataset</div>
+      <h3>Your complete AI. Built entirely from you.</h3>
+      <p>Every signal — voice, video, motion, biological rhythm — is used to train a private AI that is yours alone. The most complete representation of a human being that technology has ever made possible.</p>
+      <ul class="tier-list">
+        <li>Full voice, video, gyro, and BPM dataset used</li>
+        <li>Dedicated model trained on your signal exclusively</li>
+        <li>Real-time conversation capability activated</li>
+        <li>Legacy access for designated family members</li>
+        <li>Model lives in your private vault, not Chronis servers</li>
+      </ul>
+    </div>
+    <div class="tier">
+      <div class="tier-badge"><span class="tier-dot" style="background:var(--mu2);box-shadow:none"></span>Skimmed Dataset</div>
+      <h3>Curated intelligence. Only what you choose.</h3>
+      <p>You select which categories of your data are included in the training process. Leave out what feels too raw. Include what matters most. The AI reflects the version of you that you're willing to share.</p>
+      <ul class="tier-list">
+        <li>Choose which signal types are included</li>
+        <li>Granular session-level consent controls</li>
+        <li>AI trained only on approved data categories</li>
+        <li>Re-train or extend scope at any time</li>
+        <li>Voice and face reconstruction still available</li>
+      </ul>
+    </div>
+    <div class="tier">
+      <div class="tier-badge"><span class="tier-dot" style="background:rgba(236,232,226,.3);box-shadow:none"></span>Raw Vault</div>
+      <h3>No AI. Just the archive, untouched.</h3>
+      <p>End-to-end encrypted storage. Nothing is processed. Nothing is trained. Your data is sealed and preserved — accessible only to you, available to no system, open only to time.</p>
+      <ul class="tier-list">
+        <li>Zero AI processing of any kind</li>
+        <li>All raw recordings stored encrypted</li>
+        <li>Viewable only by vault owner</li>
+        <li>Upgrade to Full or Skimmed at any time</li>
+        <li>Permanent deletion on request, verifiably</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TECH STACK ─── -->
+<div class="tech-section" id="tech">
+  <span class="sec-label">04 · Under the hood</span>
+  <h2 class="sec-title" style="margin-bottom:12px">Our own AI.<br>Not borrowed from anyone.</h2>
+  <p class="sec-copy" style="margin-bottom:0">Chronis does not call out to OpenAI, Google, or any third-party model. Every system that runs on your data was built and is operated by us.</p>
   <div class="tech-grid">
-    <div class="tc"><h3>Face pipeline</h3><p>Face geometry extraction, expression modeling, and real-time lip sync. The visual system that makes their face move naturally as they speak.</p></div>
-    <div class="tc"><h3>Voice cloning engine</h3><p>Acoustic signature extraction, TTS synthesis in the cloned voice. Preserves accent and cadence characteristics that are unique to that person.</p></div>
-    <div class="tc"><h3>Language model</h3><p>Personality-grounded conversation model. Trained to respond in their speech style, not in generic AI prose. Memory-persistent across sessions.</p></div>
-    <div class="tc"><h3>Real-time orchestration</h3><p>The system that connects voice input to transcription to LLM to TTS to avatar in under two seconds. Built for low-latency emotional conversation.</p></div>
+    <div class="tc">
+      <span class="tc-icon">◈</span>
+      <h3>Signal ingestion engine</h3>
+      <p>Processes continuous multi-modal input from the Locket — voice, video frames, motion vectors, and BPM — into a unified temporal record tied to context.</p>
+    </div>
+    <div class="tc">
+      <span class="tc-icon">◈</span>
+      <h3>Chronis AI core</h3>
+      <p>Purpose-built architecture trained per-user from scratch. Not a fine-tuned general model — a model that has only ever seen one person. No shared weights. No bleed between users.</p>
+    </div>
+    <div class="tc">
+      <span class="tc-icon">◈</span>
+      <h3>Voice & face reconstruction</h3>
+      <p>Acoustic signature extraction, real-time TTS synthesis, face geometry and expression modeling, and live lip-sync — all running in under two seconds per conversational turn.</p>
+    </div>
+    <div class="tc">
+      <span class="tc-icon">◈</span>
+      <h3>Private vault architecture</h3>
+      <p>Every user's data lives in a cryptographically isolated environment. Architecturally impossible for Chronis to access without explicit user action. DPDP Act compliant by design.</p>
+    </div>
+    <div class="tc">
+      <span class="tc-icon">◈</span>
+      <h3>Biological context layer</h3>
+      <p>BPM and motion data are fused with voice and video to tag emotional and physical state across every recorded moment — giving the AI a richer context than any text-based system can achieve.</p>
+    </div>
+    <div class="tc">
+      <span class="tc-icon">◈</span>
+      <h3>Real-time conversation system</h3>
+      <p>Orchestrates speech transcription, model inference, voice synthesis, and avatar animation in a single low-latency pipeline. Live conversation, not pre-recorded response trees.</p>
+    </div>
   </div>
 </div>
 
-<div class="sec">
-  <div class="cta-strip rv">
-    <h2>Ready to begin?<br><em>Join the waitlist.</em></h2>
-    <p>Early access is free. We'll email you when your session is ready — usually within a few days.</p>
-    <a href="/static/locket.html" class="bgs">Get Started →</a>
+<!-- ─── CTA ─── -->
+<div class="cta-wrap">
+  <div class="cta-inner">
+    <h2>Ready to preserve<br><em>what matters?</em></h2>
+    <p>Early access is free. Join the waitlist and we'll let you know when your Chronis is ready to build.</p>
+    <a href="/static/locket.html" class="btn-primary">Get started <span class="ba">→</span></a>
   </div>
 </div>
 
-<footer id="cn-footer"></footer>
+</main>
+
+<footer>
+  <a href="/" class="fb">Chronis</a>
+  <span class="fc">© 2025 Chronis. All rights reserved.</span>
+</footer>
 
 <script>
-const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vs')})},{threshold:.1,rootMargin:'0 0 -40px 0'});
-document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+/* ── Star field ── */
+(function(){
+  const c=document.getElementById('bgc'),ctx=c.getContext('2d');
+  let W,H,P=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<92;i++)P.push({x:Math.random()*1000,y:Math.random()*1000,r:Math.random()*1.2+.28,vx:(Math.random()-.5)*.13,vy:(Math.random()-.5)*.13,a:Math.random()*.42+.08,da:(Math.random()-.5)*.003});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    P.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.a+=p.da;
+      if(p.a<=.05||p.a>=.52)p.da*=-1;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${p.a})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── Scroll reveal ── */
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vs')})},{threshold:.08});
+document.querySelectorAll('.step-row').forEach(el=>obs.observe(el));
+
+/* ── Card glow tracking ── */
+document.querySelectorAll('.liquid-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--gx',`${e.clientX-r.left}px`);
+    card.style.setProperty('--gy',`${e.clientY-r.top}px`);
+  });
+  card.addEventListener('mouseleave',()=>{
+    card.style.setProperty('--gx','-320px');
+    card.style.setProperty('--gy','-320px');
+  });
+});
 </script>
 </body>
 </html>

@@ -219,6 +219,74 @@ footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-con
   </div>
 </section>
 
+<!-- PRIVACY MODES -->
+<style>
+.pm-grid{display:flex;flex-direction:column;gap:10px;margin-top:36px}
+.pm{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:24px 22px;transition:.25s;position:relative;overflow:hidden}
+.pm::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.22),transparent)}
+.pm:hover{border-color:rgba(167,139,250,.18)}
+.pm-badge{display:inline-flex;align-items:center;gap:7px;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;color:var(--ne3);background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.16);padding:5px 11px;border-radius:999px;margin-bottom:16px}
+.pm-dot{width:4px;height:4px;border-radius:50%;background:var(--ne2);box-shadow:0 0 7px var(--ne2);flex-shrink:0}
+.pm-dot.dim{background:rgba(236,232,226,.3);box-shadow:none}
+.pm-dot.mid{background:var(--mu2);box-shadow:none}
+.pm h3{font-family:var(--fd);font-size:24px;font-weight:300;color:var(--ch);line-height:1.1;margin-bottom:10px}
+.pm-desc{font-size:13px;color:var(--mu);line-height:1.72;font-weight:300;margin-bottom:16px}
+.pm-pts{display:flex;flex-direction:column;gap:7px}
+.pm-pt{font-size:12px;color:var(--mu);font-weight:300;display:flex;align-items:flex-start;gap:9px;line-height:1.5}
+.pm-pt::before{content:'—';color:rgba(167,139,250,.44);flex-shrink:0}
+.pm.hl{border-color:rgba(167,139,250,.24);background:linear-gradient(180deg,rgba(124,58,237,.05),rgba(124,58,237,.02))}
+.pm.hl::before{background:linear-gradient(90deg,transparent,rgba(167,139,250,.44),transparent)}
+</style>
+
+<section class="sec rv">
+  <div class="pw">
+    <div class="ftxt">
+      <span class="sey">Privacy, not a policy</span>
+      <h2>We care about<br><em>your signal.</em></h2>
+      <p>The locket sees everything. You decide what happens to it. Three modes — chosen once, changeable anytime. No defaults, no fine print buried on page eleven.</p>
+    </div>
+    <div class="pm-grid">
+
+      <div class="pm hl">
+        <div class="pm-badge"><span class="pm-dot"></span>Full Dataset</div>
+        <h3>Train your own AI.<br>On everything.</h3>
+        <p class="pm-desc">Every signal the locket captures — voice, video, gyro, BPM — builds a model that has only ever seen you. Not fine-tuned. Not a persona layer. Built from scratch on your data alone.</p>
+        <div class="pm-pts">
+          <div class="pm-pt">Dedicated model architecture trained per-user — zero shared weights with any other person, ever</div>
+          <div class="pm-pt">Biological fusion: BPM and motion tag every moment with emotional and physical state context</div>
+          <div class="pm-pt">Real-time conversation + legacy access for family members you designate explicitly</div>
+          <div class="pm-pt">Model lives in your vault, not Chronis servers — we cannot execute it without your active permission</div>
+        </div>
+      </div>
+
+      <div class="pm">
+        <div class="pm-badge"><span class="pm-dot mid"></span>Skimmed Dataset</div>
+        <h3>Your AI.<br>Only what you choose.</h3>
+        <p class="pm-desc">Granular session-level consent. Include Sunday mornings. Exclude the hospital room. The model learns only what you consciously let through — nothing is assumed included.</p>
+        <div class="pm-pts">
+          <div class="pm-pt">Signal-type toggles: voice, video, motion, BPM each independently includable or excluded</div>
+          <div class="pm-pt">Session redaction — flag any window of time as off-record before it is ever processed</div>
+          <div class="pm-pt">Re-scope training at any point; model rebuilds cleanly from the updated approved dataset</div>
+          <div class="pm-pt">Voice and face reconstruction available even on minimal datasets — quality has no dataset floor</div>
+        </div>
+      </div>
+
+      <div class="pm">
+        <div class="pm-badge"><span class="pm-dot dim"></span>Raw Vault</div>
+        <h3>Sealed.<br>Nothing touches it.</h3>
+        <p class="pm-desc">End-to-end encrypted. Nothing is processed. No AI is trained. A sealed chronological record — readable only by you, invisible to every system including ours.</p>
+        <div class="pm-pts">
+          <div class="pm-pt">Zero inference, zero processing — client-side encryption before data leaves the locket hardware</div>
+          <div class="pm-pt">Chronis has no technical pathway to the contents — enforced by architecture, not policy alone</div>
+          <div class="pm-pt">Upgrade to Full or Skimmed at any time; archived data becomes the training foundation instantly</div>
+          <div class="pm-pt">Permanent deletion is cryptographically verifiable and physically irreversible — proof on request</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- PRICE -->
 <section class="prs rv">
   <div class="pw">
@@ -266,13 +334,13 @@ footer{border-top:1px solid var(--bd);padding:28px 22px;display:flex;justify-con
     <div class="fqi"><button class="fqq" onclick="tf(this)">How does setup work?<span class="fqic">+</span></button><div class="fqa">Once connected to the Chronis app, the locket will ask to record the wake up and sleep voice command and start interacting with the surroundings. We request users to wear it before using the wake commands.</div></div>
     <div class="fqi"><button class="fqq" onclick="tf(this)">What about privacy?<span class="fqic">+</span></button><div class="fqa">We are complaint with India's DPDP Act 2023. We are based on world's leading privacy first databases, we also offer users to choose from standard privacy and end to end encryption mode.  </div></div>
     <div class="fqi"><button class="fqq" onclick="tf(this)">What happens after 12 months?<span class="fqic">+</span></button><div class="fqa">Renewal pricing communicated before year one ends. We will never delete a replica without explicit advance notice and a migration path. Your memories are yours.</div></div>
-    <div class="fqi"><button class="fqq" onclick="tf(this)">Can I return it?<span class="fqic">+</span></button><div class="fqa">30-day returns from delivery, original condition. <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4e3d3b3e3e213c3a0e2d263c2120273d602720">[email&#160;protected]</a> — no friction, handled with care.</div></div>
+    <div class="fqi"><button class="fqq" onclick="tf(this)">Can I return it?<span class="fqic">+</span></button><div class="fqa">30-day returns from delivery, original condition. support@chronis.in — no friction, handled with care.</div></div>
   </div>
 </div>
 
 <footer id="cn-footer"></footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════════
    PLATINUM WHITE BRUSHED TEXTURE GENERATOR

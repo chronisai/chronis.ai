@@ -3,127 +3,632 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ethics — Chronis AI Grief Technology</title>
-<meta name="description" content="How Chronis approaches the ethical dimensions of AI-powered grief technology. Consent, privacy, psychological wellbeing, and responsible use.">
+<title>Ethics — Chronis · Built With Trust</title>
+<meta name="description" content="How Chronis approaches the ethics of self-quantification, memory replication, and AI-preserved presence. Consent, data sovereignty, psychological safety, and the questions we don't have clean answers to.">
 <link rel="canonical" href="https://chronis.in/static/ethics.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#060606;--bg2:#0a0a0a;--sf:rgba(255,255,255,.033);--sf2:rgba(255,255,255,.055);--bd:rgba(255,255,255,.076);--bd2:rgba(255,255,255,.15);--tx:#ede9e2;--mu:rgba(237,233,226,.4);--ch:rgba(237,233,226,.75);--ne:#5eead4;--ne2:#a78bfa;--gr:#4ade80;--fd:'Cormorant Garamond',Georgia,serif;--fb:'Plus Jakarta Sans',system-ui,sans-serif}
+:root{
+  --bg:#050505;--bg2:#0b0b0b;--bg3:#111111;
+  --sf:rgba(255,255,255,.024);--sf2:rgba(255,255,255,.044);
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.14);
+  --tx:#ece8e2;--mu:rgba(236,232,226,.38);--mu2:rgba(236,232,226,.62);--ch:rgba(236,232,226,.84);
+  --ne:#7c3aed;--ne2:#a78bfa;--ne3:#c4b5fd;
+  --gr:#4ade80;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Plus Jakarta Sans',system-ui,sans-serif;
+}
 html{scroll-behavior:smooth}
-body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased}
-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(6,6,6,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
+body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+
+/* ── STAR FIELD ── */
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.42}
+main,footer,nav{position:relative;z-index:1}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(5,5,5,.88);backdrop-filter:blur(28px);border-bottom:1px solid var(--bd)}
 .nl{font-family:var(--fd);font-size:20px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ch);text-decoration:none}
 .nr{display:flex;gap:6px;align-items:center}
 .na{color:var(--mu);text-decoration:none;font-size:13px;padding:6px 13px;border-radius:6px;transition:.2s}
 .na:hover{color:var(--tx);background:var(--sf)}
 .nc{background:var(--tx);color:#000;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;transition:.2s}
 .nc:hover{opacity:.87}
-@media(max-width:768px){.na{display:none}}
-.hero{padding:140px 24px 80px;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 30%,rgba(167,139,250,.03) 0%,transparent 70%);pointer-events:none}
-.ey{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:var(--mu);background:var(--sf);border:1px solid var(--bd);border-radius:40px;padding:7px 18px;margin-bottom:36px;font-weight:500}
-h1{font-family:var(--fd);font-size:clamp(42px,7vw,80px);font-weight:300;line-height:1.04;letter-spacing:-1px;max-width:780px;margin:0 auto 24px}
-h1 em{font-style:italic;color:var(--mu)}
-.hs{font-size:16px;color:var(--mu);line-height:1.8;max-width:520px;margin:0 auto;font-weight:300}
-.prose-wrap{max-width:700px;margin:0 auto;padding:60px 24px 80px}
-.prose-wrap h2{font-family:var(--fd);font-size:clamp(26px,3.5vw,38px);font-weight:300;line-height:1.15;letter-spacing:-.3px;color:var(--ch);margin:56px 0 18px}
-.prose-wrap h2:first-child{margin-top:0}
-.prose-wrap p{font-size:15px;color:var(--mu);line-height:1.82;font-weight:300;margin-bottom:18px}
+@media(max-width:768px){.na{display:none}.nr .nc{display:flex}}
+
+/* ── HERO ── */
+.hero{
+  position:relative;min-height:calc(100svh - 64px);
+  display:flex;align-items:center;justify-content:center;
+  padding:80px 24px 120px;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 65% at 50% 20%, rgba(124,58,237,.09) 0%, rgba(124,58,237,.03) 46%, transparent 74%),
+    linear-gradient(180deg, rgba(255,255,255,.013) 0%, transparent 28%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;left:50%;top:-44px;transform:translateX(-50%);
+  width:min(920px,90vw);height:clamp(210px,32vh,310px);
+  background:radial-gradient(ellipse at center, rgba(167,139,250,.17) 0%, rgba(124,58,237,.1) 36%, rgba(124,58,237,.03) 60%, transparent 78%);
+  filter:blur(32px);opacity:.88;
+  animation:heroGlow 8s ease-in-out infinite;pointer-events:none;
+}
+@keyframes heroGlow{0%,100%{transform:translateX(-50%) scale(1);opacity:.76}50%{transform:translateX(-50%) scale(1.07);opacity:1}}
+
+.hero-inner{position:relative;z-index:3;width:100%;max-width:820px;text-align:center;display:flex;flex-direction:column;align-items:center;padding-top:clamp(32px,6vh,88px)}
+.hero-ey{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);
+  background:var(--sf);border:1px solid var(--bd);border-radius:999px;
+  padding:8px 18px;margin-bottom:30px;font-weight:500;backdrop-filter:blur(12px);
+  animation:fadeUp .85s ease both;
+}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:var(--ne2);box-shadow:0 0 10px rgba(167,139,250,.9);animation:dotPulse 2.2s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.32}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+.hero h1{
+  font-family:var(--fd);font-size:clamp(44px,8.5vw,96px);font-weight:300;line-height:.96;
+  letter-spacing:-1.5px;margin:0 auto 22px;animation:fadeUp .95s .07s ease both;
+}
+.hero h1 .soft{color:var(--mu2);font-style:italic}
+.hero-sub{
+  max-width:580px;font-size:clamp(14px,1.85vw,16px);line-height:1.86;color:var(--mu);font-weight:300;
+  margin:0 auto 42px;animation:fadeUp 1.05s .15s ease both;
+}
+.hero-nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;animation:fadeUp 1.1s .23s ease both}
+.hero-navlink{
+  font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu);font-weight:500;
+  padding:8px 18px;border-radius:999px;border:1px solid var(--bd);background:var(--sf);
+  text-decoration:none;transition:.25s;
+}
+.hero-navlink:hover{color:var(--ch);border-color:var(--bd2)}
+
+/* ── SCROLL DOWN INDICATOR ── */
+.scroll-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;animation:fadeUp 1.2s .4s ease both}
+.scroll-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(236,232,226,.18)}
+.scroll-line{width:1px;height:40px;background:linear-gradient(180deg,rgba(167,139,250,.3),transparent);animation:scPulse 2.2s ease-in-out infinite}
+@keyframes scPulse{0%,100%{transform:scaleY(1);opacity:.4}50%{transform:scaleY(1.3);opacity:1}}
+
+/* ── COMMON SECTION STRUCTURE ── */
+.blk{padding:96px 24px;max-width:1100px;margin:0 auto}
+.blk-narrow{padding:96px 24px;max-width:740px;margin:0 auto}
+.sec-label{display:block;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:14px}
+.sec-title{font-family:var(--fd);font-size:clamp(34px,5.5vw,62px);font-weight:300;line-height:1.02;letter-spacing:-.7px;color:var(--tx);margin-bottom:14px}
+.sec-title em{font-style:italic;color:var(--mu2)}
+.sec-copy{font-size:15px;line-height:1.84;color:var(--mu);font-weight:300;max-width:600px;margin-bottom:0}
+.divider{border:none;border-top:1px solid var(--bd);margin:0}
+
+/* ── PULL QUOTE ── */
+.pq{border-left:2px solid rgba(167,139,250,.32);padding:24px 30px;background:rgba(124,58,237,.025);border-radius:0 12px 12px 0;margin:60px 0}
+.pq-text{font-family:var(--fd);font-size:clamp(18px,3.2vw,26px);font-weight:300;font-style:italic;color:var(--ch);line-height:1.6;margin-bottom:12px}
+.pq-attr{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu);font-weight:500}
+
+/* ── PRINCIPLES GRID ── */
+.principles-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:44px}
+.pc{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(180deg, rgba(255,255,255,.026), rgba(255,255,255,.010));
+  border:1px solid var(--bd);border-radius:20px;padding:30px 26px;
+  transition:transform .28s ease,border-color .28s ease;
+}
+.pc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.28),transparent)}
+.pc::after{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;z-index:0;
+  background:radial-gradient(circle 160px at var(--gx,-300px) var(--gy,-300px), rgba(167,139,250,.6) 0%, rgba(124,58,237,.24) 44%, transparent 68%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;transition:opacity .35s ease;
+}
+.pc:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.18)}
+.pc:hover::after{opacity:1}
+.pc-icon{font-family:var(--fd);font-size:28px;color:rgba(167,139,250,.22);margin-bottom:16px;display:block;position:relative;z-index:1}
+.pc h3{font-size:14.5px;font-weight:500;color:var(--ch);margin-bottom:9px;position:relative;z-index:1;letter-spacing:-.1px}
+.pc p{font-size:13px;color:var(--mu);line-height:1.72;font-weight:300;margin:0;position:relative;z-index:1}
+
+/* ── MODES SECTION ── */
+.modes-intro{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:end;margin-bottom:52px}
+.modes-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mode-card{
+  position:relative;isolation:isolate;overflow:hidden;
+  border:1px solid var(--bd);border-radius:22px;padding:34px 26px 28px;
+  transition:transform .3s ease,border-color .3s ease;
+}
+.mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.28),transparent)}
+.mode-card.featured{
+  border-color:rgba(167,139,250,.28);
+  background:linear-gradient(180deg, rgba(124,58,237,.06), rgba(124,58,237,.02));
+}
+.mode-card.featured::before{background:linear-gradient(90deg,transparent,rgba(167,139,250,.56),transparent)}
+.mode-card:not(.featured){background:linear-gradient(180deg, rgba(255,255,255,.026), rgba(255,255,255,.010))}
+.mode-card:hover{transform:translateY(-4px);border-color:rgba(167,139,250,.22)}
+.mode-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;
+  padding:6px 12px;border-radius:999px;border:1px solid rgba(167,139,250,.2);
+  color:var(--ne3);background:rgba(167,139,250,.06);margin-bottom:22px;
+}
+.mode-dot{width:4px;height:4px;border-radius:50%;background:var(--ne2);box-shadow:0 0 8px rgba(167,139,250,.9)}
+.mode-dot.dim{background:var(--mu2);box-shadow:none}
+.mode-dot.faint{background:rgba(236,232,226,.3);box-shadow:none}
+.mode-card h3{font-family:var(--fd);font-size:clamp(20px,3vw,26px);font-weight:300;color:var(--ch);line-height:1.1;margin-bottom:12px}
+.mode-card h3 em{font-style:italic;color:var(--mu2)}
+.mode-card > p{font-size:13.5px;line-height:1.76;color:var(--mu);font-weight:300;margin-bottom:20px}
+.mode-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.mode-list li{font-size:12.5px;color:var(--mu);font-weight:300;display:flex;align-items:flex-start;gap:9px;line-height:1.5}
+.mode-list li::before{content:'—';color:rgba(167,139,250,.45);flex-shrink:0;margin-top:1px}
+.mode-note{margin-top:20px;padding-top:18px;border-top:1px solid var(--bd);font-size:11.5px;color:rgba(236,232,226,.28);line-height:1.6;font-weight:300}
+
+/* ── PROSE SECTION ── */
+.prose-wrap{max-width:700px;margin:0 auto}
+.prose-wrap h2{font-family:var(--fd);font-size:clamp(26px,4vw,40px);font-weight:300;line-height:1.12;letter-spacing:-.3px;color:var(--ch);margin-bottom:16px}
+.prose-wrap h2 em{font-style:italic;color:var(--mu2)}
+.prose-wrap p{font-size:14.5px;color:var(--mu);line-height:1.84;font-weight:300;margin-bottom:18px}
 .prose-wrap p strong{color:var(--ch);font-weight:500}
-.prin{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:40px 0}
-.pc{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:24px}
-.pc h3{font-size:15px;font-weight:500;color:var(--ch);margin-bottom:8px}
-.pc p{font-size:13.5px;color:var(--mu);line-height:1.65;font-weight:300;margin:0}
-.quote-block{border-left:2px solid rgba(94,234,212,.3);padding:20px 24px;margin:32px 0;background:rgba(94,234,212,.03);border-radius:0 10px 10px 0}
-.quote-block p{font-family:var(--fd);font-size:18px;font-style:italic;font-weight:300;color:var(--ch);line-height:1.65;margin:0}
-.crisis-card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;margin:40px 0}
-.crisis-card h3{font-size:15px;font-weight:500;color:var(--ch);margin-bottom:12px}
-.crisis-card p{font-size:14px;color:var(--mu);line-height:1.7;font-weight:300;margin-bottom:0}
-.crisis-card a{color:var(--ne);text-decoration:none}
-.crisis-card a:hover{text-decoration:underline}
-.rv{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.prose-wrap p:last-child{margin-bottom:0}
+
+/* ── HARD QUESTIONS ACCORDION ── */
+.hq-section{margin-top:48px}
+.hq-kicker{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:28px;display:block}
+.hq-item{border-bottom:1px solid var(--bd)}
+.hq-q{
+  width:100%;text-align:left;background:none;border:none;cursor:pointer;
+  padding:22px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  font-family:var(--fb);font-size:15px;font-weight:400;color:var(--ch);
+  transition:color .2s;line-height:1.45;-webkit-tap-highlight-color:transparent;
+}
+.hq-q:hover{color:var(--tx)}
+.hq-icon{font-size:20px;color:var(--mu);flex-shrink:0;transition:transform .32s cubic-bezier(.4,0,.2,1);margin-top:1px}
+.hq-item.open .hq-icon{transform:rotate(45deg)}
+.hq-a{
+  font-size:14px;color:var(--mu);line-height:1.82;font-weight:300;
+  max-height:0;overflow:hidden;transition:max-height .44s cubic-bezier(.4,0,.2,1),padding .32s;
+}
+.hq-a p{margin-bottom:10px}
+.hq-a p:last-child{margin-bottom:0}
+.hq-item.open .hq-a{max-height:400px;padding-bottom:24px}
+
+/* ── COMMITMENT STRIP ── */
+.commitment-wrap{
+  background:linear-gradient(180deg, rgba(255,255,255,.026), rgba(255,255,255,.010));
+  border:1px solid var(--bd);border-radius:24px;padding:56px 48px;
+  position:relative;overflow:hidden;
+}
+.commitment-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.42),transparent)}
+.commitment-wrap::after{
+  content:'';position:absolute;left:50%;top:-60px;transform:translateX(-50%);
+  width:400px;height:200px;
+  background:radial-gradient(ellipse at center, rgba(124,58,237,.11) 0%, transparent 70%);
+  filter:blur(28px);pointer-events:none;
+}
+.commitment-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:36px;position:relative;z-index:1}
+.cmt{border-left:1px solid rgba(167,139,250,.18);padding-left:22px}
+.cmt-num{font-family:var(--fd);font-size:38px;font-weight:300;color:rgba(167,139,250,.22);line-height:1;margin-bottom:8px}
+.cmt h4{font-size:13.5px;font-weight:500;color:var(--ch);margin-bottom:7px;letter-spacing:-.1px}
+.cmt p{font-size:12.5px;color:var(--mu);line-height:1.65;font-weight:300;margin:0}
+
+/* ── CTA BLOCK ── */
+.cta-wrap{padding:0 24px 120px;max-width:640px;margin:0 auto;text-align:center}
+.cta-inner{
+  background:linear-gradient(180deg, rgba(255,255,255,.026), rgba(255,255,255,.012));
+  border:1px solid var(--bd);border-radius:24px;padding:56px 44px;
+  position:relative;overflow:hidden;
+}
+.cta-inner::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.38),transparent)}
+.cta-inner::after{
+  content:'';position:absolute;left:50%;top:-44px;transform:translateX(-50%);
+  width:320px;height:160px;
+  background:radial-gradient(ellipse at center, rgba(124,58,237,.13) 0%, transparent 70%);
+  filter:blur(22px);pointer-events:none;
+}
+.cta-inner h2{font-family:var(--fd);font-size:clamp(30px,4.5vw,48px);font-weight:300;line-height:1.08;margin-bottom:14px;position:relative;z-index:1}
+.cta-inner h2 em{font-style:italic;color:var(--mu2)}
+.cta-inner p{font-size:14px;color:var(--mu);line-height:1.76;margin-bottom:32px;font-weight:300;position:relative;z-index:1}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:10px;
+  background:#f3efe9;color:#060606;font-family:var(--fb);font-size:14px;font-weight:600;
+  padding:14px 30px;border-radius:12px;text-decoration:none;border:none;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;position:relative;z-index:1;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(255,255,255,.07)}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:8px;margin-top:12px;
+  background:none;border:1px solid var(--bd);color:var(--mu);font-family:var(--fb);
+  font-size:13px;padding:12px 24px;border-radius:10px;text-decoration:none;transition:.2s;
+  position:relative;z-index:1;
+}
+.btn-secondary:hover{border-color:var(--bd2);color:var(--tx)}
+.cta-btns{display:flex;flex-direction:column;align-items:center;gap:0}
+
+/* ── REVEAL ── */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .72s ease,transform .72s ease}
 .rv.vs{opacity:1;transform:translateY(0)}
+
+/* ── FOOTER ── */
 footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 .fb{font-family:var(--fd);font-size:18px;font-weight:300;letter-spacing:3px;text-transform:uppercase;color:var(--ch);text-decoration:none}
-.fc{font-size:12px;color:rgba(237,233,226,.2)}
-@media(max-width:768px){.prin{grid-template-columns:1fr}}
+.fc{font-size:12px;color:rgba(236,232,226,.2)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .modes-intro{grid-template-columns:1fr}
+  .modes-grid{grid-template-columns:1fr}
+  .principles-grid{grid-template-columns:1fr}
+  .commitment-grid{grid-template-columns:1fr;gap:16px}
+}
+@media(max-width:768px){
+  footer{padding:24px 20px}
+  nav{padding:0 20px}
+  .blk{padding:72px 18px}
+  .blk-narrow{padding:72px 18px}
+  .cta-inner{padding:40px 24px}
+  .commitment-wrap{padding:40px 24px}
+}
 </style>
-  <script src="/static/js/chronis-nav.js" defer></script>
+<script src="/static/js/chronis-nav.js" defer></script>
 </head>
 <body>
+
+<canvas id="bgc"></canvas>
+
 <nav id="cn-nav"></nav>
 
+<main>
+
+<!-- ── HERO ── -->
 <section class="hero">
-  <div class="ey">Our ethics framework</div>
-  <h1>We built this with our<br>eyes <em>wide open.</em></h1>
-  <p class="hs">Creating AI replicas of deceased people raises real ethical questions. Here is how we think about them — honestly, without corporate deflection.</p>
+  <div class="hero-inner">
+    <div class="hero-ey"><span class="hero-dot"></span>Our ethics framework</div>
+    <h1>Built with<br>eyes <span class="soft">wide open.</span></h1>
+    <p class="hero-sub">Capturing the full depth of a human being — voice, pattern, decision, rhythm — raises real ethical questions. We will not deflect them with corporate language. Here is exactly how we think.</p>
+    <nav class="hero-nav">
+      <a class="hero-navlink" href="#principles">Principles</a>
+      <a class="hero-navlink" href="#modes">The three modes</a>
+      <a class="hero-navlink" href="#hard-questions">Hard questions</a>
+      <a class="hero-navlink" href="#commitments">Our commitments</a>
+    </nav>
+  </div>
+  <div class="scroll-hint">
+    <span class="scroll-label">Read on</span>
+    <div class="scroll-line"></div>
+  </div>
 </section>
 
-<div class="prose-wrap">
-
-  <div class="rv">
-    <h2>The core tension</h2>
-    <p>Technology that allows people to interact with AI representations of deceased loved ones offers real psychological benefit to some people, and real harm to others. This is not a hypothetical. Grief is one of the most vulnerable states a human being can be in. We are building a tool that people will use while in exactly that state.</p>
-    <p>We cannot resolve this tension by pretending it doesn't exist. We've chosen to build Chronis because we believe, when used responsibly, this technology can genuinely help people. But that belief carries obligations.</p>
+<!-- ── THE CORE TENSION ── -->
+<hr class="divider">
+<div class="blk-narrow rv">
+  <div class="prose-wrap">
+    <span class="sec-label">The context</span>
+    <h2>This is not a simple<br><em>product category.</em></h2>
+    <p>Chronis sits at an intersection that has never existed before: continuous biometric capture, private AI trained from scratch on a single person, and the possibility of preserved presence that outlasts a life. Each of those things alone is ethically complex. Together, they require us to think carefully.</p>
+    <p>We built Chronis because we believe, in the right hands with the right constraints, this technology does genuine good. It helps people know themselves better. It helps families preserve what matters before it's gone. It may, in time, help solve one of the deepest problems in human experience — the fragmentation that happens when a person dies. <strong>But that belief carries obligations.</strong></p>
+    <p>Grief is one use case. Self-quantification — understanding your own patterns, your own decision architecture, your own emotional baseline — is another, and perhaps the one with the most profound long-term implications. Both require the same ethical seriousness. This page is that seriousness, written down.</p>
   </div>
-
-  <div class="rv">
-    <h2>Our principles</h2>
-    <div class="prin">
-      <div class="pc"><h3>Informed consent</h3><p>No replica is created without explicit informed consent from the person initiating the process. We explain clearly what the technology does and doesn't do before any upload.</p></div>
-      <div class="pc"><h3>Psychological safety</h3><p>We include grief resource referrals throughout the product. Chronis is not a replacement for grief support. We say this clearly, often, without hiding it in footnotes.</p></div>
-      <div class="pc"><h3>Data sovereignty</h3><p>Your memories belong to you. Your data is never used to train any AI models. You can delete your replica and all associated data permanently, at any time, immediately.</p></div>
-      <div class="pc"><h3>Honest framing</h3><p>We never describe Chronis as a way to "bring back" the deceased. The replica is an AI — a sophisticated, emotionally resonant AI, but an AI. We don't obscure this.</p></div>
-    </div>
-  </div>
-
-  <div class="rv">
-    <div class="quote-block">
-      <p>"Grief does not end on a schedule. For some people, continued conversation with a thoughtful simulation of who they've lost is a genuine act of healing. For others, it may not be. We trust people to know the difference — and we build in safeguards for those who are uncertain."</p>
-    </div>
-  </div>
-
-  <div class="rv">
-    <h2>What Chronis is not</h2>
-    <p>Chronis is <strong>not a replacement for grief therapy</strong>. It is not a way to avoid the grief process. It is not a product that will make loss hurt less. What it may offer — for some people, in some circumstances — is a space for conversations that weren't finished, for questions that went unasked, for presence that grief makes feel impossibly absent.</p>
-    <p>We are building for adults who approach this technology thoughtfully, with support networks in place. If you are in acute crisis, please reach out to a mental health professional before using Chronis.</p>
-  </div>
-
-  <div class="rv">
-    <h2>The question of consent from the deceased</h2>
-    <p>This is the hardest ethical question in our product space, and we won't pretend to have a clean answer. The person being replicated cannot consent to their replica existing. We require consent from the living person uploading the video — but that is not the same thing.</p>
-    <p>Our current position: we believe family members who have legitimate access to video of a deceased loved one, creating a private replica for personal grief processing, is ethically different from commercial use, public use, or use that misrepresents the deceased's beliefs or character. We prohibit the latter uses in our Terms of Service and actively enforce this.</p>
-    <p>We expect this conversation to evolve as the technology and cultural norms around it mature. We commit to revisiting our policies as they do.</p>
-  </div>
-
-  <div class="rv">
-    <h2>The 2Wai controversy and what we learned</h2>
-    <p>In November 2025, the AI grief app 2Wai faced significant public backlash — described variously as "demonic" and "dystopian" by critics. We watched this closely. What it demonstrated is that the framing, ethics, and consent architecture of grief tech products matters enormously — not just for public reception, but for the genuine wellbeing of users.</p>
-    <p>Chronis was built with this conversation already happening in our product team. Consent flows, ethics disclosures, crisis referrals, and honest framing are not add-ons. They are load-bearing walls.</p>
-  </div>
-
-  <div class="rv">
-    <div class="crisis-card">
-      <h3>If you are in grief crisis</h3>
-      <p>If you are experiencing acute grief, suicidal thoughts, or a mental health crisis, please reach out to a professional before using Chronis. In India, iCall offers free mental health support: <a href="https://icallhelpline.org" target="_blank" rel="noopener">icallhelpline.org</a> · 9152987821. Vandrevala Foundation Helpline: <a href="tel:18602662345">1860-2662-345</a> (24/7).</p>
-    </div>
-  </div>
-
-  <div class="rv">
-    <h2>Ongoing commitments</h2>
-    <p>We commit to publishing an annual ethics review. We commit to maintaining a public ethics advisory — including voices from grief counselors, ethicists, and bereaved families. We commit to responding to user concerns about the product's psychological impact on an individual case basis.</p>
-    <p>Ethics is not a document you write once. It is a practice. We are learning as we build.</p>
-  </div>
-
 </div>
 
-<footer id="cn-footer"></footer>
+<!-- ── PRINCIPLES ── -->
+<hr class="divider">
+<div class="blk" id="principles">
+  <div style="max-width:640px;margin-bottom:52px">
+    <span class="sec-label">01 · How we operate</span>
+    <h2 class="sec-title">Six principles.<br><em>Not aspirations.</em></h2>
+    <p class="sec-copy">These are not marketing commitments. They are architectural decisions built into how the product works — constraints we cannot override even if we wanted to.</p>
+  </div>
+  <div class="principles-grid">
+    <div class="pc rv">
+      <span class="pc-icon">I</span>
+      <h3>Informed consent, before anything</h3>
+      <p>No data is captured, no model is trained, no replica exists without explicit, informed consent. Not checkbox consent — documented consent with a clear explanation of what the technology does and does not do. We explain the hard parts first, not in footnotes.</p>
+    </div>
+    <div class="pc rv">
+      <span class="pc-icon">II</span>
+      <h3>You own the model, not us</h3>
+      <p>The AI that Chronis trains on your data is not an asset on our balance sheet. It lives in your private vault. Chronis staff cannot access it without your explicit permission. If you delete it, it is gone — from our infrastructure, not just our database. We have no shadow copy.</p>
+    </div>
+    <div class="pc rv">
+      <span class="pc-icon">III</span>
+      <h3>Zero training bleed between users</h3>
+      <p>Your data trains only your model. It never improves a shared foundation model, never improves another user's experience, never leaves your vault in a form that carries your identity. This is not the default in AI — it is a deliberate, expensive departure from industry norm.</p>
+    </div>
+    <div class="pc rv">
+      <span class="pc-icon">IV</span>
+      <h3>Honest framing, always</h3>
+      <p>Chronis is an AI. A sophisticated, personality-grounded, emotionally resonant AI — but an AI. We never describe it as bringing someone back. We never obscure the synthetic nature of what the user is experiencing. Clarity about what this is protects the people using it.</p>
+    </div>
+    <div class="pc rv">
+      <span class="pc-icon">V</span>
+      <h3>Psychological safety is a design requirement</h3>
+      <p>We include grief resource referrals throughout the product. We build in session pacing features to avoid dependence patterns. We actively study the psychological literature on grief technology and adjust accordingly. Wellbeing is a product metric, not an afterthought.</p>
+    </div>
+    <div class="pc rv">
+      <span class="pc-icon">VI</span>
+      <h3>Permanent deletion is unconditional</h3>
+      <p>If you request deletion — of your data, your model, your replica, or your account — it happens immediately and completely. No retention period for "service improvement." No anonymisation that preserves anything identifiable. Deletion means gone.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── THE THREE MODES ── -->
+<hr class="divider">
+<div class="blk" id="modes">
+  <div class="modes-intro rv">
+    <div>
+      <span class="sec-label">02 · How you control it</span>
+      <h2 class="sec-title">Three modes.<br><em>Total control.</em></h2>
+    </div>
+    <p class="sec-copy">You decide what Chronis does with your signal. Nothing is assumed. Nothing is defaulted. These are not settings in a menu — they are distinct architectures with different data flows and different promises. You choose once; you can change any time.</p>
+  </div>
+  <div class="modes-grid">
+
+    <!-- MODE 1: FULL DATASET -->
+    <div class="mode-card featured rv">
+      <div class="mode-badge"><span class="mode-dot"></span>Full Dataset</div>
+      <h3>Your complete AI. <em>Built entirely from you.</em></h3>
+      <p>Every signal the Locket captures — voice, video, motion, biological rhythm — is used to train a private AI that represents only you. The most complete model of a human being that technology has made possible. And the most private.</p>
+      <ul class="mode-list">
+        <li>Full voice, video, gyroscope, and BPM dataset used</li>
+        <li>Dedicated model trained on your signal exclusively</li>
+        <li>Real-time conversation capability fully activated</li>
+        <li>Legacy access for designated family members</li>
+        <li>Model lives in your private vault, not Chronis servers</li>
+      </ul>
+      <div class="mode-note">This is the most powerful mode and the one with the most complete data picture. It is also the most private: a dedicated model trained only on you means your data never touches a shared system.</div>
+    </div>
+
+    <!-- MODE 2: SKIMMED -->
+    <div class="mode-card rv">
+      <div class="mode-badge"><span class="mode-dot dim"></span>Skimmed Dataset</div>
+      <h3>Curated intelligence. <em>Only what you choose.</em></h3>
+      <p>You select which categories of your signal are used in training. Leave out what feels too raw. Include what matters most. The AI reflects the version of you that you are willing to share — no more.</p>
+      <ul class="mode-list">
+        <li>Choose which signal types are included</li>
+        <li>Granular session-level consent controls</li>
+        <li>AI trained only on your approved categories</li>
+        <li>Expand or restrict scope at any time</li>
+        <li>Voice and face reconstruction still available</li>
+      </ul>
+      <div class="mode-note">Recommended for people who want the experience of Chronis but aren't ready to share everything. You control the depth. Most users start here.</div>
+    </div>
+
+    <!-- MODE 3: RAW VAULT -->
+    <div class="mode-card rv">
+      <div class="mode-badge"><span class="mode-dot faint"></span>Raw Vault</div>
+      <h3>No AI. <em>Just the archive, untouched.</em></h3>
+      <p>Zero processing. Zero training. Your recordings are sealed in end-to-end encrypted storage — accessible only to you, processed by nothing, opened only when you choose. A time capsule, not a model.</p>
+      <ul class="mode-list">
+        <li>Zero AI processing of any kind</li>
+        <li>All raw recordings stored encrypted at rest</li>
+        <li>Viewable only by vault owner</li>
+        <li>Upgrade to Full or Skimmed at any time</li>
+        <li>Permanent deletion on request, immediately</li>
+      </ul>
+      <div class="mode-note">For people who want to preserve now and decide later. No irreversible decisions are made until you ask for them. The vault is yours and untouched until you say otherwise.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── PULL QUOTE ── -->
+<div class="blk-narrow rv" style="padding-top:0;padding-bottom:0">
+  <div class="pq">
+    <p class="pq-text">The three modes exist because control is not a feature — it is a right. The most ethical thing we can do is build a system where the default is restraint, not extraction.</p>
+    <div class="pq-attr">Chronis — product ethics, 2026</div>
+  </div>
+</div>
+
+<!-- ── HARD QUESTIONS ── -->
+<hr class="divider" style="margin-top:96px">
+<div class="blk-narrow" id="hard-questions">
+  <div class="rv" style="margin-bottom:56px">
+    <span class="sec-label">03 · The questions we don't deflect</span>
+    <h2 class="sec-title">The questions<br>we can't fully <em>answer yet.</em></h2>
+    <p class="sec-copy">Intellectual honesty requires acknowledging where we don't have clean answers. These are the hard questions in our space — and our current best thinking on each.</p>
+  </div>
+
+  <div class="hq-section rv">
+    <span class="hq-kicker">Open questions</span>
+
+    <div class="hq-item">
+      <button class="hq-q" onclick="toggleHQ(this)">
+        <span>Can this become a generative intelligence model?</span>
+        <span class="hq-icon">+</span>
+      </button>
+      <div class="hq-a">
+        <p>We are building towards a future where wisdom doesn't vanish where we remember everything we evolve from. While this is a step towards generative interface we stay grounded for now not in generic AI, but in the memory, voice, and patterns stored privately and personally.</p>
+      </div>
+    </div>
+
+    <div class="hq-item">
+      <button class="hq-q" onclick="toggleHQ(this)">
+        <span>Does self-quantification change how you think about yourself?</span>
+        <span class="hq-icon">+</span>
+      </button>
+      <div class="hq-a">
+        <p>Almost certainly, yes — and this is not a trivial concern. Seeing your own patterns made explicit (your decision latency, your emotional baseline, your speech rhythm) changes your relationship to those patterns. In some cases this is exactly the point. In others, it may be unwanted.</p>
+        <p>We believe most people who choose to use Chronis want that self-knowledge. But we build in the ability to stop, to step back, and to never look at your own data if you prefer it as a sealed archive. The Raw Vault mode exists partly for this reason: preservation without observation.</p>
+      </div>
+    </div>
+
+    <div class="hq-item">
+      <button class="hq-q" onclick="toggleHQ(this)">
+        <span>Could a Chronis replica cause harm to a grieving person?</span>
+        <span class="hq-icon">+</span>
+      </button>
+      <div class="hq-a">
+        <p>It could — for some people, in some circumstances. Grief is one of the most vulnerable states a human being can be in. Research on grief technology is early, and the evidence is mixed: some people report genuine comfort from continued interaction with a deceased person's digital presence; others report it complicating or prolonging the grief process.</p>
+        <p>While chronis is capable to make interaction with a deceased person but we only offer it as a complimentary feature. What we do: include grief resource referrals in every session, build session pacing features, avoid features that blur the reality of loss, and make it easy to step away or close the replica permanently. We are not a grief therapy product. We say this clearly, always, without hiding it.</p>
+      </div>
+    </div>
+
+    <div class="hq-item">
+      <button class="hq-q" onclick="toggleHQ(this)">
+        <span>What happens to your data if Chronis ceases to operate?</span>
+        <span class="hq-icon">+</span>
+      </button>
+      <div class="hq-a">
+        <p>This is a question every long-term data steward must answer honestly, and most don't. Our commitment: in the event Chronis ceases to operate, users receive 180 days notice to export or delete their full dataset and trained model. We are required by our own terms to provide export tools that give users their data in portable formats. No sale of user data to a successor is permitted without opt-in consent per user.</p>
+        <p>We are also exploring a third-party escrow model for trained models — where the model is held by a neutral party and accessible only to the user — as the most robust version of this commitment. We will publish our progress.</p>
+      </div>
+    </div>
+
+    <div class="hq-item">
+      <button class="hq-q" onclick="toggleHQ(this)">
+        <span>How do you prevent the AI from misrepresenting who the person is?</span>
+        <span class="hq-icon">+</span>
+      </button>
+      <div class="hq-a">
+        <p>The model is trained on observed behaviour, not described character — which is the most direct guard against this. It not just knows what you said to yourself; it knows how you actually spoke, reasoned, and moved. Fabrication risk is lower when training data is behavioural rather than declarative.</p>
+        <p>We also build in epistemic transparency: the AI is trained to signal uncertainty, to mention "Data insufficient" and to resist confident responses in areas where training data is thin. A Chronis replica should be recognised as a reconstruction, not a simulation of omniscience. We build that humility into the model architecture.</p>
+      </div>
+    </div>
+
+    <div class="hq-item">
+      <button class="hq-q" onclick="toggleHQ(this)">
+        <span>Is replicating human intelligence ethically different from preserving photos?</span>
+        <span class="hq-icon">+</span>
+      </button>
+      <div class="hq-a">
+        <p>Yes — significantly. A photograph is passive. It captures a moment and offers no response. A Chronis model captures a pattern and continues to apply it. It can respond to new situations the person never encountered. That is categorically different: it is a form of ongoing agency, however bounded.</p>
+        <p>This distinction means the ethical stakes are higher, the consent requirements are stricter, and the honesty requirements about what the technology is and is not are non-negotiable. We don't think this means the technology shouldn't exist. We think it means the people building it have a higher obligation to think carefully. We are trying to live up to that obligation.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── COMMITMENTS ── -->
+<hr class="divider" style="margin-top:96px">
+<div class="blk" id="commitments">
+  <div class="rv" style="max-width:560px;margin-bottom:52px">
+    <span class="sec-label">04 · What we commit to</span>
+    <h2 class="sec-title">Not policies.<br><em>Architecture.</em></h2>
+    <p class="sec-copy">The commitments below are not just stated in a legal document and never violated by how the product actually works. These commitments are the product. The architecture enforces them.</p>
+  </div>
+  <div class="commitment-wrap rv">
+    <div style="position:relative;z-index:1">
+      <span class="sec-label">Six architectural commitments</span>
+      <h3 style="font-family:var(--fd);font-size:clamp(22px,3vw,30px);font-weight:300;color:var(--ch);line-height:1.1">These are not aspirations. They are<br><em style="color:var(--mu2)">how the code is written.</em></h3>
+    </div>
+    <div class="commitment-grid">
+      <div class="cmt">
+        <div class="cmt-num">01</div>
+        <h4>Chronis based on privacy first architecture</h4>
+        <p>Your data is stored in world's leading databases with advanced private architecture protection.</p>
+      </div>
+      <div class="cmt">
+        <div class="cmt-num">02</div>
+        <h4>No cross-user weight sharing</h4>
+        <p>Models trained on one user's data never improve another user's model. No shared foundation model is fine-tuned on your signal. Each model is built from scratch, for one person, isolated completely.</p>
+      </div>
+      <div class="cmt">
+        <div class="cmt-num">03</div>
+        <h4>Deletion is total and immediate</h4>
+        <p>When you delete, every record is removed — training data, trained weights, conversation history. Deletion takes effect within 24 hours. We retain no backup beyond a 30-day disaster recovery window, after which even that is purged.</p>
+      </div>
+      <div class="cmt">
+        <div class="cmt-num">04</div>
+        <h4>Consent before every data category</h4>
+        <p>Before each new signal type is activated — voice, video, biometric — explicit, documented consent is required. Consent is granular, not blanket. You can grant and revoke per category, per session, at any time.</p>
+      </div>
+      <div class="cmt">
+        <div class="cmt-num">05</div>
+        <h4>Epistemic transparency in the model</h4>
+        <p>The AI is trained to signal uncertainty, to acknowledge the limits of its reconstruction, and to resist confident responses where training data is thin. It is honest about what it is — a model, not a person — by design.</p>
+      </div>
+      <div class="cmt">
+        <div class="cmt-num">06</div>
+        <h4>Annual privacy audit</h4>
+        <p>Our data handling, model architecture, and deletion processes are audited annually. Audit results are published in summary form.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CTA ── -->
+<div class="cta-wrap rv">
+  <div class="cta-inner">
+    <h2>Satisfied with<br>where we <em>stand?</em></h2>
+    <p>If you have questions our ethics framework doesn't address, email us directly. We read every message. We reply to every serious question.</p>
+    <div class="cta-btns">
+      <a class="btn-primary" href="/#waitlist">Join the waitlist →</a>
+      <a class="btn-secondary" href="mailto:ethics@chronis.in">ethics@chronis.in</a>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer id="cn-footer">
+  <a href="/" class="fb">Chronis</a>
+  <span class="fc">© 2026 Chronis Technologies Pvt. Ltd.</span>
+</footer>
+
 <script>
-const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vs')})},{threshold:.1,rootMargin:'0 0 -40px 0'});
-document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+/* ── Star field ── */
+(function(){
+  const c=document.getElementById('bgc'),ctx=c.getContext('2d');
+  let W,H,P=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  resize();addEventListener('resize',resize);
+  for(let i=0;i<100;i++)P.push({
+    x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    r:Math.random()*.8+.2,
+    vx:(Math.random()-.5)*.07,vy:(Math.random()-.5)*.07,
+    a:Math.random()*.22+.05,da:(Math.random()-.5)*.0014
+  });
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    P.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.a+=p.da;
+      if(p.a<.04||p.a>.3)p.da*=-1;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${p.a})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }draw();
+})();
+
+/* ── Liquid border on principle cards ── */
+(function(){
+  document.querySelectorAll('.pc').forEach(card=>{
+    let tx=-400,ty=-400,cx=-400,cy=-400,raf=null;
+    function lerp(a,b,t){return a+(b-a)*t}
+    function tick(){
+      cx=lerp(cx,tx,.09);cy=lerp(cy,ty,.09);
+      card.style.setProperty('--gx',cx+'px');
+      card.style.setProperty('--gy',cy+'px');
+      if(Math.hypot(cx-tx,cy-ty)>.3)raf=requestAnimationFrame(tick);else raf=null;
+    }
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      tx=e.clientX-r.left;ty=e.clientY-r.top;
+      if(!raf)raf=requestAnimationFrame(tick);
+    });
+    card.addEventListener('mouseleave',()=>{
+      tx=-400;ty=-400;
+      if(!raf)raf=requestAnimationFrame(tick);
+    });
+  });
+})();
+
+/* ── Accordion ── */
+function toggleHQ(btn){
+  const item=btn.closest('.hq-item');
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.hq-item.open').forEach(i=>i.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
+}
+
+/* ── Scroll reveal ── */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vs');io.unobserve(e.target)}});
+},{threshold:.07});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 </script>
 </body>
 </html>
