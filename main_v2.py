@@ -1255,6 +1255,7 @@ async def api_join(request: Request):
     name    = (data.get("name") or "").strip()
     email   = (data.get("email") or "").strip().lower()
     country = (data.get("country") or "").strip()
+    ref     = (data.get("ref") or "").strip().lower()[:64]  # intern referral code
 
     if not name or not email or not country:
         raise HTTPException(400, "All fields are required.")
@@ -1264,10 +1265,10 @@ async def api_join(request: Request):
         raise HTTPException(400, "This email is already on the waitlist.")
 
     position = get_waitlist_count() + 1
-    sb_insert("waitlist", {
-        "name": name, "email": email,
-        "country": country, "position": position,
-    })
+    row = {"name": name, "email": email, "country": country, "position": position}
+    if ref:
+        row["ref_code"] = ref
+    sb_insert("waitlist", row)
     try:
         _send_welcome_email(name, email, position)
     except Exception as e:
