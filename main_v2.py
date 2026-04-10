@@ -39,7 +39,7 @@ from fastapi import (
     Request, UploadFile, WebSocket, WebSocketDisconnect,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from gradio_client import Client, handle_file
 
@@ -842,7 +842,7 @@ def sb_select(table, query=""):
         return []
 
 
-def sb_insert(table, data):
+def sb_insert(table, data, raise_on_fail=False):
     try:
         r = requests.post(
             f"{SUPABASE_URL}/rest/v1/{table}",
@@ -850,10 +850,23 @@ def sb_insert(table, data):
             json=data,
             timeout=10,
         )
-        rows = r.json()
-        return rows[0] if r.ok and rows else None
+        if not r.ok:
+            err = r.text[:200]
+            print(f"[SB insert FAILED] table={table} status={r.status_code} body={err}", flush=True)
+            if raise_on_fail:
+                raise RuntimeError(f"DB write failed ({r.status_code}): {err}")
+            return None
+        try:
+            rows = r.json()
+            return rows[0] if rows else None
+        except Exception:
+            return None  # 204 No Content — insert succeeded, no body
+    except RuntimeError:
+        raise
     except Exception as e:
-        print(f"[SB insert error] {e}", flush=True)
+        print(f"[SB insert error] table={table} {e}", flush=True)
+        if raise_on_fail:
+            raise
         return None
 
 
@@ -1081,6 +1094,17 @@ async def leaderboard_page():
     return FileResponse("static/leaderboard.html")
 
 
+
+@app.get("/ref/{code}")
+async def ref_redirect(code: str):
+    """
+    Friendly short redirect for intern referral links.
+    Handles path-style links like /ref/alice → /?ref=alice.
+    Fixes "detail: Not Found" when interns share path-style URLs.
+    """
+    safe = code.strip().lower()[:64]
+    return RedirectResponse(url=f"/?ref={safe}", status_code=302)
+
 @app.get("/api/v2/waitlist/check")
 async def check_waitlist(email: str = "", admin_secret: str = ""):
     """
@@ -1277,7 +1301,11 @@ async def api_join(request: Request):
     row = {"name": name, "email": email, "country": country, "position": position}
     if ref:
         row["ref_code"] = ref
-    sb_insert("waitlist", row)
+    try:
+        sb_insert("waitlist", row, raise_on_fail=True)
+    except Exception as e:
+        print(f"[Join] Supabase insert failed: {e}", flush=True)
+        raise HTTPException(500, "Could not save your signup. Please try again.")
     try:
         _send_welcome_email(name, email, position)
     except Exception as e:

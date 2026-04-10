@@ -287,7 +287,8 @@ function genMyLink() {
   // Normalise: lowercase, spaces → hyphens, strip non-alphanumeric/hyphen
   const code = raw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   if (!code) { alert('Use letters or numbers only.'); return; }
-  const link = `${window.location.origin}/?ref=${code}`;
+  // /ref/<code> redirects to /?ref=<code> on the server — shorter and shareable
+  const link = `${window.location.origin}/ref/${code}`;
   document.getElementById('myLinkVal').value = link;
   document.getElementById('myLinkRow').style.display = 'flex';
   document.getElementById('myLinkNote').style.display = 'block';
