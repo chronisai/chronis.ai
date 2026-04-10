@@ -1072,6 +1072,15 @@ async def live(email: str = ""):
     return FileResponse("static/live.html")
 
 
+@app.get("/leaderboard")
+async def leaderboard_page():
+    """
+    Growth intern referral leaderboard — publicly accessible via direct URL.
+    No admin secret required; data is aggregated counts only (no PII).
+    """
+    return FileResponse("static/leaderboard.html")
+
+
 @app.get("/api/v2/waitlist/check")
 async def check_waitlist(email: str = "", admin_secret: str = ""):
     """
@@ -1286,6 +1295,115 @@ async def api_waitlist_count():
 @app.post("/api/waitlist/join")
 async def api_waitlist_join(request: Request):
     return await api_join(request)
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# REFERRAL / LEADERBOARD ROUTES
+# ────────────────────────────────────────────────────────────────────────────
+
+@app.get("/api/referral/leaderboard")
+async def referral_leaderboard():
+    """
+    Public leaderboard endpoint — no auth required.
+    Returns aggregated ref-code signup counts (no PII).
+    Used by leaderboard.html which all interns can access.
+
+    Response shape:
+    {
+      "total_signups": 42,
+      "total_referred": 28,
+      "entries": [
+        {"ref_code": "alice", "count": 18, "link": "https://chronis.in/?ref=alice"},
+        ...
+      ]
+    }
+    """
+    try:
+        rows = sb_select(
+            "waitlist",
+            "select=ref_code&ref_code=not.is.null",
+        )
+
+        tally: dict = {}
+        for row in rows:
+            code = (row.get("ref_code") or "").strip().lower()
+            if not code:
+                continue
+            tally[code] = tally.get(code, 0) + 1
+
+        entries = sorted(
+            [{"ref_code": c, "count": n, "link": f"{SITE_URL}/?ref={c}"}
+             for c, n in tally.items()],
+            key=lambda x: -x["count"],
+        )
+
+        total_signups  = get_waitlist_count()
+        total_referred = sum(e["count"] for e in entries)
+
+        return {
+            "total_signups":  total_signups,
+            "total_referred": total_referred,
+            "entries":        entries,
+        }
+    except Exception as e:
+        print(f"[Referral] leaderboard error: {e}", flush=True)
+        raise HTTPException(500, f"Could not fetch leaderboard: {e}")
+
+
+@app.get("/api/referral/stats")
+async def referral_stats(admin_secret: str = ""):
+    """
+    Detailed referral stats including latest signup timestamps — admin only.
+    For the public leaderboard use /api/referral/leaderboard instead.
+    """
+    if not admin_secret or admin_secret != ADMIN_SECRET:
+        raise HTTPException(403, "Admin secret required")
+
+    try:
+        rows = sb_select(
+            "waitlist",
+            "select=ref_code,created_at&ref_code=not.is.null&order=created_at.asc",
+        )
+
+        tally: dict = {}
+        for row in rows:
+            code = (row.get("ref_code") or "").strip().lower()
+            if not code:
+                continue
+            if code not in tally:
+                tally[code] = {"ref_code": code, "count": 0, "latest": None}
+            tally[code]["count"] += 1
+            tally[code]["latest"] = row.get("created_at")
+
+        entries = sorted(
+            tally.values(),
+            key=lambda x: (-x["count"], x["ref_code"]),
+        )
+
+        return {
+            "total_referred": sum(e["count"] for e in entries),
+            "entries": entries,
+            "site_url": SITE_URL,
+        }
+    except Exception as e:
+        print(f"[Referral] stats error: {e}", flush=True)
+        raise HTTPException(500, f"Could not fetch referral stats: {e}")
+
+
+@app.get("/api/referral/link/{ref_code}")
+async def referral_link_info(ref_code: str, admin_secret: str = ""):
+    """
+    Returns the shareable referral link for a given ref_code and its
+    current signup count. Useful for generating intern links.
+    Admin only.
+    """
+    if not admin_secret or admin_secret != ADMIN_SECRET:
+        raise HTTPException(403, "Admin secret required")
+
+    code  = ref_code.strip().lower()
+    count = sb_count("waitlist", f"ref_code=eq.{requests.utils.quote(code)}")
+    link  = f"{SITE_URL}/?ref={code}"
+    return {"ref_code": code, "link": link, "signups": count}
 
 
 # ────────────────────────────────────────────────────────────────────────────
