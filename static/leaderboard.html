@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chronis — Growth Board</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050505;--bg2:#0b0b0b;--bg3:#111111;
+  --sf:rgba(255,255,255,.024);--sf2:rgba(255,255,255,.045);
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.14);
+  --tx:#ece8e2;--mu:rgba(236,232,226,.38);--mu2:rgba(236,232,226,.62);--ch:rgba(236,232,226,.84);
+  --ne:#7c3aed;--ne2:#a78bfa;--ne3:#c4b5fd;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--tx);font-family:var(--fb);
+  font-weight:400;min-height:100vh;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ── Background canvas glow ── */
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
+
+/* ── Ambient top glow ── */
+.ambient{
+  position:fixed;top:-120px;left:50%;transform:translateX(-50%);
+  width:min(900px,100vw);height:420px;
+  background:radial-gradient(ellipse at center,rgba(167,139,250,.13) 0%,rgba(124,58,237,.07) 40%,transparent 72%);
+  filter:blur(40px);pointer-events:none;z-index:0;
+  animation:ambientPulse 8s ease-in-out infinite;
+}
+@keyframes ambientPulse{0%,100%{opacity:.7;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.06)}}
+
+main{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:clamp(60px,10vh,100px) 24px 80px}
+
+/* ── Eyebrow ── */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);
+  background:var(--sf);border:1px solid var(--bd);border-radius:999px;
+  padding:8px 16px;margin-bottom:28px;font-weight:500;
+  backdrop-filter:blur(12px);
+  animation:fadeUp .8s ease both;
+}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--ne2);box-shadow:0 0 10px rgba(167,139,250,.9);animation:dotPulse 2.2s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── Title ── */
+h1{
+  font-family:var(--fd);font-size:clamp(48px,7vw,88px);font-weight:300;
+  line-height:.95;letter-spacing:-1px;text-align:center;
+  margin-bottom:12px;
+  animation:fadeUp .9s .06s ease both;
+}
+h1 em{font-style:italic;color:var(--mu2)}
+
+.subtitle{
+  font-size:13px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--mu);text-align:center;margin-bottom:56px;
+  animation:fadeUp 1s .12s ease both;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Total count pill ── */
+.total-pill{
+  display:inline-flex;align-items:baseline;gap:12px;
+  padding:14px 28px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.022);
+  backdrop-filter:blur(16px);
+  margin-bottom:52px;
+  animation:fadeUp 1s .18s ease both;
+}
+.total-num{font-family:var(--fd);font-size:52px;line-height:1;color:var(--tx);font-weight:300;letter-spacing:-.5px}
+.total-label{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu)}
+
+/* ── Board ── */
+.board{
+  width:min(660px,100%);
+  display:flex;flex-direction:column;gap:10px;
+  animation:fadeUp 1s .24s ease both;
+}
+
+.row{
+  display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:16px;
+  padding:18px 22px;
+  background:linear-gradient(135deg,rgba(255,255,255,.032),rgba(255,255,255,.016));
+  border:1px solid var(--bd);border-radius:16px;
+  backdrop-filter:blur(12px);
+  transition:border-color .2s,transform .2s;
+  position:relative;overflow:hidden;
+}
+.row::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+}
+.row:hover{border-color:var(--bd2);transform:translateY(-1px)}
+
+/* top 3 glow accents */
+.row.rank-1{border-color:rgba(167,139,250,.28);background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(255,255,255,.016))}
+.row.rank-2{border-color:rgba(255,255,255,.14)}
+.row.rank-3{border-color:rgba(255,255,255,.1)}
+
+.rank{
+  font-family:var(--fd);font-size:22px;font-weight:300;
+  color:var(--mu);text-align:center;line-height:1;
+}
+.row.rank-1 .rank{color:var(--ne3)}
+.row.rank-2 .rank{color:rgba(236,232,226,.7)}
+.row.rank-3 .rank{color:rgba(205,170,120,.7)}
+
+.intern-name{
+  font-size:15px;font-weight:500;color:var(--tx);letter-spacing:.2px;
+  text-transform:capitalize;
+}
+.intern-name.direct{color:var(--mu2);font-weight:400;font-style:italic}
+
+.bar-wrap{margin-top:6px;height:2px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;width:100%}
+.bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--ne),var(--ne2));transition:width .8s cubic-bezier(.4,0,.2,1)}
+.row.rank-1 .bar{background:linear-gradient(90deg,var(--ne),var(--ne3))}
+
+.count-wrap{text-align:right;flex-shrink:0}
+.count-num{font-family:var(--fd);font-size:32px;font-weight:300;line-height:1;color:var(--tx)}
+.count-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--mu)}
+
+/* ── Empty / loading state ── */
+.state-msg{
+  text-align:center;padding:48px 0;
+  font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);
+}
+
+/* ── Footer ── */
+.footer{
+  margin-top:56px;text-align:center;
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);
+  animation:fadeUp 1s .3s ease both;
+}
+.refresh-btn{
+  display:inline-flex;align-items:center;gap:8px;margin-top:16px;
+  padding:9px 20px;border-radius:999px;
+  border:1px solid var(--bd);background:var(--sf);
+  color:var(--mu2);font-family:var(--fb);font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;transition:border-color .2s,color .2s;
+}
+.refresh-btn:hover{border-color:var(--bd2);color:var(--tx)}
+.refresh-btn.spinning svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.last-updated{margin-top:10px;font-size:10px;letter-spacing:1.5px;color:var(--mu);opacity:.6}
+
+/* ── Divider ── */
+.divider{
+  width:min(660px,100%);height:1px;
+  background:linear-gradient(90deg,transparent,var(--bd),transparent);
+  margin:40px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+<canvas id="bgc"></canvas>
+
+<main>
+  <div class="eyebrow"><span class="dot"></span> Internal · Growth Board</div>
+  <h1>The <em>Race</em></h1>
+  <p class="subtitle">Chronis Waitlist · Live Standings</p>
+
+  <div class="total-pill">
+    <span class="total-num" id="total">—</span>
+    <span class="total-label">total on waitlist</span>
+  </div>
+
+  <div class="board" id="board">
+    <div class="state-msg" id="state">Loading…</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="footer">
+    Auto-refreshes every 5 minutes
+    <br>
+    <button class="refresh-btn" id="refreshBtn" onclick="load()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+      Refresh now
+    </button>
+    <div class="last-updated" id="lastUpdated"></div>
+  </div>
+</main>
+
+<script>
+// ── CONFIG — replace these two values ──────────────────────────────
+const SUPABASE_URL = "https://xpwzxgfvqggjqppyqrgp.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhwd3p4Z2Z2cWdnanFwcHlxcmdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4OTg3NTgsImV4cCI6MjA4OTQ3NDc1OH0.WT954AHPYfJbVeXjUcNQCpMXT7hfbC9UaJuaAL4MD7E";
+// ──────────────────────────────────────────────────────────────────
+
+const MEDALS = ["🥇","🥈","🥉"];
+
+async function load() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/waitlist?select=ref_code`,
+      { headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+
+    // Tally
+    const counts = {};
+    rows.forEach(r => {
+      const k = r.ref_code || "(direct)";
+      counts[k] = (counts[k] || 0) + 1;
+    });
+
+    // Sort desc, put (direct) always last
+    const sorted = Object.entries(counts).sort((a, b) => {
+      if (a[0] === '(direct)') return 1;
+      if (b[0] === '(direct)') return -1;
+      return b[1] - a[1];
+    });
+
+    const total = rows.length;
+    const top = sorted[0]?.[1] || 1;
+
+    document.getElementById('total').textContent = Math.max(101, total).toLocaleString();
+
+    const board = document.getElementById('board');
+    if (sorted.length === 0) {
+      board.innerHTML = '<div class="state-msg">No signups yet — go get \'em.</div>';
+      return;
+    }
+
+    board.innerHTML = sorted.map(([name, count], i) => {
+      const isDirect = name === '(direct)';
+      const rankClass = i < 3 && !isDirect ? `rank-${i+1}` : '';
+      const rankLabel = isDirect ? '—' : (MEDALS[i] || `${i+1}`);
+      const barPct = Math.round((count / top) * 100);
+      return `
+        <div class="row ${rankClass}" style="animation:fadeUp .5s ${i * 0.06}s ease both;opacity:0">
+          <div class="rank">${rankLabel}</div>
+          <div>
+            <div class="intern-name ${isDirect ? 'direct' : ''}">${isDirect ? 'organic / direct' : name}</div>
+            <div class="bar-wrap"><div class="bar" style="width:0%" data-pct="${barPct}"></div></div>
+          </div>
+          <div class="count-wrap">
+            <div class="count-num">${count}</div>
+            <div class="count-label">sign ups</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Animate bars after paint
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        document.querySelectorAll('.bar').forEach(b => {
+          b.style.width = b.dataset.pct + '%';
+        });
+      }, 100);
+    });
+
+    document.getElementById('state')?.remove();
+    document.getElementById('lastUpdated').textContent =
+      `Last updated ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+
+  } catch(e) {
+    document.getElementById('board').innerHTML =
+      `<div class="state-msg">Could not load data.<br>Check Supabase config.</div>`;
+    console.error(e);
+  } finally {
+    btn.classList.remove('spinning');
+  }
+}
+
+// Auto-refresh every 5 min
+load();
+setInterval(load, 5 * 60 * 1000);
+
+// ── Subtle canvas particle bg ─────────────────────────────────────
+(function(){
+  const c = document.getElementById('bgc');
+  const ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize(){ W=c.width=innerWidth; H=c.height=innerHeight; }
+  function init(){
+    resize();
+    pts = Array.from({length:38},()=>({
+      x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-.5)*.18, vy:(Math.random()-.5)*.18,
+      r:Math.random()*1.2+.3, o:Math.random()*.4+.1
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W) p.vx*=-1;
+      if(p.y<0||p.y>H) p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(167,139,250,${p.o})`;
+      ctx.fill();
+    });
+    // draw faint connecting lines
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x,pts[i].y);
+          ctx.lineTo(pts[j].x,pts[j].y);
+          ctx.strokeStyle=`rgba(124,58,237,${.06*(1-dist/120)})`;
+          ctx.lineWidth=.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{resize()});
+  init(); draw();
+})();
+</script>
+</body>
+</html>
