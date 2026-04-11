@@ -1095,6 +1095,41 @@ async def leaderboard_page():
 
 
 
+@app.get("/blog")
+async def blog():
+    return FileResponse("static/blog.html")
+
+
+@app.get("/comparison")
+async def comparison():
+    return FileResponse("static/comparison.html")
+
+
+@app.get("/ethics")
+async def ethics():
+    return FileResponse("static/ethics.html")
+
+
+@app.get("/how-it-works")
+async def how_it_works():
+    return FileResponse("static/how-it-works.html")
+
+
+@app.get("/investors")
+async def investors():
+    return FileResponse("static/investors.html")
+
+
+@app.get("/locket")
+async def locket():
+    return FileResponse("static/locket.html")
+
+
+@app.get("/privacy")
+async def privacy():
+    return FileResponse("static/privacy.html")
+
+
 @app.get("/ref/{code}")
 async def ref_redirect(code: str):
     """
