@@ -68,7 +68,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+@app.middleware("http")
+async def add_os_csp_header(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/os"):
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self' https: data: blob:; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; "
+            "style-src 'self' 'unsafe-inline' https:; "
+            "font-src 'self' https: data:; "
+            "connect-src 'self' wss: https:; "
+            "img-src 'self' data: https: blob:;"
+        )
+    return response
 # Register onboarding routes (/api/v2/onboard/*)
 app.include_router(onboarding_router)
 
