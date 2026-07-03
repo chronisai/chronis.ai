@@ -5,3 +5,4 @@ __pycache__/
 test_memory.py
 test_voice.wav
 gen_wav.py
+node_modules/

@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["python311", "nodejs_20", "ffmpeg"]
+
+[phases.install]
+cmds = [
+  "pip install -r requirements_v2.txt",
+  "npm install"
+]
+
+[start]
+cmd = "bash start.sh"

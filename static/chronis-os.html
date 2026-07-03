@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronis OS — Command Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050505;--bg2:#080808;--bg3:#0f0f0f;--bg4:#141414;
+  --sf:rgba(255,255,255,.024);--sf2:rgba(255,255,255,.04);--sf3:rgba(255,255,255,.07);
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);--bd3:rgba(255,255,255,.22);
+  --tx:#ece8e2;--mu:rgba(236,232,226,.38);--mu2:rgba(236,232,226,.62);--ch:rgba(236,232,226,.84);
+  --ne:#7c3aed;--ne2:#a78bfa;--ne3:#c4b5fd;
+  --gr:#10b981;--gr2:#34d399;--gr3:#6ee7b7;
+  --am:#f59e0b;--am2:#fbbf24;
+  --rd:#ef4444;--rd2:#f87171;
+  --bl:#3b82f6;--bl2:#60a5fa;
+  --cy:#06b6d4;--cy2:#22d3ee;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Plus Jakarta Sans',system-ui,sans-serif;
+  --r6:6px;--r10:10px;--r14:14px;--r20:20px;--r999:999px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* VIEWS */
+.view{display:none!important}
+.view.active{display:flex!important}
+
+/* ===================== LOGIN PAGE ===================== */
+#view-login{min-height:100vh;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-direction:column}
+#view-login::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 20%,rgba(124,58,237,.09) 0%,transparent 70%);pointer-events:none}
+.login-bg-orb{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.12) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:orbFloat 8s ease-in-out infinite;pointer-events:none}
+@keyframes orbFloat{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-52%) scale(1.06)}}
+.login-card{position:relative;z-index:2;width:min(440px,92vw);background:linear-gradient(180deg,rgba(255,255,255,.038),rgba(255,255,255,.018));border:1px solid var(--bd2);border-radius:24px;padding:40px;backdrop-filter:blur(24px);box-shadow:0 24px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
+.login-logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--ne) 0%,var(--ne2) 100%);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:18px;color:#fff;font-weight:300;letter-spacing:-1px}
+.login-logo-text{font-family:var(--fd);font-size:26px;font-weight:300;letter-spacing:-.5px}
+.login-logo-sub{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;text-align:center;margin-top:-8px;margin-bottom:28px}
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:7px}
+.fi{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:var(--r10);color:var(--tx);font-size:14px;font-family:var(--fb);padding:13px 15px;outline:none;transition:border-color .2s,background .2s}
+.fi:focus{border-color:rgba(167,139,250,.45);background:rgba(255,255,255,.05)}
+.fi::placeholder{color:var(--mu)}
+.login-btn{width:100%;padding:14px;border-radius:var(--r10);border:none;background:linear-gradient(135deg,var(--ne) 0%,#6d28d9 100%);color:#fff;font-family:var(--fb);font-size:14px;font-weight:600;letter-spacing:.3px;cursor:pointer;transition:transform .2s,box-shadow .2s;margin-top:20px;box-shadow:0 8px 32px rgba(124,58,237,.35)}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 12px 40px rgba(124,58,237,.5)}
+.login-err{color:var(--rd2);font-size:13px;text-align:center;min-height:18px;margin-top:10px}
+.login-role-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--r999);border:1px solid var(--bd);background:var(--sf);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu2);margin:0 auto 24px;display:flex;justify-content:center}
+.role-dot{width:6px;height:6px;border-radius:50%}
+
+/* ===================== MAIN LAYOUT ===================== */
+#view-app{flex-direction:column;min-height:100vh}
+.app-shell{display:flex;flex:1;overflow:hidden}
+.sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.sidebar-logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--ne) 0%,var(--ne2) 100%);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:15px;color:#fff;font-weight:300}
+.sidebar-logo-text{font-family:var(--fd);font-size:20px;font-weight:300;letter-spacing:-.3px}
+.sidebar-logo-os{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);font-weight:600}
+.sidebar-user{padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.sidebar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--ne) 0%,var(--cy) 100%);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;overflow:hidden;flex-shrink:0;position:relative}
+.sidebar-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.sidebar-user-info{flex:1;min-width:0}
+.sidebar-user-name{font-size:13px;font-weight:600;color:var(--ch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user-role{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);font-weight:500}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--gr2);box-shadow:0 0 8px rgba(52,211,153,.8);flex-shrink:0}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-section-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--mu);font-weight:600;padding:8px 8px 4px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r10);cursor:pointer;transition:background .15s,color .15s;color:var(--mu2);font-size:13.5px;font-weight:500;text-decoration:none;margin-bottom:2px;position:relative}
+.nav-item:hover{background:var(--sf2);color:var(--tx)}
+.nav-item.active{background:rgba(124,58,237,.14);color:var(--ne3);border:1px solid rgba(124,58,237,.2)}
+.nav-item .nav-icon{width:16px;text-align:center;opacity:.8}
+.nav-badge{margin-left:auto;background:var(--rd);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:var(--r999)}
+.sidebar-footer{padding:12px;border-top:1px solid var(--bd)}
+.logout-btn{width:100%;padding:10px;border-radius:var(--r10);border:1px solid var(--bd);background:transparent;color:var(--mu2);font-family:var(--fb);font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.logout-btn:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--rd2)}
+
+/* MAIN CONTENT */
+.main-content{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:60px;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 28px;gap:16px;background:rgba(5,5,5,.8);backdrop-filter:blur(20px);position:sticky;top:0;z-index:50}
+.topbar-title{font-family:var(--fd);font-size:22px;font-weight:300;letter-spacing:-.3px;flex:1}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.icon-btn{width:36px;height:36px;border-radius:var(--r10);border:1px solid var(--bd);background:var(--sf);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mu2);transition:all .2s;font-size:14px}
+.icon-btn:hover{background:var(--sf2);border-color:var(--bd2);color:var(--tx)}
+.page-body{flex:1;padding:28px;overflow-y:auto}
+
+/* PANELS / SECTIONS */
+.section-panel{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r20);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.section-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent)}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.panel-title{font-family:var(--fd);font-size:20px;font-weight:300;letter-spacing:-.3px}
+.panel-kicker{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--mu);font-weight:600;margin-bottom:4px}
+.btn{padding:9px 16px;border-radius:var(--r10);border:1px solid var(--bd);background:var(--sf);color:var(--ch);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{background:var(--sf2);border-color:var(--bd2)}
+.btn-primary{background:linear-gradient(135deg,var(--ne),#6d28d9);border-color:transparent;color:#fff;box-shadow:0 4px 16px rgba(124,58,237,.3)}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(124,58,237,.45);transform:translateY(-1px)}
+.btn-danger{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--rd2)}
+.btn-danger:hover{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.4)}
+.btn-warn{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.25);color:var(--am2)}
+.btn-warn:hover{background:rgba(245,158,11,.18)}
+.btn-sm{padding:6px 11px;font-size:12px;border-radius:8px}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.stat-card{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r14);padding:18px 20px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:50%;opacity:.08;transform:translate(20px,-20px)}
+.stat-card.purple::after{background:var(--ne2)}
+.stat-card.green::after{background:var(--gr2)}
+.stat-card.amber::after{background:var(--am2)}
+.stat-card.blue::after{background:var(--bl2)}
+.stat-card.red::after{background:var(--rd2)}
+.stat-card.cyan::after{background:var(--cy2)}
+.stat-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu);font-weight:600;margin-bottom:8px}
+.stat-val{font-family:var(--fd);font-size:32px;font-weight:300;line-height:1;letter-spacing:-.5px}
+.stat-sub{font-size:11px;color:var(--mu);margin-top:5px}
+.stat-glow-purple{color:var(--ne3)}
+.stat-glow-green{color:var(--gr3)}
+.stat-glow-amber{color:var(--am2)}
+.stat-glow-blue{color:var(--bl2)}
+.stat-glow-red{color:var(--rd2)}
+.stat-glow-cyan{color:var(--cy2)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:var(--r999);font-size:11px;font-weight:600}
+.badge-green{background:rgba(16,185,129,.12);color:var(--gr2);border:1px solid rgba(16,185,129,.2)}
+.badge-red{background:rgba(239,68,68,.12);color:var(--rd2);border:1px solid rgba(239,68,68,.2)}
+.badge-amber{background:rgba(245,158,11,.12);color:var(--am2);border:1px solid rgba(245,158,11,.2)}
+.badge-purple{background:rgba(124,58,237,.12);color:var(--ne3);border:1px solid rgba(124,58,237,.2)}
+.badge-blue{background:rgba(59,130,246,.12);color:var(--bl2);border:1px solid rgba(59,130,246,.2)}
+.badge-cyan{background:rgba(6,182,212,.12);color:var(--cy2);border:1px solid rgba(6,182,212,.2)}
+.badge-grey{background:rgba(255,255,255,.06);color:var(--mu2);border:1px solid var(--bd)}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu);font-weight:600;text-align:left;padding:10px 14px;border-bottom:1px solid var(--bd)}
+.data-table td{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13.5px;color:var(--ch);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(255,255,255,.018)}
+.data-table .td-name{display:flex;align-items:center;gap:10px}
+.avatar-sm{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ne) 0%,var(--cy) 100%);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;overflow:hidden;position:relative}
+.avatar-sm img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+
+/* PROGRESS */
+.progress-bar{height:6px;background:rgba(255,255,255,.06);border-radius:var(--r999);overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:var(--r999);transition:width .6s ease;background:linear-gradient(90deg,var(--ne),var(--ne2))}
+.progress-fill.green{background:linear-gradient(90deg,var(--gr),var(--gr2))}
+.progress-fill.amber{background:linear-gradient(90deg,#d97706,var(--am2))}
+.progress-fill.red{background:linear-gradient(90deg,#dc2626,var(--rd2))}
+
+/* TASK CARDS */
+.tasks-grid{display:grid;gap:14px}
+.task-card{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r14);padding:18px;position:relative;transition:border-color .2s}
+.task-card:hover{border-color:var(--bd2)}
+.task-card.overdue{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04)}
+.task-card.done{border-color:rgba(16,185,129,.2);background:rgba(16,185,129,.03);opacity:.75}
+.task-title{font-size:15px;font-weight:600;color:var(--ch);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.task-desc{font-size:13px;color:var(--mu);line-height:1.6;margin-bottom:12px}
+.task-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.task-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.countdown{font-family:var(--fd);font-size:15px;color:var(--am2);letter-spacing:1px;font-weight:400}
+.countdown.urgent{color:var(--rd2);animation:urgentPulse 1.2s ease-in-out infinite}
+@keyframes urgentPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.countdown.done{color:var(--gr2)}
+
+/* SUBTASK */
+.subtask-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.subtask{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--sf);border-radius:8px;cursor:pointer;transition:background .15s}
+.subtask:hover{background:var(--sf2)}
+.subtask-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--bd2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer}
+.subtask-check.checked{background:var(--gr);border-color:var(--gr)}
+.subtask-text{font-size:13px;color:var(--mu2);flex:1}
+.subtask-text.done-text{text-decoration:line-through;color:var(--mu)}
+
+/* LEADERBOARD */
+.lb-list{display:flex;flex-direction:column;gap:10px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r14);transition:border-color .2s}
+.lb-row:hover{border-color:var(--bd2)}
+.lb-rank{font-family:var(--fd);font-size:24px;font-weight:300;color:var(--mu);width:32px;text-align:center;flex-shrink:0}
+.lb-rank.gold{color:#f59e0b}
+.lb-rank.silver{color:#94a3b8}
+.lb-rank.bronze{color:#92400e}
+.lb-info{flex:1}
+.lb-name{font-size:14px;font-weight:600;color:var(--ch)}
+.lb-score{font-size:12px;color:var(--mu);margin-top:2px}
+.lb-points{font-family:var(--fd);font-size:22px;color:var(--ne3);font-weight:300}
+.bottleneck-flag{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:var(--r999);background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:var(--rd2);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;animation:bottleneckPulse 2s ease-in-out infinite}
+@keyframes bottleneckPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+
+/* HEATMAP */
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+.hm-cell{aspect-ratio:1;border-radius:4px;background:rgba(255,255,255,.04);transition:all .2s;cursor:pointer;position:relative}
+.hm-cell:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid var(--bd2);border-radius:6px;padding:5px 8px;font-size:11px;color:var(--tx);white-space:nowrap;z-index:10;pointer-events:none}
+.hm-cell[data-v="1"]{background:rgba(16,185,129,.15)}
+.hm-cell[data-v="2"]{background:rgba(16,185,129,.3)}
+.hm-cell[data-v="3"]{background:rgba(16,185,129,.5)}
+.hm-cell[data-v="4"]{background:rgba(16,185,129,.75)}
+.hm-cell[data-v="5"]{background:var(--gr)}
+
+/* INTERN PROFILE */
+.profile-hero{display:flex;align-items:flex-start;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+.profile-avatar-big{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--ne),var(--cy));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid var(--bd2);cursor:pointer;position:relative}
+.profile-avatar-big img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.profile-avatar-big:hover::after{content:'Change Photo';position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:1px;color:#fff;text-align:center;display:flex;border-radius:50%}
+.profile-info{flex:1}
+.profile-name{font-family:var(--fd);font-size:28px;font-weight:300;letter-spacing:-.5px}
+.profile-role-badge{margin:6px 0}
+.profile-bio{font-size:14px;color:var(--mu2);line-height:1.6;max-width:500px}
+.edit-bio-area{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r10);color:var(--tx);font-family:var(--fb);font-size:14px;padding:12px;resize:vertical;min-height:80px;outline:none;transition:border-color .2s}
+.edit-bio-area:focus{border-color:rgba(167,139,250,.4)}
+
+/* INTERN DIRECTORY */
+.intern-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.intern-card{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r14);padding:18px;text-align:center;transition:border-color .2s,transform .2s;cursor:pointer}
+.intern-card:hover{border-color:var(--bd2);transform:translateY(-2px)}
+.intern-card-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--ne),var(--cy));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;margin:0 auto 12px;overflow:hidden;position:relative}
+.intern-card-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.intern-card-name{font-size:14px;font-weight:600;color:var(--ch);margin-bottom:4px}
+.intern-card-title{font-size:12px;color:var(--mu);margin-bottom:10px}
+.online-indicator{display:inline-flex;align-items:center;gap:5px;font-size:11px}
+.online-indicator .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-online{background:var(--gr2);box-shadow:0 0 8px rgba(52,211,153,.7)}
+.dot-offline{background:rgba(255,255,255,.2)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bd2);border-radius:24px;width:min(600px,96vw);max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 40px 120px rgba(0,0,0,.7)}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);border-radius:24px 24px 0 0}
+.modal-header{padding:24px 24px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-family:var(--fd);font-size:22px;font-weight:300}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--bd);background:var(--sf);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mu2);transition:all .2s}
+.modal-close:hover{background:var(--sf2);color:var(--tx)}
+.modal-body{padding:0 24px 24px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.form-row.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);font-weight:600}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+
+/* WARNING / FLAGS */
+.warning-card{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:var(--r14);padding:16px;margin-bottom:10px}
+.warning-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.warning-icon{font-size:16px}
+.warning-title{font-size:14px;font-weight:600;color:var(--rd2)}
+.warning-body{font-size:13px;color:var(--mu2);line-height:1.6}
+.termination-bar{background:linear-gradient(90deg,rgba(239,68,68,.08),rgba(239,68,68,.02));border:1px solid rgba(239,68,68,.25);border-radius:var(--r14);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.term-strikes{display:flex;gap:6px}
+.term-strike{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:11px}
+.term-strike.active{background:var(--rd);border-color:var(--rd)}
+
+/* NOTIFICATION */
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:13px;background:var(--sf);border-radius:var(--r10);margin-bottom:8px;border-left:3px solid transparent}
+.notif-item.warn{border-left-color:var(--am2)}
+.notif-item.danger{border-left-color:var(--rd2)}
+.notif-item.info{border-left-color:var(--bl2)}
+.notif-item.success{border-left-color:var(--gr2)}
+.notif-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.notif-text{font-size:13px;color:var(--mu2);line-height:1.5}
+.notif-time{font-size:11px;color:var(--mu);margin-top:3px}
+
+/* CEO POWER PANEL */
+.power-panel{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(6,182,212,.04));border:1px solid rgba(124,58,237,.2);border-radius:var(--r20);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.power-panel::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.1) 0%,transparent 70%);pointer-events:none}
+.power-title{font-family:var(--fd);font-size:24px;font-weight:300;color:var(--ne3);margin-bottom:6px}
+.power-sub{font-size:13px;color:var(--mu);margin-bottom:20px}
+
+/* SCROLL */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.18)}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--sf);border-radius:var(--r14);padding:5px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--mu2);cursor:pointer;transition:all .2s}
+.tab.active{background:var(--bg2);color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* TOAST */
+#toast-container{position:fixed;top:80px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--r14);padding:14px 18px;min-width:280px;font-size:13.5px;color:var(--tx);box-shadow:0 8px 32px rgba(0,0,0,.5);animation:toastIn .3s ease;pointer-events:all;display:flex;align-items:center;gap:10px}
+.toast.removing{animation:toastOut .3s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(20px)}}
+.toast-icon{font-size:16px}
+.toast-success .toast-icon{color:var(--gr2)}
+.toast-error .toast-icon{color:var(--rd2)}
+.toast-warn .toast-icon{color:var(--am2)}
+.toast-info .toast-icon{color:var(--bl2)}
+
+/* CEO analytics */
+.org-tree{display:flex;flex-direction:column;gap:8px}
+.org-node{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r14);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.org-node.ceo-node{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.06)}
+.org-node.cto-node{border-color:rgba(6,182,212,.3);background:rgba(6,182,212,.04)}
+.org-node.mgr-node{border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.03)}
+.org-indent-1{margin-left:20px}
+.org-indent-2{margin-left:40px}
+
+/* Inline alert */
+.inline-alert{padding:12px 16px;border-radius:var(--r10);margin-bottom:14px;font-size:13px;display:flex;align-items:flex-start;gap:9px}
+.inline-alert.danger{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--rd2)}
+.inline-alert.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--am2)}
+.inline-alert.success{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--gr2)}
+.inline-alert.info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:var(--bl2)}
+
+/* Responsive */
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.main-content{margin-left:0}.stats-grid{grid-template-columns:1fr 1fr}.form-row{grid-template-columns:1fr}}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s ease both}
+</style>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- LOGIN VIEW -->
+<div id="view-login" class="view active" style="display:flex!important">
+  <div class="login-bg-orb"></div>
+  <div class="login-card fade-up">
+    <div class="login-logo">
+      <div class="login-logo-mark">C</div>
+      <div>
+        <div style="font-family:var(--fd);font-size:22px;font-weight:300;letter-spacing:-.3px">Chronis</div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);font-weight:600">OS</div>
+      </div>
+    </div>
+    <div class="login-logo-sub">Command Intelligence Platform</div>
+    <div id="login-role-indicator" class="login-role-badge">
+      <span class="role-dot" id="login-role-dot" style="background:var(--mu)"></span>
+      <span id="login-role-text">Enter credentials</span>
+    </div>
+    <div class="login-field">
+      <label>Email Address</label>
+      <input class="fi" type="email" id="login-email" placeholder="your@chronis.in" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input class="fi" type="password" id="login-password" placeholder="Password issued by admin">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Enter Chronis OS →</button>
+    <div class="login-err" id="login-err"></div>
+    <div style="margin-top:20px;padding:12px;background:var(--sf);border-radius:var(--r10);font-size:12px;color:var(--mu);text-align:center;line-height:1.7">
+      <strong style="color:var(--mu2)">Demo accounts:</strong><br>
+      ceo@chronis.in / ceo123 &nbsp;|&nbsp; cto@chronis.in / cto123<br>
+      manager@chronis.in / mgr123 &nbsp;|&nbsp; alice@chronis.in / intern123
+    </div>
+  </div>
+</div>
+
+<!-- APP VIEW -->
+<div id="view-app" class="view" style="display:none!important">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">C</div>
+      <div>
+        <div class="sidebar-logo-text">Chronis</div>
+        <div class="sidebar-logo-os">OS</div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebar-user-name">User</div>
+        <div class="sidebar-user-role" id="sidebar-user-role">Role</div>
+      </div>
+      <div class="online-dot"></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <!-- injected by JS -->
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">⬡ Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Notifications" onclick="showPage('notifications')" id="notif-bell">🔔</button>
+        <button class="icon-btn" title="My Profile" onclick="showPage('profile')">👤</button>
+      </div>
+    </div>
+    <div class="page-body" id="page-body">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Modal</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ===================================================
+// CHRONIS OS — REAL BACKEND INTEGRATION
+// Replace the const DB = { ... } block with this
+// ===================================================
+
+// ── Config ────────────────────────────────────────
+const API = '/os/api';
+let accessToken  = null;
+let refreshToken = null;
+let currentUser  = null;
+let socket       = null;
+
+// Local cache — populated from API on login
+let CACHE = { users: [], tasks: [], notifications: [] };
+
+// Countdown intervals tracker
+let countdownIntervals = {};
+
+// ── API Fetch Helper (auto-refresh JWT) ──────────
+async function apiFetch(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  };
+  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
+  const res = await fetch(`${API}${path}`, { ...options, headers });
+
+  if (res.status === 401 && refreshToken) {
+    // Try refreshing the access token
+    try {
+      const rRes = await fetch(`${API}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (rRes.ok) {
+        const d = await rRes.json();
+        accessToken = d.accessToken;
+        // Retry original request with new token
+        return apiFetch(path, options);
+      }
+    } catch (_) {}
+    // Refresh failed — kick to login
+    doLogout();
+    return null;
+  }
+
+  return res;
+}
+
+// ── Load all initial data in one pass ────────────
+async function loadInitialData() {
+  try {
+    const [usersRes, tasksRes, notifsRes] = await Promise.all([
+      apiFetch('/users'),
+      apiFetch('/tasks'),
+      apiFetch('/notifications'),
+    ]);
+    CACHE.users         = await usersRes.json();
+    CACHE.tasks         = await tasksRes.json();
+    CACHE.notifications = await notifsRes.json();
+  } catch (err) {
+    console.error('loadInitialData error:', err);
+    toast('error', 'Failed to load data. Check your connection.');
+  }
+}
+
+// ── Socket.io realtime connection ────────────────
+function connectSocket() {
+  if (typeof io === 'undefined') return; // Socket.io not loaded
+  socket = io('/', { path: '/os/socket.io', auth: { token: accessToken } });
+
+  socket.on('connect', () => console.log('[socket] connected'));
+
+  socket.on('notification', (notif) => {
+    CACHE.notifications.unshift(notif);
+    updateNotifBadge();
+    toast(notif.type === 'danger' ? 'error' : notif.type === 'warn' ? 'warn' : notif.type === 'success' ? 'success' : 'info', notif.content);
+  });
+
+  socket.on('user:presence', ({ userId, online }) => {
+    const u = CACHE.users.find(x => x.id === userId);
+    if (u) u.online = online;
+  });
+
+  socket.on('task_updated', async ({ task_id }) => {
+    // Re-fetch just the updated task
+    const res = await apiFetch(`/tasks/${task_id}`);
+    if (res && res.ok) {
+      const updated = await res.json();
+      const idx = CACHE.tasks.findIndex(t => t.id === task_id);
+      if (idx >= 0) CACHE.tasks[idx] = updated;
+    }
+  });
+
+  socket.on('account_terminated', ({ status }) => {
+    toast('error', `Your account has been ${status}. You will be logged out.`);
+    setTimeout(() => doLogout(), 2500);
+  });
+
+  // Heartbeat ping every 30s to keep last_active fresh
+  setInterval(() => {
+    if (socket && socket.connected) socket.emit('notifications:ping');
+  }, 30000);
+}
+
+function updateNotifBadge() {
+  const unread = CACHE.notifications.filter(n => !n.read).length;
+  const bell   = document.getElementById('notif-bell');
+  const badge  = document.getElementById('nav-notifications')?.querySelector('.nav-badge');
+  if (badge) badge.textContent = unread || '';
+}
+
+// ===================================================
+// AUTH
+// ===================================================
+async function doLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl    = document.getElementById('login-err');
+  errEl.textContent = '';
+
+  try {
+    const res  = await fetch(`${API}/auth/login`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      errEl.textContent = data.error || 'Login failed.';
+      return;
+    }
+
+    accessToken  = data.accessToken;
+    refreshToken = data.refreshToken;
+    currentUser  = data.user;
+
+    // Persist refresh token for page reload
+    try { localStorage.setItem('chronis_refresh', refreshToken); } catch (_) {}
+
+    await loadInitialData();
+    connectSocket();
+    switchView('app');
+    initApp();
+  } catch (err) {
+    errEl.textContent = 'Connection error. Is the backend running?';
+    console.error('login error:', err);
+  }
+}
+
+async function doLogout() {
+  try {
+    if (refreshToken) {
+      await fetch(`${API}/auth/logout`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ refreshToken }),
+      });
+    }
+  } catch (_) {}
+
+  if (socket) socket.disconnect();
+  accessToken  = null;
+  refreshToken = null;
+  currentUser  = null;
+  CACHE        = { users: [], tasks: [], notifications: [] };
+  try { localStorage.removeItem('chronis_refresh'); } catch (_) {}
+
+  Object.values(countdownIntervals).forEach(clearInterval);
+  countdownIntervals = {};
+
+  switchView('login');
+  document.getElementById('login-email').value    = '';
+  document.getElementById('login-password').value = '';
+}
+
+// Try to restore session from stored refresh token
+async function tryRestoreSession() {
+  let stored;
+  try { stored = localStorage.getItem('chronis_refresh'); } catch (_) {}
+  if (!stored) return;
+
+  try {
+    const res = await fetch(`${API}/auth/refresh`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ refreshToken: stored }),
+    });
+    if (!res.ok) return;
+
+    const { accessToken: at } = await res.json();
+    accessToken  = at;
+    refreshToken = stored;
+
+    // Get current user info
+    const meRes = await apiFetch('/auth/me');
+    if (!meRes || !meRes.ok) return;
+    currentUser = await meRes.json();
+
+    await loadInitialData();
+    connectSocket();
+    switchView('app');
+    initApp();
+  } catch (_) {}
+}
+
+document.getElementById('login-email').addEventListener('keypress',    e => { if (e.key === 'Enter') document.getElementById('login-password').focus(); });
+document.getElementById('login-password').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('login-email').addEventListener('input',       updateLoginRole);
+
+function updateLoginRole() {
+  const email = document.getElementById('login-email').value.trim();
+  // Guess role from cached users (if any) or just clear
+  const u     = CACHE.users.find(x => x.email === email);
+  const dot   = document.getElementById('login-role-dot');
+  const txt   = document.getElementById('login-role-text');
+  if (!u) { dot.style.background = 'var(--mu)'; txt.textContent = 'Enter credentials'; return; }
+  const colors = { ceo: 'var(--ne2)', cto: 'var(--cy2)', manager: 'var(--am2)', intern: 'var(--gr2)' };
+  dot.style.background = colors[u.role] || 'var(--mu)';
+  txt.textContent = roleLabel(u.role);
+}
+
+function switchView(v) {
+  document.getElementById('view-login').style.display = v === 'login' ? 'flex' : 'none';
+  document.getElementById('view-app').style.display   = v === 'app'   ? 'flex' : 'none';
+}
+
+// ===================================================
+// APP INIT
+// ===================================================
+function initApp() {
+  const u = currentUser;
+  document.getElementById('sidebar-user-name').textContent = u.name;
+  document.getElementById('sidebar-user-role').textContent = roleLabel(u.role);
+  const sav = document.getElementById('sidebar-avatar');
+  sav.textContent = u.name[0];
+  if (u.avatar_url) sav.innerHTML = `<img src="${u.avatar_url}">`;
+  buildSidebarNav();
+  showPage('dashboard');
+}
+
+function roleLabel(r)     { return { ceo: 'Chief Executive Officer', cto: 'Chief Technology Officer', manager: 'Engineering Manager', intern: 'Intern' }[r] || r; }
+function roleBadgeColor(r){ return { ceo: 'purple', cto: 'cyan', manager: 'amber', intern: 'green' }[r] || 'grey'; }
+
+function buildSidebarNav() {
+  const r   = currentUser.role;
+  const nav = document.getElementById('sidebar-nav');
+  let   html = '';
+
+  const unread    = CACHE.notifications.filter(n => !n.read).length;
+  const myPending = CACHE.tasks.filter(t => t.assigned_to === currentUser.id && t.status !== 'completed').length;
+
+  html += '<div class="nav-section-label">Workspace</div>';
+  const commonPages = [
+    { id: 'dashboard',      icon: '⬡', label: 'Dashboard' },
+    { id: 'tasks',          icon: '✓', label: 'My Tasks',       badge: myPending || 0 },
+    { id: 'profile',        icon: '◉', label: 'Profile' },
+    { id: 'leaderboard',    icon: '⭑', label: 'Leaderboard' },
+    { id: 'directory',      icon: '◈', label: 'Intern Directory' },
+    { id: 'notifications',  icon: '◎', label: 'Notifications',  badge: unread || 0 },
+  ];
+  commonPages.forEach(p => {
+    html += `<div class="nav-item" id="nav-${p.id}" onclick="showPage('${p.id}')">`
+      + `<span class="nav-icon">${p.icon}</span>${p.label}`
+      + (p.badge ? `<span class="nav-badge">${p.badge}</span>` : '')
+      + '</div>';
+  });
+
+  if (r === 'manager' || r === 'cto' || r === 'ceo') {
+    html += '<div class="nav-section-label">Management</div>';
+    html += `<div class="nav-item" id="nav-manage-tasks"   onclick="showPage('manage-tasks')"><span class="nav-icon">◷</span>Task Control</div>`;
+    html += `<div class="nav-item" id="nav-intern-mgmt"    onclick="showPage('intern-mgmt')"><span class="nav-icon">◩</span>Intern Management</div>`;
+    html += `<div class="nav-item" id="nav-heatmap"        onclick="showPage('heatmap')"><span class="nav-icon">◫</span>Activity Heatmap</div>`;
+    html += `<div class="nav-item" id="nav-create-profile" onclick="showPage('create-profile')"><span class="nav-icon">⊕</span>Create Profile</div>`;
+  }
+  if (r === 'cto' || r === 'ceo') {
+    html += '<div class="nav-section-label">Command</div>';
+    html += `<div class="nav-item" id="nav-cto-panel"  onclick="showPage('cto-panel')"><span class="nav-icon">◬</span>CTO Command</div>`;
+    html += `<div class="nav-item" id="nav-analytics"  onclick="showPage('analytics')"><span class="nav-icon">◰</span>Analytics</div>`;
+  }
+  if (r === 'ceo') {
+    html += '<div class="nav-section-label">Executive</div>';
+    html += `<div class="nav-item" id="nav-ceo-panel" onclick="showPage('ceo-panel')"><span class="nav-icon">◈</span>CEO Command</div>`;
+    html += `<div class="nav-item" id="nav-org"       onclick="showPage('org')"><span class="nav-icon">◎</span>Org Overview</div>`;
+  }
+
+  nav.innerHTML = html;
+}
+
+// ===================================================
+// PAGE ROUTER
+// ===================================================
+function showPage(page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+
+  const titles = {
+    dashboard: 'Dashboard', tasks: 'My Tasks', profile: 'My Profile',
+    leaderboard: 'Leaderboard', directory: 'Intern Directory', notifications: 'Notifications',
+    'manage-tasks': 'Task Control', 'intern-mgmt': 'Intern Management',
+    heatmap: 'Activity Heatmap', 'create-profile': 'Create Profile',
+    'cto-panel': 'CTO Command', analytics: 'Analytics',
+    'ceo-panel': 'CEO Command', org: 'Org Overview',
+  };
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+
+  Object.values(countdownIntervals).forEach(clearInterval);
+  countdownIntervals = {};
+
+  const body     = document.getElementById('page-body');
+  const builders = {
+    dashboard:        buildDashboard,
+    tasks:            buildTasks,
+    profile:          buildProfile,
+    leaderboard:      buildLeaderboard,
+    directory:        buildDirectory,
+    notifications:    buildNotifications,
+    'manage-tasks':   buildManageTasks,
+    'intern-mgmt':    buildInternMgmt,
+    heatmap:          buildHeatmap,
+    'create-profile': buildCreateProfile,
+    'cto-panel':      buildCTOPanel,
+    analytics:        buildAnalytics,
+    'ceo-panel':      buildCEOPanel,
+    org:              buildOrg,
+  };
+
+  const builder = builders[page];
+  if (builder) body.innerHTML = builder();
+  else body.innerHTML = `<div style="color:var(--mu)">Page not found</div>`;
+
+  afterBuild(page);
+}
+
+function afterBuild(page) {
+  if (page === 'tasks' || page === 'manage-tasks') startCountdowns();
+  if (page === 'leaderboard') animateLeaderboard();
+  if (page === 'notifications') markAllRead();
+  if (page === 'heatmap') loadHeatmaps();
+}
+
+// ===================================================
+// DASHBOARD
+// ===================================================
+function buildDashboard() {
+  const u = currentUser;
+  const r = u.role;
+  if (r === 'ceo')     return buildCEODashboard();
+  if (r === 'cto')     return buildCTODashboard();
+  if (r === 'manager') return buildManagerDashboard();
+  return buildInternDashboard();
+}
+
+function buildInternDashboard() {
+  const u       = currentUser;
+  const myTasks = CACHE.tasks.filter(t => t.assigned_to === u.id);
+  const done    = myTasks.filter(t => t.status === 'completed').length;
+  const inProg  = myTasks.filter(t => t.status === 'in_progress').length;
+  const overdue = myTasks.filter(t => t.status === 'overdue').length;
+  const unread  = CACHE.notifications.filter(n => !n.read).length;
+  const totalPct = myTasks.length > 0
+    ? Math.round(myTasks.reduce((a, t) => {
+        const subs = t.subtasks || [];
+        return a + (subs.length > 0 ? subs.filter(s => s.completed).length / subs.length : 0);
+      }, 0) / myTasks.length * 100)
+    : 0;
+
+  return `
+  <div class="fade-up">
+    ${unread > 0 ? `<div class="inline-alert warn">⚠️ You have ${unread} unread notification${unread > 1 ? 's' : ''}.</div>` : ''}
+    ${u.strikes > 0 ? `<div class="inline-alert danger">🚨 You have ${u.strikes} termination warning${u.strikes > 1 ? 's' : ''}. ${u.strikes >= 3 ? 'Account suspended.' : 'Immediate improvement required.'}</div>` : ''}
+    <div class="stats-grid">
+      <div class="stat-card purple"><div class="stat-label">Assigned</div><div class="stat-val stat-glow-purple">${myTasks.length}</div></div>
+      <div class="stat-card green"><div class="stat-label">Completed</div><div class="stat-val stat-glow-green">${done}</div></div>
+      <div class="stat-card amber"><div class="stat-label">In Progress</div><div class="stat-val stat-glow-amber">${inProg}</div></div>
+      <div class="stat-card red"><div class="stat-label">Overdue</div><div class="stat-val stat-glow-red">${overdue}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="section-panel">
+        <div class="panel-kicker">Overall Progress</div>
+        <div class="panel-title">Task Completion</div>
+        <div style="margin-top:14px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:13px;color:var(--mu2)">All subtasks</span>
+            <span style="font-family:var(--fd);font-size:22px;color:var(--ne3)">${totalPct}%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${totalPct}%"></div></div>
+          <div style="font-size:12px;color:var(--mu);margin-top:8px">${done} of ${myTasks.length} tasks complete</div>
+        </div>
+      </div>
+      <div class="section-panel">
+        <div class="panel-header">
+          <div><div class="panel-kicker">Active Work</div><div class="panel-title">Active Tasks</div></div>
+          <button class="btn btn-sm" onclick="showPage('tasks')">View all →</button>
+        </div>
+        ${myTasks.filter(t => t.status !== 'completed').slice(0, 3).map(t => `
+          <div class="task-card ${t.status === 'overdue' ? 'overdue' : ''}" style="margin-bottom:10px">
+            <div class="task-title">${t.title} ${priorityBadge(t.priority)}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:12px;color:var(--mu)">Due: ${formatDate(t.deadline)}</div>
+              <div class="countdown" id="cd-dash-${t.id}">${formatCountdown(t.deadline)}</div>
+            </div>
+            <div class="progress-bar" style="margin-top:8px">
+              <div class="progress-fill ${t.status === 'overdue' ? 'red' : ''}" style="width:${taskPct(t)}%"></div>
+            </div>
+          </div>
+        `).join('') || '<div style="color:var(--mu);font-size:14px;padding:20px 0;text-align:center">No active tasks 🎉</div>'}
+      </div>
+    </div>
+    <div class="section-panel">
+      <div class="panel-header">
+        <div><div class="panel-kicker">Updates</div><div class="panel-title">Recent Notifications</div></div>
+        <button class="btn btn-sm" onclick="showPage('notifications')">All →</button>
+      </div>
+      ${CACHE.notifications.slice(0, 4).map(n => `
+        <div class="notif-item ${n.type}">
+          <div class="notif-icon">${notifIcon(n.type)}</div>
+          <div><div class="notif-text">${n.content}</div><div class="notif-time">${timeAgo(n.created_at)}</div></div>
+        </div>
+      `).join('') || '<div style="color:var(--mu);font-size:14px">No notifications</div>'}
+    </div>
+  </div>`;
+}
+
+function buildManagerDashboard() {
+  const interns = CACHE.users.filter(u => u.role === 'intern');
+  const allTasks = CACHE.tasks;
+  const overdue  = allTasks.filter(t => t.status === 'overdue').length;
+  const done     = allTasks.filter(t => t.status === 'completed').length;
+  const online   = interns.filter(u => u.online).length;
+  const flagged  = interns.filter(u => u.warnings > 0).length;
+
+  return `
+  <div class="fade-up">
+    <div class="stats-grid">
+      <div class="stat-card purple"><div class="stat-label">Total Interns</div><div class="stat-val stat-glow-purple">${interns.length}</div></div>
+      <div class="stat-card green"><div class="stat-label">Online Now</div><div class="stat-val stat-glow-green">${online}</div></div>
+      <div class="stat-card amber"><div class="stat-label">Active Tasks</div><div class="stat-val stat-glow-amber">${allTasks.length}</div></div>
+      <div class="stat-card red"><div class="stat-label">Overdue</div><div class="stat-val stat-glow-red">${overdue}</div></div>
+      <div class="stat-card blue"><div class="stat-label">Completed</div><div class="stat-val stat-glow-blue">${done}</div></div>
+      <div class="stat-card cyan"><div class="stat-label">Flagged</div><div class="stat-val stat-glow-cyan">${flagged}</div></div>
+    </div>
+    <div class="section-panel">
+      <div class="panel-header">
+        <div><div class="panel-kicker">Team Status</div><div class="panel-title">Intern Overview</div></div>
+        <button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ Assign Task</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Intern</th><th>Status</th><th>Tasks</th><th>Progress</th><th>Actions</th></tr></thead>
+        <tbody>
+        ${interns.map(i => {
+          const pct  = calcInternProgress(i.id);
+          const tasks = CACHE.tasks.filter(t => t.assigned_to === i.id);
+          return `<tr>
+            <td><div class="td-name">
+              <div class="avatar-sm">${i.avatar_url ? `<img src="${i.avatar_url}">` : i.name[0]}</div>
+              <div><div style="font-weight:600">${i.name}</div><div style="font-size:11px;color:var(--mu)">${i.title}</div></div>
+            </div></td>
+            <td>${i.online ? '<span class="badge badge-green">● Online</span>' : '<span class="badge badge-grey">○ Offline</span>'}</td>
+            <td style="font-family:var(--fd);font-size:18px">${tasks.length}</td>
+            <td style="min-width:100px">
+              <div class="progress-bar"><div class="progress-fill ${pct < 30 ? 'red' : pct < 70 ? 'amber' : 'green'}" style="width:${pct}%"></div></div>
+              <div style="font-size:11px;color:var(--mu);margin-top:3px">${pct}%</div>
+            </td>
+            <td><div style="display:flex;gap:6px">
+              <button class="btn btn-sm btn-warn"   onclick="issueNudge('${i.id}')">Nudge</button>
+              <button class="btn btn-sm btn-danger" onclick="issueWarning('${i.id}')">⚑ Flag</button>
+            </div></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function buildCTODashboard() {
+  return `<div class="fade-up">
+    <div class="power-panel">
+      <div class="power-title">CTO Command Center</div>
+      <div class="power-sub">Full system oversight. Instant removal authority.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('cto-panel')">◬ Open Command</button>
+        <button class="btn" onclick="showPage('analytics')">◰ Analytics</button>
+        <button class="btn" onclick="openTaskModal()">⊕ Assign Task</button>
+      </div>
+    </div>
+    ${buildManagerDashboard()}
+  </div>`;
+}
+
+function buildCEODashboard() {
+  const everyone   = CACHE.users.filter(u => u.id !== currentUser.id);
+  const totalTasks = CACHE.tasks.length;
+  const allDone    = CACHE.tasks.filter(t => t.status === 'completed').length;
+  const health     = Math.round(allDone / Math.max(totalTasks, 1) * 100);
+
+  return `<div class="fade-up">
+    <div class="power-panel">
+      <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);margin-bottom:8px">CEO EXECUTIVE SUITE</div>
+      <div class="power-title">Total Organizational Control</div>
+      <div class="power-sub">Supreme authority over all members, roles, and operations.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('ceo-panel')">◈ CEO Command</button>
+        <button class="btn" onclick="showPage('org')">◎ Org View</button>
+        <button class="btn" onclick="showPage('analytics')">◰ Analytics</button>
+        <button class="btn" onclick="openTaskModal()">⊕ Deploy Task</button>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card purple"><div class="stat-label">Total Members</div><div class="stat-val stat-glow-purple">${CACHE.users.length}</div></div>
+      <div class="stat-card green"><div class="stat-label">Online</div><div class="stat-val stat-glow-green">${CACHE.users.filter(u => u.online).length}</div></div>
+      <div class="stat-card cyan"><div class="stat-label">Interns</div><div class="stat-val stat-glow-cyan">${CACHE.users.filter(u => u.role === 'intern').length}</div></div>
+      <div class="stat-card amber"><div class="stat-label">Tasks Deployed</div><div class="stat-val stat-glow-amber">${totalTasks}</div></div>
+      <div class="stat-card blue"><div class="stat-label">Org Health</div><div class="stat-val stat-glow-blue">${health}%</div></div>
+      <div class="stat-card red"><div class="stat-label">Flagged</div><div class="stat-val stat-glow-red">${CACHE.users.filter(u => u.warnings > 0).length}</div></div>
+    </div>
+  </div>`;
+}
+
+// ===================================================
+// TASKS
+// ===================================================
+function buildTasks() {
+  const r       = currentUser.role;
+  const myTasks = r === 'intern'
+    ? CACHE.tasks.filter(t => t.assigned_to === currentUser.id)
+    : CACHE.tasks;
+
+  if (myTasks.length === 0) return `
+    <div class="section-panel" style="text-align:center;padding:60px">
+      <div style="font-size:40px;margin-bottom:16px">✓</div>
+      <div class="panel-title">No tasks yet</div>
+      <div style="color:var(--mu);font-size:14px;margin-top:8px">Your manager will assign tasks here.</div>
+    </div>`;
+
+  return `
+  <div class="fade-up">
+    <div class="panel-header" style="margin-bottom:20px">
+      <div><div class="panel-kicker">Active Work</div><div class="panel-title">${r === 'intern' ? 'My Tasks' : 'All Tasks'}</div></div>
+      ${r !== 'intern' ? `<button class="btn btn-primary" onclick="openTaskModal()">⊕ Create Task</button>` : ''}
+    </div>
+    <div class="tasks-grid">
+      ${myTasks.map(t => buildTaskCard(t, true)).join('')}
+    </div>
+  </div>`;
+}
+
+function buildTaskCard(t, showSubtasks = true) {
+  const assignee  = CACHE.users.find(u => u.id === t.assigned_to);
+  const pct       = taskPct(t);
+  const isMyTask  = t.assigned_to === currentUser.id;
+  const canToggle = isMyTask || currentUser.role !== 'intern';
+  const subs      = t.subtasks || [];
+
+  return `
+  <div class="task-card ${t.status === 'overdue' ? 'overdue' : t.status === 'completed' ? 'done' : ''}" id="task-${t.id}">
+    <div class="task-title">
+      ${t.title}
+      ${priorityBadge(t.priority)}
+      ${statusBadge(t.status)}
+    </div>
+    <div class="task-desc">${t.description || ''}</div>
+    <div class="task-meta">
+      ${assignee ? `<span style="font-size:12px;color:var(--mu2)">👤 ${assignee.name}</span>` : ''}
+      <span style="font-size:12px;color:var(--mu2)">📅 Due ${formatDate(t.deadline)}</span>
+      ${t.assigner_name ? `<span style="font-size:12px;color:var(--mu2)">👤 By ${t.assigner_name}</span>` : ''}
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="flex:1;margin-right:16px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:4px">
+          <span>Progress</span><span>${pct}%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill ${pct < 30 ? 'red' : pct < 70 ? 'amber' : 'green'}" style="width:${pct}%"></div></div>
+      </div>
+      <div class="countdown ${new Date(t.deadline) < new Date() && t.status !== 'completed' ? 'urgent' : t.status === 'completed' ? 'done' : ''}" id="cd-${t.id}">
+        ${t.status === 'completed' ? '✓ Done' : formatCountdown(t.deadline)}
+      </div>
+    </div>
+    ${showSubtasks ? `
+    <div class="subtask-list">
+      ${subs.map(s => `
+        <div class="subtask" onclick="${canToggle ? `toggleSubtask('${t.id}','${s.id}')` : ''}" id="subtask-${t.id}-${s.id}">
+          <div class="subtask-check ${s.completed ? 'checked' : ''}">
+            ${s.completed ? '<svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>' : ''}
+          </div>
+          <div class="subtask-text ${s.completed ? 'done-text' : ''}">${s.title}</div>
+        </div>
+      `).join('')}
+    </div>` : ''}
+    <div class="task-footer" style="margin-top:14px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${currentUser.role !== 'intern' ? `<button class="btn btn-sm btn-danger" onclick="deleteTask('${t.id}')">Remove</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+async function toggleSubtask(taskId, subtaskId) {
+  try {
+    const res  = await apiFetch(`/tasks/${taskId}/subtasks/${subtaskId}/toggle`, { method: 'POST' });
+    if (!res) return;
+    const data = await res.json();
+    if (!res.ok) { toast('error', data.error); return; }
+
+    // Update cache
+    const task = CACHE.tasks.find(t => t.id === taskId);
+    if (task) {
+      const sub = (task.subtasks || []).find(s => s.id === subtaskId);
+      if (sub) sub.completed = !sub.completed;
+      task.status = data.task_status;
+    }
+
+    // Update UI in-place
+    const subEl = document.getElementById(`subtask-${taskId}-${subtaskId}`);
+    if (subEl) {
+      const isNowDone = (task?.subtasks || []).find(s => s.id === subtaskId)?.completed;
+      const check = subEl.querySelector('.subtask-check');
+      const txt   = subEl.querySelector('.subtask-text');
+      check.className = 'subtask-check' + (isNowDone ? ' checked' : '');
+      check.innerHTML = isNowDone
+        ? '<svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>'
+        : '';
+      txt.className = 'subtask-text' + (isNowDone ? ' done-text' : '');
+    }
+
+    // Update progress bar
+    const card = document.getElementById(`task-${taskId}`);
+    if (card) {
+      const fill = card.querySelector('.progress-fill');
+      if (fill) {
+        const p = data.completion_pct;
+        fill.style.width = p + '%';
+        fill.className   = `progress-fill ${p < 30 ? 'red' : p < 70 ? 'amber' : 'green'}`;
+      }
+    }
+
+    toast('success', data.task_status === 'completed' ? '🎉 Task completed!' : '✓ Subtask updated');
+  } catch (err) {
+    console.error('toggleSubtask error:', err);
+    toast('error', 'Failed to update subtask');
+  }
+}
+
+async function deleteTask(taskId) {
+  if (!confirm('Remove this task?')) return;
+  const res = await apiFetch(`/tasks/${taskId}`, { method: 'DELETE' });
+  if (res && res.ok) {
+    CACHE.tasks = CACHE.tasks.filter(t => t.id !== taskId);
+    toast('info', 'Task removed.');
+    showPage(currentUser.role === 'intern' ? 'tasks' : 'manage-tasks');
+  }
+}
+
+// ===================================================
+// PROFILE
+// ===================================================
+function buildProfile() {
+  const u       = currentUser;
+  const myTasks = CACHE.tasks.filter(t => t.assigned_to === u.id);
+  const pct     = calcInternProgress(u.id);
+
+  return `
+  <div class="fade-up">
+    <div class="section-panel">
+      <div class="profile-hero">
+        <div class="profile-avatar-big" id="profile-avatar-big" onclick="triggerAvatarUpload()">
+          ${u.avatar_url ? `<img src="${u.avatar_url}">` : `<span>${u.name[0]}</span>`}
+        </div>
+        <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+        <div class="profile-info">
+          <div class="profile-name">${u.name}</div>
+          <div class="profile-role-badge"><span class="badge badge-${roleBadgeColor(u.role)}">${roleLabel(u.role)}</span></div>
+          <div class="profile-bio" id="profile-bio-display">${u.bio || 'No bio yet.'}</div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sm" onclick="toggleBioEdit()">✎ Edit Bio</button>
+          </div>
+        </div>
+      </div>
+      <div id="bio-editor" style="display:none">
+        <textarea class="edit-bio-area" id="bio-textarea" placeholder="Tell the team about yourself...">${u.bio || ''}</textarea>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-primary btn-sm" onclick="saveBio()">Save Bio</button>
+          <button class="btn btn-sm" onclick="toggleBioEdit()">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card purple"><div class="stat-label">Assigned</div><div class="stat-val stat-glow-purple">${myTasks.length}</div></div>
+      <div class="stat-card green"><div class="stat-label">Completed</div><div class="stat-val stat-glow-green">${myTasks.filter(t => t.status === 'completed').length}</div></div>
+      <div class="stat-card amber"><div class="stat-label">Progress</div><div class="stat-val stat-glow-amber">${pct}%</div></div>
+      <div class="stat-card red"><div class="stat-label">Strikes</div><div class="stat-val stat-glow-red">${u.strikes}</div></div>
+    </div>
+  </div>`;
+}
+
+function triggerAvatarUpload() { document.getElementById('avatar-input').click(); }
+
+async function handleAvatarUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append('avatar', file);
+  try {
+    const res  = await fetch(`${API}/upload/avatar`, {
+      method:  'POST',
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+      body:    form,
+    });
+    const data = await res.json();
+    if (!res.ok) { toast('error', data.error); return; }
+    currentUser.avatar_url = data.avatar_url;
+    const big = document.getElementById('profile-avatar-big');
+    if (big) big.innerHTML = `<img src="${data.avatar_url}">`;
+    const sav = document.getElementById('sidebar-avatar');
+    if (sav) sav.innerHTML = `<img src="${data.avatar_url}">`;
+    toast('success', 'Profile photo updated!');
+  } catch (err) {
+    toast('error', 'Upload failed');
+  }
+}
+
+function toggleBioEdit() {
+  const ed   = document.getElementById('bio-editor');
+  const disp = document.getElementById('profile-bio-display');
+  if (ed.style.display === 'none') { ed.style.display = 'block'; disp.style.display = 'none'; }
+  else { ed.style.display = 'none'; disp.style.display = ''; }
+}
+
+async function saveBio() {
+  const bio = document.getElementById('bio-textarea').value;
+  const res = await apiFetch(`/users/${currentUser.id}/bio`, {
+    method: 'PATCH',
+    body:   JSON.stringify({ bio }),
+  });
+  if (res && res.ok) {
+    currentUser.bio = bio;
+    const disp = document.getElementById('profile-bio-display');
+    if (disp) disp.textContent = bio || 'No bio added.';
+    document.getElementById('bio-editor').style.display = 'none';
+    disp.style.display = '';
+    toast('success', 'Bio saved!');
+  }
+}
+
+// ===================================================
+// LEADERBOARD
+// ===================================================
+function buildLeaderboard() {
+  const interns = [...CACHE.users].filter(u => u.role === 'intern').sort((a, b) => cacheScore(b) - cacheScore(a));
+
+  return `
+  <div class="fade-up">
+    <div class="section-panel" style="margin-bottom:20px">
+      <div class="panel-kicker">Performance Rankings</div>
+      <div class="panel-title">Intern Leaderboard</div>
+      <div style="font-size:13px;color:var(--mu);margin-top:4px">Live scores from real task completion data</div>
+    </div>
+    <div class="lb-list" id="lb-list">
+      ${interns.map((u, i) => {
+        const rank      = i + 1;
+        const sc        = cacheScore(u);
+        const tasks     = CACHE.tasks.filter(t => t.assigned_to === u.id);
+        const done      = tasks.filter(t => t.status === 'completed').length;
+        const pct       = calcInternProgress(u.id);
+        const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+        return `
+        <div class="lb-row fade-up" style="animation-delay:${i * 0.06}s" id="lb-${u.id}">
+          <div class="lb-rank ${rankClass}">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</div>
+          <div class="sidebar-avatar" style="width:42px;height:42px;font-size:15px;border-radius:50%;background:${roleGradient(u.role)};overflow:hidden;position:relative">
+            ${u.avatar_url ? `<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">` : u.name[0]}
+          </div>
+          <div class="lb-info">
+            <div class="lb-name">${u.name} ${u.id === currentUser.id ? '<span class="badge badge-purple" style="font-size:9px">YOU</span>' : ''}</div>
+            <div class="lb-score">${done} tasks done · ${pct}% avg progress</div>
+            <div style="margin-top:6px">
+              ${u.strikes >= 2 ? `<span class="badge badge-red">🚨 ${u.strikes} strikes</span>` : ''}
+              ${u.online
+                ? '<span class="online-indicator" style="margin-left:8px"><span class="dot dot-online"></span><span style="font-size:11px;color:var(--gr2)">Online</span></span>'
+                : '<span class="online-indicator" style="margin-left:8px"><span class="dot dot-offline"></span><span style="font-size:11px;color:var(--mu)">Offline</span></span>'}
+            </div>
+          </div>
+          <div class="lb-points">${sc}<span style="font-size:12px;color:var(--mu);display:block;text-align:right">pts</span></div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function cacheScore(u) {
+  const tasks   = CACHE.tasks.filter(t => t.assigned_to === u.id);
+  const done    = tasks.filter(t => t.status === 'completed').length;
+  const subDone = tasks.reduce((a, t) => a + (t.subtasks || []).filter(s => s.completed).length, 0);
+  const onTime  = tasks.filter(t => t.status === 'completed' && t.completed_at && new Date(t.completed_at) <= new Date(t.deadline)).length;
+  return done * 100 + subDone * 10 + onTime * 25;
+}
+
+function animateLeaderboard() {
+  document.querySelectorAll('.lb-row').forEach((r, i) => {
+    r.style.opacity = '0'; r.style.transform = 'translateX(-10px)';
+    setTimeout(() => { r.style.transition = 'all 0.3s ease'; r.style.opacity = '1'; r.style.transform = 'none'; }, i * 60);
+  });
+}
+
+// ===================================================
+// DIRECTORY
+// ===================================================
+function buildDirectory() {
+  const r       = currentUser.role;
+  const visible = r === 'intern'
+    ? CACHE.users.filter(u => u.role === 'intern')
+    : CACHE.users.filter(u => u.id !== currentUser.id);
+
+  return `
+  <div class="fade-up">
+    <div class="section-panel" style="margin-bottom:20px">
+      <div class="panel-kicker">Team</div>
+      <div class="panel-title">Intern Directory</div>
+      <div style="font-size:13px;color:var(--mu);margin-top:4px">${visible.length} member${visible.length !== 1 ? 's' : ''} · ${visible.filter(u => u.online).length} online now</div>
+    </div>
+    <div class="intern-grid">
+      ${visible.map(u => `
+        <div class="intern-card" onclick="showInternProfile('${u.id}')">
+          <div class="intern-card-avatar" style="background:${roleGradient(u.role)}">
+            ${u.avatar_url ? `<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">` : u.name[0]}
+          </div>
+          <div class="intern-card-name">${u.name}</div>
+          <div class="intern-card-title">${u.title || ''}</div>
+          <div class="online-indicator" style="justify-content:center">
+            <span class="dot ${u.online ? 'dot-online' : 'dot-offline'}"></span>
+            <span style="font-size:12px;color:${u.online ? 'var(--gr2)' : 'var(--mu)'}">${u.online ? 'Online' : 'Offline'}</span>
+          </div>
+          ${r !== 'intern' ? `<div style="margin-top:10px"><span class="badge badge-${roleBadgeColor(u.role)}">${u.role}</span></div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function showInternProfile(userId) {
+  const u     = CACHE.users.find(x => x.id === userId);
+  if (!u) return;
+  const tasks = CACHE.tasks.filter(t => t.assigned_to === u.id);
+  const pct   = calcInternProgress(u.id);
+
+  openModal(`${u.name}'s Profile`, `
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:72px;height:72px;border-radius:50%;background:${roleGradient(u.role)};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;margin:0 auto 12px;overflow:hidden;position:relative">
+        ${u.avatar_url ? `<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">` : u.name[0]}
+      </div>
+      <div style="font-family:var(--fd);font-size:22px;font-weight:300">${u.name}</div>
+      <div style="margin:6px 0"><span class="badge badge-${roleBadgeColor(u.role)}">${roleLabel(u.role)}</span></div>
+      <div class="online-indicator" style="justify-content:center;margin-top:4px">
+        <span class="dot ${u.online ? 'dot-online' : 'dot-offline'}"></span>
+        <span style="font-size:12px;color:${u.online ? 'var(--gr2)' : 'var(--mu)'}">${u.online ? '● Online now' : 'Offline'}</span>
+      </div>
+    </div>
+    <div style="background:var(--sf);border-radius:var(--r10);padding:14px;margin-bottom:16px;font-size:14px;color:var(--mu2);line-height:1.6">${u.bio || 'No bio added yet.'}</div>
+    <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="stat-card purple" style="padding:12px"><div class="stat-label">Tasks</div><div class="stat-val stat-glow-purple" style="font-size:24px">${tasks.length}</div></div>
+      <div class="stat-card green"  style="padding:12px"><div class="stat-label">Done</div><div class="stat-val stat-glow-green"  style="font-size:24px">${tasks.filter(t => t.status === 'completed').length}</div></div>
+      <div class="stat-card amber"  style="padding:12px"><div class="stat-label">Progress</div><div class="stat-val stat-glow-amber" style="font-size:24px">${pct}%</div></div>
+    </div>
+  `);
+}
+
+// ===================================================
+// NOTIFICATIONS
+// ===================================================
+function buildNotifications() {
+  const notifs = [...CACHE.notifications].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  return `
+  <div class="fade-up">
+    <div class="section-panel">
+      <div class="panel-header">
+        <div><div class="panel-kicker">Inbox</div><div class="panel-title">Notifications</div></div>
+        <button class="btn btn-sm" onclick="markAllRead()">Mark all read</button>
+      </div>
+      ${notifs.length === 0 ? '<div style="color:var(--mu);text-align:center;padding:40px 0">No notifications yet</div>' : ''}
+      ${notifs.map(n => `
+        <div class="notif-item ${n.type}" style="${n.read ? 'opacity:.55' : ''}">
+          <div class="notif-icon" style="font-size:18px">${notifIcon(n.type)}</div>
+          <div style="flex:1">
+            <div class="notif-text">${n.content}</div>
+            <div class="notif-time">${timeAgo(n.created_at)}</div>
+          </div>
+          ${!n.read ? '<div style="width:7px;height:7px;border-radius:50%;background:var(--ne2);flex-shrink:0;margin-top:5px"></div>' : ''}
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+async function markAllRead() {
+  const res = await apiFetch('/notifications/read-all', { method: 'PATCH' });
+  if (res && res.ok) {
+    CACHE.notifications.forEach(n => n.read = true);
+    updateNotifBadge();
+  }
+}
+
+// ===================================================
+// MANAGE TASKS (Manager/CTO/CEO)
+// ===================================================
+function buildManageTasks() {
+  return `
+  <div class="fade-up">
+    <div class="section-panel" style="margin-bottom:20px">
+      <div class="panel-header">
+        <div><div class="panel-kicker">Task Control</div><div class="panel-title">All Tasks</div></div>
+        <button class="btn btn-primary" onclick="openTaskModal()">⊕ Create & Assign Task</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(event,'all-tasks')">All Tasks</div>
+      <div class="tab" onclick="switchTab(event,'in-progress-tasks')">In Progress</div>
+      <div class="tab" onclick="switchTab(event,'overdue-tasks')">Overdue</div>
+      <div class="tab" onclick="switchTab(event,'done-tasks')">Completed</div>
+    </div>
+    <div class="tab-content active" id="tab-all-tasks">
+      <div class="tasks-grid">${CACHE.tasks.map(t => buildTaskCard(t)).join('')}</div>
+    </div>
+    <div class="tab-content" id="tab-in-progress-tasks">
+      <div class="tasks-grid">${CACHE.tasks.filter(t => t.status === 'in_progress').map(t => buildTaskCard(t)).join('') || noTasksMsg()}</div>
+    </div>
+    <div class="tab-content" id="tab-overdue-tasks">
+      <div class="tasks-grid">${CACHE.tasks.filter(t => t.status === 'overdue').map(t => buildTaskCard(t)).join('') || '<div class="section-panel" style="color:var(--mu);text-align:center;padding:40px">No overdue tasks 🎉</div>'}</div>
+    </div>
+    <div class="tab-content" id="tab-done-tasks">
+      <div class="tasks-grid">${CACHE.tasks.filter(t => t.status === 'completed').map(t => buildTaskCard(t)).join('') || noTasksMsg()}</div>
+    </div>
+  </div>`;
+}
+
+function noTasksMsg() { return '<div class="section-panel" style="color:var(--mu);text-align:center;padding:40px">No tasks here</div>'; }
+
+// ===================================================
+// INTERN MANAGEMENT
+// ===================================================
+function buildInternMgmt() {
+  const interns = CACHE.users.filter(u => u.role === 'intern');
+  return `
+  <div class="fade-up">
+    <div class="stats-grid">
+      <div class="stat-card purple"><div class="stat-label">Total Interns</div><div class="stat-val stat-glow-purple">${interns.length}</div></div>
+      <div class="stat-card green"><div class="stat-label">Online Now</div><div class="stat-val stat-glow-green">${interns.filter(u => u.online).length}</div></div>
+      <div class="stat-card amber"><div class="stat-label">Flagged</div><div class="stat-val stat-glow-amber">${interns.filter(u => u.warnings > 0).length}</div></div>
+      <div class="stat-card red"><div class="stat-label">At Risk</div><div class="stat-val stat-glow-red">${interns.filter(u => u.strikes >= 2).length}</div></div>
+    </div>
+    <div class="section-panel">
+      <div class="panel-header">
+        <div><div class="panel-kicker">Roster</div><div class="panel-title">Intern Management</div></div>
+        <button class="btn btn-primary btn-sm" onclick="showPage('create-profile')">⊕ Add Intern</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Intern</th><th>Status</th><th>Tasks</th><th>Progress</th><th>Warnings</th><th>Actions</th></tr></thead>
+        <tbody>
+        ${interns.map(u => {
+          const tasks = CACHE.tasks.filter(t => t.assigned_to === u.id);
+          const pct   = calcInternProgress(u.id);
+          return `<tr>
+            <td><div class="td-name">
+              <div class="avatar-sm">${u.avatar_url ? `<img src="${u.avatar_url}">` : u.name[0]}</div>
+              <div><div style="font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--mu)">${u.title}</div></div>
+            </div></td>
+            <td>${u.online ? '<span class="badge badge-green">● Online</span>' : '<span class="badge badge-grey">○ Offline</span>'}</td>
+            <td><span style="font-family:var(--fd);font-size:18px">${tasks.length}</span></td>
+            <td style="min-width:120px">
+              <div class="progress-bar"><div class="progress-fill ${pct < 30 ? 'red' : pct < 70 ? 'amber' : 'green'}" style="width:${pct}%"></div></div>
+              <div style="font-size:11px;color:var(--mu);margin-top:3px">${pct}%</div>
+            </td>
+            <td>
+              <div class="term-strikes">
+                ${[1,2,3].map(n => `<div class="term-strike ${u.strikes >= n ? 'active' : ''}" style="width:18px;height:18px;font-size:9px">${u.strikes >= n ? '⚑' : ''}</div>`).join('')}
+              </div>
+            </td>
+            <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+              <button class="btn btn-sm btn-warn"   onclick="issueNudge('${u.id}')">Nudge</button>
+              <button class="btn btn-sm btn-danger" onclick="issueWarning('${u.id}')">⚑ Flag</button>
+              ${currentUser.role === 'cto' || currentUser.role === 'ceo'
+                ? `<button class="btn btn-sm btn-danger" onclick="terminateUser('${u.id}','terminated')">Remove</button>` : ''}
+            </div></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ===================================================
+// HEATMAP — loads real data from API
+// ===================================================
+function buildHeatmap() {
+  const interns = CACHE.users.filter(u => u.role === 'intern');
+  const days    = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return `
+  <div class="fade-up">
+    <div class="section-panel" style="margin-bottom:20px">
+      <div class="panel-kicker">Activity Intelligence</div>
+      <div class="panel-title">Team Activity Heatmap</div>
+      <div style="font-size:13px;color:var(--mu);margin-top:4px">12 weeks of real activity data</div>
+    </div>
+    ${interns.map(u => `
+      <div class="section-panel" style="margin-bottom:14px" id="hm-${u.id}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="avatar-sm">${u.avatar_url ? `<img src="${u.avatar_url}">` : u.name[0]}</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--ch)">${u.name}</div>
+              <div style="font-size:11px;color:var(--mu)">${u.title}</div>
+            </div>
+            ${u.online ? '<span class="badge badge-green">● Online</span>' : '<span class="badge badge-grey">○ Offline</span>'}
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;margin-bottom:6px">
+          ${days.map(d => `<div style="width:calc(100%/7);font-size:9px;color:var(--mu);letter-spacing:1px;text-align:center">${d[0]}</div>`).join('')}
+        </div>
+        <div class="heatmap-grid" id="hm-grid-${u.id}">
+          ${Array.from({ length: 84 }, () => '<div class="hm-cell" data-v="0"></div>').join('')}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:10px">
+          <span style="font-size:11px;color:var(--mu)">Less</span>
+          ${[0,1,2,3,4,5].map(v => `<div style="width:12px;height:12px;border-radius:3px;background:${['rgba(255,255,255,.04)','rgba(16,185,129,.15)','rgba(16,185,129,.3)','rgba(16,185,129,.5)','rgba(16,185,129,.75)','rgba(16,185,129,1)'][v]}"></div>`).join('')}
+          <span style="font-size:11px;color:var(--mu)">More</span>
+        </div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+async function loadHeatmaps() {
+  const interns = CACHE.users.filter(u => u.role === 'intern');
+  for (const u of interns) {
+    try {
+      const res  = await apiFetch(`/analytics/heatmap/${u.id}`);
+      if (!res || !res.ok) continue;
+      const data = await res.json(); // [{ date, score, intensity }]
+      const grid = document.getElementById(`hm-grid-${u.id}`);
+      if (!grid) continue;
+
+      // Build a map of date → intensity
+      const dateMap = {};
+      data.forEach(d => { dateMap[d.date.slice(0, 10)] = d.intensity; });
+
+      // Fill 84 cells = last 84 days
+      const cells = grid.querySelectorAll('.hm-cell');
+      const now   = new Date();
+      cells.forEach((cell, i) => {
+        const d   = new Date(now);
+        d.setDate(d.getDate() - (83 - i));
+        const key = d.toISOString().slice(0, 10);
+        const v   = dateMap[key] || 0;
+        cell.setAttribute('data-v',  v);
+        cell.setAttribute('data-tip', `${key}: ${v === 0 ? 'No activity' : v === 1 ? 'Low' : v === 2 ? 'Moderate' : v === 3 ? 'Active' : v === 4 ? 'Very active' : 'Peak'}`);
+      });
+    } catch (err) {
+      console.error('loadHeatmaps error for', u.id, err);
+    }
+  }
+}
+
+// ===================================================
+// CREATE PROFILE
+// ===================================================
+function buildCreateProfile() {
+  return `
+  <div class="fade-up">
+    <div class="section-panel">
+      <div class="panel-kicker">Onboarding</div>
+      <div class="panel-title">Create New Intern Profile</div>
+      <div style="font-size:13px;color:var(--mu);margin-top:4px;margin-bottom:24px">Intern credentials will be set to what you enter here.</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Full Name</label><input class="fi" id="np-name" placeholder="Jane Doe"></div>
+        <div class="form-group"><label class="form-label">Title</label><input class="fi" id="np-title" placeholder="ML Intern"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Email</label><input class="fi" id="np-email" type="email" placeholder="intern@chronis.io"></div>
+        <div class="form-group"><label class="form-label">Temporary Password</label><input class="fi" id="np-pass" value="intern123" placeholder="intern123"></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Bio</label><textarea class="fi" id="np-bio" placeholder="Brief intro..." style="min-height:80px;resize:vertical"></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn btn-primary" onclick="createNewProfile()">⊕ Create Profile</button>
+        <button class="btn" onclick="showPage('intern-mgmt')">Cancel</button>
+      </div>
+      <div id="profile-created-msg" style="margin-top:14px"></div>
+    </div>
+  </div>`;
+}
+
+async function createNewProfile() {
+  const name  = document.getElementById('np-name').value.trim();
+  const email = document.getElementById('np-email').value.trim();
+  const pass  = document.getElementById('np-pass').value.trim();
+  const title = document.getElementById('np-title').value.trim();
+  const bio   = document.getElementById('np-bio').value.trim();
+  const msgEl = document.getElementById('profile-created-msg');
+
+  if (!name || !email || !pass) {
+    msgEl.innerHTML = '<div class="inline-alert danger">⚠ Name, email, and password are required.</div>';
+    return;
+  }
+
+  const res  = await apiFetch('/users', {
+    method: 'POST',
+    body:   JSON.stringify({ name, email, password: pass, title, bio }),
+  });
+  const data = await res.json();
+
+  if (!res.ok) {
+    msgEl.innerHTML = `<div class="inline-alert danger">⚠ ${data.error}</div>`;
+    return;
+  }
+
+  CACHE.users.push({ ...data, online: false });
+  msgEl.innerHTML = `<div class="inline-alert success">✅ Profile created for <strong>${data.name}</strong>! Login: ${email} / ${pass}</div>`;
+  toast('success', `Profile created: ${data.name}`);
+  ['np-name','np-email','np-title','np-bio'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+}
+
+// ===================================================
+// CTO PANEL
+// ===================================================
+function buildCTOPanel() {
+  if (currentUser.role !== 'cto' && currentUser.role !== 'ceo') return '<div class="inline-alert danger">⛔ Access denied.</div>';
+  const managers = CACHE.users.filter(u => u.role === 'manager');
+  const interns  = CACHE.users.filter(u => u.role === 'intern');
+
+  return `
+  <div class="fade-up">
+    <div class="power-panel">
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--cy2);margin-bottom:8px">CTO COMMAND</div>
+      <div class="power-title" style="color:var(--cy2)">Technical Command Suite</div>
+      <div class="power-sub">Instant removal authority. Single warning removes interns immediately.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="section-panel">
+        <div class="panel-kicker">Authority</div>
+        <div class="panel-title" style="margin-bottom:16px">Manager Control</div>
+        ${managers.map(m => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--sf);border-radius:var(--r10);margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="avatar-sm" style="background:linear-gradient(135deg,var(--am),var(--am2))">${m.name[0]}</div>
+              <div><div style="font-size:13px;font-weight:600">${m.name}</div><div style="font-size:11px;color:var(--mu)">${m.title}</div></div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm btn-warn"   onclick="issueNudge('${m.id}')">Nudge</button>
+              <button class="btn btn-sm btn-danger" onclick="terminateUser('${m.id}','suspended')">Suspend</button>
+            </div>
+          </div>
+        `).join('') || '<div style="color:var(--mu);font-size:13px">No managers</div>'}
+      </div>
+      <div class="section-panel">
+        <div class="panel-kicker">Interns</div>
+        <div class="panel-title" style="margin-bottom:16px">Single-Strike Removal</div>
+        <div class="inline-alert warn" style="margin-bottom:14px">⚡ CTO authority: 1 warning = immediate removal</div>
+        ${interns.map(i => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--sf);border-radius:var(--r10);margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="avatar-sm">${i.name[0]}</div>
+              <div><div style="font-size:13px;font-weight:600">${i.name}</div></div>
+            </div>
+            <div style="display:flex;gap:5px">
+              <button class="btn btn-sm btn-warn"   onclick="issueNudge('${i.id}')">⚡ Nudge</button>
+              <button class="btn btn-sm btn-danger" onclick="terminateUser('${i.id}','terminated')">⚑ Remove</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="section-panel">
+      <div class="panel-kicker">Task Authority</div>
+      <div class="panel-title" style="margin-bottom:16px">Deploy Technical Tasks</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="openTaskModal()">⊕ Deploy Critical Task</button>
+        <button class="btn" onclick="showPage('manage-tasks')">View All Tasks</button>
+        <button class="btn" onclick="showPage('analytics')">◰ Performance Analytics</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ===================================================
+// ANALYTICS
+// ===================================================
+function buildAnalytics() {
+  const interns    = CACHE.users.filter(u => u.role === 'intern');
+  const totalTasks = CACHE.tasks.length;
+  const done       = CACHE.tasks.filter(t => t.status === 'completed').length;
+  const overdue    = CACHE.tasks.filter(t => t.status === 'overdue').length;
+  const inProgress = CACHE.tasks.filter(t => t.status === 'in_progress').length;
+
+  return `
+  <div class="fade-up">
+    <div class="stats-grid">
+      <div class="stat-card purple"><div class="stat-label">Completion Rate</div><div class="stat-val stat-glow-purple">${Math.round(done / Math.max(totalTasks, 1) * 100)}%</div></div>
+      <div class="stat-card green"><div class="stat-label">Tasks Done</div><div class="stat-val stat-glow-green">${done}</div></div>
+      <div class="stat-card amber"><div class="stat-label">In Progress</div><div class="stat-val stat-glow-amber">${inProgress}</div></div>
+      <div class="stat-card red"><div class="stat-label">Overdue</div><div class="stat-val stat-glow-red">${overdue}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="section-panel">
+        <div class="panel-kicker">Individual Performance</div>
+        <div class="panel-title" style="margin-bottom:16px">Per Intern Analytics</div>
+        ${[...interns].sort((a, b) => cacheScore(b) - cacheScore(a)).map((u, i) => {
+          const pct   = calcInternProgress(u.id);
+          const tasks = CACHE.tasks.filter(t => t.assigned_to === u.id);
+          return `
+          <div style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-family:var(--fd);font-size:16px;color:var(--mu);width:20px">${i + 1}</span>
+                <div class="avatar-sm">${u.name[0]}</div>
+                <div><div style="font-size:13px;font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--mu)">${tasks.filter(t => t.status === 'completed').length}/${tasks.length} tasks</div></div>
+              </div>
+              <div style="font-family:var(--fd);font-size:18px;color:var(--ne3)">${cacheScore(u)} pts</div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill ${pct < 30 ? 'red' : pct < 70 ? 'amber' : 'green'}" style="width:${pct}%"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="section-panel">
+        <div class="panel-kicker">Task Distribution</div>
+        <div class="panel-title" style="margin-bottom:16px">Status Breakdown</div>
+        ${[
+          { label: 'Done',        count: done,       color: 'green' },
+          { label: 'In Progress', count: inProgress, color: 'amber' },
+          { label: 'Overdue',     count: overdue,    color: 'red'   },
+          { label: 'Not Started', count: CACHE.tasks.filter(t => t.status === 'not_started').length, color: '' },
+        ].map(s => {
+          const pct = Math.round(s.count / Math.max(totalTasks, 1) * 100);
+          return `
+          <div style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:13px;color:var(--mu2)">${s.label}</span>
+              <span style="font-size:13px;color:var(--ch)">${s.count} (${pct}%)</span>
+            </div>
+            <div class="progress-bar" style="height:8px"><div class="progress-fill ${s.color}" style="width:${pct}%"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ===================================================
+// CEO PANEL
+// ===================================================
+function buildCEOPanel() {
+  if (currentUser.role !== 'ceo') return '<div class="inline-alert danger">⛔ Access denied.</div>';
+  const everyone = CACHE.users.filter(u => u.id !== currentUser.id);
+
+  return `
+  <div class="fade-up">
+    <div class="power-panel">
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ne3);margin-bottom:8px">SUPREME AUTHORITY — CEO</div>
+      <div class="power-title">Executive Command Center</div>
+      <div class="power-sub">Total organizational control.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+        <button class="btn btn-primary" onclick="ceoBroadcast()">📣 Broadcast</button>
+        <button class="btn" onclick="showPage('org')">◎ Org Chart</button>
+        <button class="btn" onclick="openTaskModal()">⊕ Deploy Task</button>
+      </div>
+    </div>
+    <div class="section-panel">
+      <div class="panel-kicker">Supreme Control</div>
+      <div class="panel-title" style="margin-bottom:16px">All Members</div>
+      <table class="data-table">
+        <thead><tr><th>Member</th><th>Role</th><th>Status</th><th>Strikes</th><th>Performance</th><th>CEO Actions</th></tr></thead>
+        <tbody>
+        ${everyone.sort((a, b) => {
+          const ord = { cto: 0, manager: 1, intern: 2 };
+          return (ord[a.role] || 3) - (ord[b.role] || 3);
+        }).map(u => {
+          const pct = calcInternProgress(u.id);
+          return `<tr>
+            <td><div class="td-name">
+              <div class="avatar-sm" style="background:${roleGradient(u.role)}">${u.name[0]}</div>
+              <div><div style="font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--mu)">${u.email}</div></div>
+            </div></td>
+            <td><span class="badge badge-${roleBadgeColor(u.role)}">${u.role.toUpperCase()}</span></td>
+            <td>${u.online ? '<span class="badge badge-green">● Live</span>' : '<span class="badge badge-grey">○ Away</span>'}</td>
+            <td><div style="display:flex;gap:4px">${[1,2,3].map(n => `<div class="term-strike ${u.strikes >= n ? 'active' : ''}" style="width:16px;height:16px;font-size:9px">${u.strikes >= n ? '⚑' : ''}</div>`).join('')}</div></td>
+            <td style="min-width:100px">
+              <div class="progress-bar"><div class="progress-fill ${pct < 30 ? 'red' : pct < 70 ? 'amber' : 'green'}" style="width:${pct}%"></div></div>
+              <div style="font-size:10px;color:var(--mu);margin-top:2px">${pct}%</div>
+            </td>
+            <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+              <button class="btn btn-sm btn-warn"   onclick="issueNudge('${u.id}')">⚡</button>
+              <button class="btn btn-sm"            onclick="ceoChangeRole('${u.id}')">◈ Role</button>
+              <button class="btn btn-sm btn-danger" onclick="terminateUser('${u.id}','terminated')">Remove</button>
+            </div></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function buildOrg() {
+  if (currentUser.role !== 'ceo' && currentUser.role !== 'cto') return '<div class="inline-alert danger">Access denied</div>';
+  const byRole = (r) => CACHE.users.filter(u => u.role === r);
+
+  return `
+  <div class="fade-up">
+    <div class="section-panel" style="margin-bottom:20px">
+      <div class="panel-kicker">Structure</div>
+      <div class="panel-title">Organization Chart</div>
+    </div>
+    <div class="org-tree">
+      ${byRole('ceo').map(u => `
+        <div class="org-node ceo-node">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="avatar-sm" style="background:linear-gradient(135deg,var(--ne),var(--ne2))">${u.name[0]}</div>
+            <div><div style="font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--ne3)">Chief Executive Officer</div></div>
+            ${u.online ? '<span class="badge badge-green">● Live</span>' : ''}
+          </div>
+        </div>
+      `).join('')}
+      ${byRole('cto').map(u => `
+        <div class="org-node cto-node org-indent-1">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="color:var(--mu)">└─</span>
+            <div class="avatar-sm" style="background:linear-gradient(135deg,var(--cy),var(--cy2))">${u.name[0]}</div>
+            <div><div style="font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--cy2)">CTO</div></div>
+            ${u.online ? '<span class="badge badge-green">● Live</span>' : ''}
+          </div>
+        </div>
+      `).join('')}
+      ${byRole('manager').map(u => `
+        <div class="org-node mgr-node org-indent-1">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="color:var(--mu)">└─</span>
+            <div class="avatar-sm" style="background:linear-gradient(135deg,var(--am),var(--am2))">${u.name[0]}</div>
+            <div><div style="font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--am2)">Manager</div></div>
+            ${u.online ? '<span class="badge badge-green">● Live</span>' : ''}
+          </div>
+        </div>
+      `).join('')}
+      ${byRole('intern').map(u => `
+        <div class="org-node org-indent-2">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="color:var(--mu)">└─</span>
+            <div class="avatar-sm">${u.name[0]}</div>
+            <div><div style="font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--mu)">${u.title}</div></div>
+            ${u.online ? '<span class="badge badge-green">● Live</span>' : ''}
+            ${u.strikes > 0 ? `<span class="badge badge-red">⚑ ${u.strikes}</span>` : ''}
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:var(--mu)">Tasks</div>
+            <div style="font-family:var(--fd)">${CACHE.tasks.filter(t => t.assigned_to === u.id && t.status === 'completed').length}/${CACHE.tasks.filter(t => t.assigned_to === u.id).length}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+// ===================================================
+// MODALS
+// ===================================================
+function openModal(title, body) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML    = body;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+function openTaskModal(internId = '') {
+  const interns = CACHE.users.filter(u => u.role === 'intern' && u.account_status !== 'terminated');
+  openModal('Create & Assign Task', `
+    <div class="form-row full"><div class="form-group"><label class="form-label">Task Title</label><input class="fi" id="t-title" placeholder="e.g. Build API integration"></div></div>
+    <div class="form-row full"><div class="form-group"><label class="form-label">Description</label><textarea class="fi" id="t-desc" placeholder="Detailed description..." style="min-height:90px;resize:vertical"></textarea></div></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Assign To</label>
+        <select class="fi" id="t-assignee">
+          ${interns.map(i => `<option value="${i.id}" ${i.id === internId ? 'selected' : ''}>${i.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Priority</label>
+        <select class="fi" id="t-priority">
+          <option value="high">🔴 High</option><option value="medium" selected>🟡 Medium</option><option value="low">🟢 Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Deadline</label><input class="fi" type="datetime-local" id="t-deadline"></div>
+      <div class="form-group"><label class="form-label">Subtasks (one per line)</label><textarea class="fi" id="t-subtasks" placeholder="Review docs&#10;Write tests&#10;Deploy" style="min-height:80px;resize:vertical"></textarea></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitTask()">⊕ Assign Task</button>
+    </div>
+  `);
+  const d = new Date(Date.now() + 3 * 86400000);
+  document.getElementById('t-deadline').value = d.toISOString().slice(0, 16);
+}
+
+async function submitTask() {
+  const title    = document.getElementById('t-title').value.trim();
+  const desc     = document.getElementById('t-desc').value.trim();
+  const assignee = document.getElementById('t-assignee').value;
+  const priority = document.getElementById('t-priority').value;
+  const deadline = document.getElementById('t-deadline').value;
+  const rawSubs  = document.getElementById('t-subtasks').value.trim().split('\n').filter(l => l.trim());
+
+  if (!title || !assignee) { toast('error', 'Title and assignee are required.'); return; }
+
+  const res  = await apiFetch('/tasks', {
+    method: 'POST',
+    body:   JSON.stringify({ title, description: desc, priority, deadline, assigned_to: assignee, subtasks: rawSubs }),
+  });
+  const data = await res.json();
+
+  if (!res.ok) { toast('error', data.error); return; }
+
+  CACHE.tasks.push(data);
+  closeModal();
+  toast('success', `Task "${title}" assigned!`);
+  showPage(currentUser.role === 'intern' ? 'tasks' : 'manage-tasks');
+}
+
+// ===================================================
+// ACTIONS
+// ===================================================
+async function issueNudge(userId) {
+  const user   = CACHE.users.find(u => u.id === userId);
+  const reason = prompt('Reason for nudge (optional):') || '';
+  const res    = await apiFetch(`/users/${userId}/nudge`, {
+    method: 'POST',
+    body:   JSON.stringify({ reason }),
+  });
+  if (res && res.ok) toast('warn', `Nudge sent to ${user?.name || 'user'}`);
+}
+
+async function issueWarning(userId) {
+  const user   = CACHE.users.find(u => u.id === userId);
+  const reason = prompt(`Warning reason for ${user?.name || 'user'}:`);
+  if (!reason) return;
+  const res  = await apiFetch(`/users/${userId}/warning`, {
+    method: 'POST',
+    body:   JSON.stringify({ reason }),
+  });
+  const data = await res.json();
+  if (res.ok) {
+    // Update cache
+    const cu = CACHE.users.find(u => u.id === userId);
+    if (cu) { cu.warnings = data.warnings; cu.strikes = data.strikes; }
+    toast('warn', `Warning ${data.strikes}/3 issued to ${user?.name || 'user'}`);
+    if (data.auto_suspended) toast('error', `${user?.name} auto-suspended after 3 strikes`);
+    showPage(document.getElementById('topbar-title').textContent.includes('Intern') ? 'intern-mgmt' : 'dashboard');
+  } else {
+    toast('error', data.error);
+  }
+}
+
+async function terminateUser(userId, status = 'terminated') {
+  const user = CACHE.users.find(u => u.id === userId);
+  if (!confirm(`${status === 'terminated' ? 'Permanently remove' : 'Suspend'} ${user?.name || 'this user'}?`)) return;
+
+  const reason = prompt('Reason (optional):') || '';
+  const res    = await apiFetch(`/users/${userId}/terminate`, {
+    method: 'POST',
+    body:   JSON.stringify({ status, reason }),
+  });
+  if (res && res.ok) {
+    CACHE.users = CACHE.users.filter(u => u.id !== userId);
+    toast('error', `${user?.name || 'User'} ${status}`);
+    showPage('intern-mgmt');
+  }
+}
+
+async function ceoChangeRole(userId) {
+  const user = CACHE.users.find(u => u.id === userId);
+  if (!user) return;
+  openModal(`Change Role: ${user.name}`, `
+    <div style="margin-bottom:16px;font-size:14px;color:var(--mu2)">Current role: <strong style="color:var(--tx)">${user.role}</strong></div>
+    <div class="form-group" style="margin-bottom:20px"><label class="form-label">New Role</label>
+      <select class="fi" id="promote-role">
+        <option value="intern"  ${user.role === 'intern'  ? 'selected' : ''}>Intern</option>
+        <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
+        <option value="cto"     ${user.role === 'cto'     ? 'selected' : ''}>CTO</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="applyRoleChange('${userId}')">Apply Change</button>
+    </div>
+  `);
+}
+
+async function applyRoleChange(userId) {
+  const newRole = document.getElementById('promote-role').value;
+  const res     = await apiFetch(`/users/${userId}/role`, {
+    method: 'PATCH',
+    body:   JSON.stringify({ role: newRole }),
+  });
+  if (res && res.ok) {
+    const u = CACHE.users.find(x => x.id === userId);
+    if (u) u.role = newRole;
+    toast('success', `Role updated to ${newRole}`);
+    closeModal();
+    showPage('ceo-panel');
+  }
+}
+
+async function ceoBroadcast() {
+  openModal('CEO Broadcast', `
+    <div class="form-group" style="margin-bottom:16px"><label class="form-label">Message to All Members</label>
+      <textarea class="fi" id="broadcast-msg" placeholder="Enter your message..." style="min-height:100px;resize:vertical"></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:20px"><label class="form-label">Priority</label>
+      <select class="fi" id="broadcast-type">
+        <option value="info">ℹ Info</option><option value="warn">⚠ Warning</option><option value="danger">🚨 Critical</option><option value="success">✅ Positive</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="sendBroadcast()">📣 Broadcast</button>
+    </div>
+  `);
+}
+
+async function sendBroadcast() {
+  const content = document.getElementById('broadcast-msg').value.trim();
+  const type    = document.getElementById('broadcast-type').value;
+  if (!content) { toast('error', 'Message cannot be empty.'); return; }
+
+  const res = await apiFetch('/users/broadcast', {
+    method: 'POST',
+    body:   JSON.stringify({ content, type }),
+  });
+  if (res && res.ok) {
+    const data = await res.json();
+    closeModal();
+    toast('success', data.message);
+  }
+}
+
+// ===================================================
+// TABS
+// ===================================================
+function switchTab(event, activeId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  const el = document.getElementById('tab-' + activeId);
+  if (el) el.classList.add('active');
+}
+
+// ===================================================
+// HELPERS
+// ===================================================
+function taskPct(task) {
+  const subs = task.subtasks || [];
+  if (subs.length === 0) return task.status === 'completed' ? 100 : 0;
+  return Math.round(subs.filter(s => s.completed).length / subs.length * 100);
+}
+
+function calcInternProgress(userId) {
+  const tasks = CACHE.tasks.filter(t => t.assigned_to === userId);
+  if (tasks.length === 0) return 0;
+  return Math.round(tasks.reduce((a, t) => a + taskPct(t), 0) / tasks.length);
+}
+
+function formatDate(ts) {
+  return new Date(ts).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function formatCountdown(deadline) {
+  const now  = Date.now();
+  const diff = new Date(deadline).getTime() - now;
+  if (diff < 0) {
+    const a = Math.abs(diff);
+    return `${Math.floor(a / 86400000)}d ${Math.floor((a % 86400000) / 3600000)}h overdue`;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  if (d > 0) return `${d}d ${h}h ${m}m`;
+  if (h > 0) return `${h}h ${m}m ${s}s`;
+  return `${m}m ${s}s`;
+}
+
+function startCountdowns() {
+  Object.values(countdownIntervals).forEach(clearInterval);
+  countdownIntervals = {};
+  CACHE.tasks.forEach(t => {
+    if (t.status === 'completed') return;
+    const els = document.querySelectorAll(`#cd-${t.id}, #cd-dash-${t.id}`);
+    if (els.length > 0) {
+      countdownIntervals[t.id] = setInterval(() => {
+        const txt      = formatCountdown(t.deadline);
+        const isOverdue = new Date(t.deadline) < new Date();
+        els.forEach(el => {
+          el.textContent = txt;
+          el.className   = 'countdown' + (isOverdue ? ' urgent' : '');
+        });
+      }, 1000);
+    }
+  });
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - new Date(ts).getTime();
+  if (diff < 60000)    return 'Just now';
+  if (diff < 3600000)  return Math.floor(diff / 60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+  return Math.floor(diff / 86400000) + 'd ago';
+}
+
+function priorityBadge(p) {
+  return { high: '<span class="badge badge-red">🔴 High</span>', medium: '<span class="badge badge-amber">🟡 Medium</span>', low: '<span class="badge badge-green">🟢 Low</span>' }[p] || '';
+}
+function statusBadge(s) {
+  return { completed: '<span class="badge badge-green">✓ Done</span>', overdue: '<span class="badge badge-red">⏰ Overdue</span>', in_progress: '<span class="badge badge-blue">↻ In Progress</span>', not_started: '<span class="badge badge-grey">◌ Not Started</span>' }[s] || '';
+}
+function notifIcon(type)   { return { success: '✅', danger: '🚨', warn: '⚠️', info: 'ℹ️' }[type] || '◎'; }
+function roleGradient(role){ return { ceo: 'linear-gradient(135deg,#7c3aed,#a78bfa)', cto: 'linear-gradient(135deg,#0891b2,#22d3ee)', manager: 'linear-gradient(135deg,#d97706,#fbbf24)', intern: 'linear-gradient(135deg,#059669,#34d399)' }[role] || 'linear-gradient(135deg,var(--ne),var(--cy))'; }
+
+// TOAST
+function toast(type, msg) {
+  const c    = document.getElementById('toast-container');
+  const t    = document.createElement('div');
+  const icons = { success: '✅', error: '❌', warn: '⚠️', info: 'ℹ️' };
+  t.className  = `toast toast-${type}`;
+  t.innerHTML  = `<span class="toast-icon">${icons[type] || '◎'}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Boot ──────────────────────────────────────────
+// Try to restore session, then fall through to login
+tryRestoreSession();
+
+</script>
+</body>
+</html>

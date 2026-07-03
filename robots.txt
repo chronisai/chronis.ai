@@ -4,6 +4,8 @@ Allow: /static/
 Disallow: /admin
 Disallow: /api/
 Disallow: /ws/
+Disallow: /os
+Disallow: /os/
 Disallow: /static/test.html
 Disallow: /static/live.html
 Disallow: /static/dashboard.html

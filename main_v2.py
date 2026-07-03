@@ -39,7 +39,7 @@ from fastapi import (
     Request, UploadFile, WebSocket, WebSocketDisconnect,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from gradio_client import Client, handle_file
 
@@ -79,6 +79,8 @@ ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
 RESEND_API_KEY     = os.environ.get("RESEND_API_KEY", "")
 NOTIFY_EMAIL       = os.environ.get("NOTIFY_EMAIL", "")
 ADMIN_SECRET       = os.environ.get("ADMIN_SECRET", "")
+OS_ADMIN_SECRET    = os.environ.get("OS_ADMIN_SECRET", "")
+OS_INTERNAL_URL    = os.environ.get("OS_INTERNAL_URL", "http://localhost:3001")
 SUPABASE_URL       = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY       = os.environ.get("SUPABASE_SERVICE_KEY", "")
 # Razorpay keys are read inside services/razorpay_client.py
@@ -1045,6 +1047,58 @@ def _clean_for_xtts(text):
     return text if len(text) > 3 else "I am here with you."
 
 
+# ── Chronis OS — Internal Admin Portal ───────────────────────────────────────
+
+@app.get("/os")
+async def chronis_os_portal(os_secret: str = ""):
+    """
+    Hidden internal admin portal — Chronis OS.
+    Access: https://chronis.in/os?os_secret=YOUR_OS_ADMIN_SECRET
+    Not linked from the public site. Not in sitemap. Blocked in robots.txt.
+    """
+    if not os_secret or os_secret != OS_ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Access denied.")
+    return FileResponse("static/chronis-os.html")
+
+
+@app.api_route("/os/api/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
+async def os_api_proxy(path: str, request: Request):
+    """Proxies /os/api/* to the Chronis OS Node.js backend (port 3001)."""
+    target = f"{OS_INTERNAL_URL}/api/{path}"
+    if request.url.query:
+        target += f"?{request.url.query}"
+    body = await request.body()
+    headers = {k: v for k, v in request.headers.items() if k.lower() not in ("host", "content-length")}
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            r = await client.request(request.method, target, headers=headers, content=body)
+        return Response(content=r.content, status_code=r.status_code,
+                        headers=dict(r.headers),
+                        media_type=r.headers.get("content-type", "application/json"))
+    except httpx.ConnectError:
+        raise HTTPException(status_code=503, detail="Chronis OS backend not running. Start with: node chronis_os_server.js")
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="Chronis OS backend timed out")
+
+
+@app.api_route("/os/socket.io/{path:path}", methods=["GET", "POST"])
+async def os_socketio_proxy(path: str, request: Request):
+    """Proxies Socket.io polling transport to Chronis OS Node.js backend."""
+    target = f"{OS_INTERNAL_URL}/os/socket.io/{path}"
+    if request.url.query:
+        target += f"?{request.url.query}"
+    body = await request.body()
+    headers = {k: v for k, v in request.headers.items() if k.lower() not in ("host", "content-length")}
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            r = await client.request(request.method, target, headers=headers, content=body)
+        return Response(content=r.content, status_code=r.status_code,
+                        headers=dict(r.headers),
+                        media_type=r.headers.get("content-type", "text/plain"))
+    except (httpx.ConnectError, httpx.TimeoutException):
+        raise HTTPException(status_code=503, detail="Chronis OS socket unavailable")
+
+
 # ────────────────────────────────────────────────────────────────────────────
 # STATIC FILES
 # ────────────────────────────────────────────────────────────────────────────
@@ -1093,41 +1147,6 @@ async def leaderboard_page():
     """
     return FileResponse("static/leaderboard.html")
 
-
-
-@app.get("/blog")
-async def blog():
-    return FileResponse("static/blog.html")
-
-
-@app.get("/comparison")
-async def comparison():
-    return FileResponse("static/comparison.html")
-
-
-@app.get("/ethics")
-async def ethics():
-    return FileResponse("static/ethics.html")
-
-
-@app.get("/how-it-works")
-async def how_it_works():
-    return FileResponse("static/how-it-works.html")
-
-
-@app.get("/investors")
-async def investors():
-    return FileResponse("static/investors.html")
-
-
-@app.get("/locket")
-async def locket():
-    return FileResponse("static/locket.html")
-
-
-@app.get("/privacy")
-async def privacy():
-    return FileResponse("static/privacy.html")
 
 
 @app.get("/ref/{code}")
