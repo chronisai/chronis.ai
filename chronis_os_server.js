@@ -89,7 +89,7 @@ app.use((err, _req, res, _next) => {
 // ── Startup ────────────────────────────────────────────────────────────────
 const PORT = parseInt(process.env.OS_PORT || '3001', 10);
 
-server.listen(PORT, async () => {
+server.listen(PORT, "127.0.0.1", async () => {
   console.log(`\n🏢 Chronis OS backend running on internal port ${PORT}`);
   console.log(`   Accessible via FastAPI proxy at /os/\n`);
 
