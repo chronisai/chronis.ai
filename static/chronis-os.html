@@ -53,7 +53,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 .role-dot{width:6px;height:6px;border-radius:50%}
 
 /* ===================== MAIN LAYOUT ===================== */
-#view-app{flex-direction:column;min-height:100vh;width:100%;min-width:0}
+#view-app{display:block!important;width:100%!important;min-height:100vh!important;position:relative}
 .app-shell{display:flex;flex:1;overflow:hidden}
 .sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s}
 .sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
@@ -79,7 +79,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 .logout-btn:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--rd2)}
 
 /* MAIN CONTENT */
-.main-content{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.main-content{margin-left:240px;display:flex;flex-direction:column;min-height:100vh;width:calc(100% - 240px)}
 .topbar{height:60px;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 28px;gap:16px;background:rgba(5,5,5,.8);backdrop-filter:blur(20px);position:sticky;top:0;z-index:50}
 .topbar-title{font-family:var(--fd);font-size:22px;font-weight:300;letter-spacing:-.3px;flex:1}
 .topbar-actions{display:flex;align-items:center;gap:10px}
@@ -357,7 +357,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 </div>
 
 <!-- APP VIEW -->
-<div id="view-app" class="view" style="width:100%;min-height:100vh;flex-direction:column">
+<div id="view-app" class="view">
   <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
@@ -640,7 +640,7 @@ function switchView(v) {
   const app   = document.getElementById("view-app");
   if (v === "app") {
     login.style.cssText = "display:none!important";
-    app.style.cssText   = "display:flex!important;width:100%!important;min-height:100vh!important;flex-direction:column!important";
+    app.style.cssText   = "display:block!important;width:100%!important;min-height:100vh!important;";
   } else {
     login.style.cssText = "display:flex!important";
     app.style.cssText   = "display:none!important";
