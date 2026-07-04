@@ -357,7 +357,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 </div>
 
 <!-- APP VIEW -->
-<div id="view-app" class="view" style="display:none!important">
+<div id="view-app" class="view" style="width:100%;min-height:100vh;flex-direction:column">
   <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
@@ -636,8 +636,15 @@ function updateLoginRole() {
 }
 
 function switchView(v) {
-  document.getElementById('view-login').style.display = v === 'login' ? 'flex' : 'none';
-  document.getElementById('view-app').style.display   = v === 'app'   ? 'flex' : 'none';
+  const login = document.getElementById("view-login");
+  const app   = document.getElementById("view-app");
+  if (v === "app") {
+    login.style.cssText = "display:none!important";
+    app.style.cssText   = "display:flex!important;width:100%!important;min-height:100vh!important;flex-direction:column!important";
+  } else {
+    login.style.cssText = "display:flex!important";
+    app.style.cssText   = "display:none!important";
+  }
 }
 
 // ===================================================
