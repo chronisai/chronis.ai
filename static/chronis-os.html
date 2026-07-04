@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chronis OS — Command Intelligence Platform</title>
+<title>Chronis HQ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -36,11 +36,18 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 #view-login::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 20%,rgba(124,58,237,.09) 0%,transparent 70%);pointer-events:none}
 .login-bg-orb{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.12) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:orbFloat 8s ease-in-out infinite;pointer-events:none}
 @keyframes orbFloat{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-52%) scale(1.06)}}
+@keyframes gridMove{0%{transform:translateY(0)}100%{transform:translateY(60px)}}
+@keyframes particleDrift{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:.4}100%{transform:translateY(-120vh) translateX(40px);opacity:0}}
+@keyframes scanLine{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+.login-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(124,58,237,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.04) 1px,transparent 1px);background-size:60px 60px;animation:gridMove 8s linear infinite;pointer-events:none;z-index:0}
+.login-scan{position:fixed;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,.18),transparent);animation:scanLine 12s linear infinite;pointer-events:none;z-index:0}
+.login-particles{position:fixed;inset:0;pointer-events:none;z-index:0}
+.lp{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--ne2);animation:particleDrift linear infinite}
 .login-card{position:relative;z-index:2;width:min(440px,92vw);background:linear-gradient(180deg,rgba(255,255,255,.038),rgba(255,255,255,.018));border:1px solid var(--bd2);border-radius:24px;padding:40px;backdrop-filter:blur(24px);box-shadow:0 24px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
-.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
-.login-logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--ne) 0%,var(--ne2) 100%);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:18px;color:#fff;font-weight:300;letter-spacing:-1px}
+.login-logo{display:flex;align-items:center;flex-direction:column;gap:0;margin-bottom:16px;justify-content:center}
+
 .login-logo-text{font-family:var(--fd);font-size:26px;font-weight:300;letter-spacing:-.5px}
-.login-logo-sub{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;text-align:center;margin-top:-8px;margin-bottom:28px}
+.login-logo-sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);font-weight:500;text-align:center;margin-top:4px;margin-bottom:28px;opacity:.8}
 .login-field{margin-bottom:14px}
 .login-field label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:7px}
 .fi{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:var(--r10);color:var(--tx);font-size:14px;font-family:var(--fb);padding:13px 15px;outline:none;transition:border-color .2s,background .2s}
@@ -325,15 +332,23 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 <!-- LOGIN VIEW -->
 <div id="view-login" class="view active" style="display:flex!important">
   <div class="login-bg-orb"></div>
+  <div class="login-grid"></div>
+  <div class="login-scan"></div>
+  <div class="login-particles">
+    <div class="lp" style="left:8%;animation-duration:18s;animation-delay:0s;width:2px;height:2px"></div>
+    <div class="lp" style="left:18%;animation-duration:24s;animation-delay:3s;width:1px;height:1px;opacity:.6"></div>
+    <div class="lp" style="left:32%;animation-duration:20s;animation-delay:6s"></div>
+    <div class="lp" style="left:47%;animation-duration:28s;animation-delay:1s;width:1px;height:1px"></div>
+    <div class="lp" style="left:61%;animation-duration:22s;animation-delay:9s;width:3px;height:3px;opacity:.5"></div>
+    <div class="lp" style="left:74%;animation-duration:16s;animation-delay:4s"></div>
+    <div class="lp" style="left:85%;animation-duration:26s;animation-delay:7s;width:1px;height:1px"></div>
+    <div class="lp" style="left:92%;animation-duration:19s;animation-delay:2s"></div>
+  </div>
   <div class="login-card fade-up">
-    <div class="login-logo">
-      <div class="login-logo-mark">C</div>
-      <div>
-        <div style="font-family:var(--fd);font-size:22px;font-weight:300;letter-spacing:-.3px">Chronis</div>
-        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);font-weight:600">OS</div>
-      </div>
+    <div class="login-logo" style="flex-direction:column;gap:6px;margin-bottom:8px">
+      <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:38px;font-weight:300;font-style:italic;letter-spacing:-1px;color:var(--tx);line-height:1">chronis.</div>
     </div>
-    <div class="login-logo-sub">Command Intelligence Platform</div>
+    <div class="login-logo-sub">Chronis HQ</div>
     <div id="login-role-indicator" class="login-role-badge">
       <span class="role-dot" id="login-role-dot" style="background:var(--mu)"></span>
       <span id="login-role-text">Enter credentials</span>
@@ -346,12 +361,11 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
       <label>Password</label>
       <input class="fi" type="password" id="login-password" placeholder="Password issued by admin">
     </div>
-    <button class="login-btn" onclick="doLogin()">Enter Chronis OS →</button>
+    <button class="login-btn" onclick="doLogin()">Enter Chronis HQ →</button>
     <div class="login-err" id="login-err"></div>
     <div style="margin-top:20px;padding:12px;background:var(--sf);border-radius:var(--r10);font-size:12px;color:var(--mu);text-align:center;line-height:1.7">
-      <strong style="color:var(--mu2)">Demo accounts:</strong><br>
-      ceo@chronis.in / ceo123 &nbsp;|&nbsp; cto@chronis.in / cto123<br>
-      manager@chronis.in / mgr123 &nbsp;|&nbsp; alice@chronis.in / intern123
+      <strong style="color:var(--mu2)">login with the credentials sent through mail</strong><br>
+      support at founders@chronis.in &nbsp; &nbsp; <br>
     </div>
   </div>
 </div>
