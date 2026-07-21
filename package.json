@@ -1,7 +1,7 @@
 {
   "name": "chronis-os-integration",
   "version": "1.0.0",
-  "description": "Chronis OS internal admin portal \u2014 runs alongside the main FastAPI server",
+  "description": "Chronis OS internal admin portal — runs alongside the main FastAPI server",
   "main": "chronis_os_server.js",
   "scripts": {
     "os": "node chronis_os_server.js",

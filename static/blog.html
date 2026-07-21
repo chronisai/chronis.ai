@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Intelligence & Memory — The Chronis Journal</title>
 <meta name="description" content="Dispatches on self-quantification, memory science, pattern intelligence, and the frontier of human understanding. From the team building Chronis.">
-<link rel="canonical" href="https://chronis.in/static/blog.html">
+<link rel="canonical" href="https://chronis.in/blog">
+<meta property="og:title" content="The Chronis Journal">
+<meta property="og:description" content="Dispatches on self-quantification, memory science, pattern intelligence, and the frontier of human understanding.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://chronis.in/blog">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -231,6 +235,11 @@ footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-con
 }
 </style>
 <script src="/static/js/chronis-nav.js" defer></script>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png">
+<link rel="manifest" href="/static/icons/site.webmanifest">
 </head>
 <body>
 
@@ -251,167 +260,35 @@ footer{border-top:1px solid var(--bd);padding:28px 40px;display:flex;justify-con
 </section>
 
 <!-- Category filters -->
-<div class="filters rv">
+<div class="filters rv" id="cat-filters">
   <button class="f-pill active" onclick="filterCat(this,'all')">All</button>
-  <button class="f-pill" onclick="filterCat(this,'self')">Self-Quantification</button>
-  <button class="f-pill" onclick="filterCat(this,'memory')">Memory Science</button>
-  <button class="f-pill" onclick="filterCat(this,'patterns')">Pattern Intelligence</button>
-  <button class="f-pill" onclick="filterCat(this,'grief')">Grief & Loss</button>
-  <button class="f-pill" onclick="filterCat(this,'tech')">Technology</button>
 </div>
 
 <div class="content">
 
-  <!-- ── FEATURED ── -->
-  <div class="rv">
+  <!-- ── FEATURED (populated dynamically) ── -->
+  <div class="rv" id="featured-section" style="display:none">
     <span class="sec-label">Essential reading</span>
-    <div class="featured-grid">
-      <a class="art-main liquid-card" href="#" id="art-feat">
-        <span class="art-tag">Deep Dive</span>
-        <h2>The Self as Data: <em>What you reveal when no one is watching.</em></h2>
-        <p>Chronis was built on a single thesis: the most revealing portrait of a human being isn't what they say, it's what they do when unobserved. Voice cadence. Decision latency. The nervous energy before a hard conversation. This is what we capture — and why it matters.</p>
-        <div class="art-meta">
-          <span>Pattern Intelligence</span>
-          <span>6 min read</span>
-          <span>April 2026</span>
-          <span class="art-arrow">→</span>
-        </div>
-      </a>
-      <div class="art-side">
-        <a class="art-sm" href="#">
-          <span class="art-tag amber">Memory Science</span>
-          <h3>Why Memory Fails <em>Exactly When You Need It</em></h3>
-          <p>The brain was not designed to preserve. It was designed to predict. Understanding this changes everything about how you approach memory preservation.</p>
-          <div class="art-meta">4 min · March 2026</div>
-        </a>
-        <a class="art-sm" href="#">
-          <span class="art-tag teal">Guide</span>
-          <h3>The Complete Self-Quantification Framework for 2026</h3>
-          <p>Voice, movement, decision patterns, emotional baselines — a practitioner's guide to measuring the unmeasured self.</p>
-          <div class="art-meta">Coming soon · 5,000 words</div>
-        </a>
-      </div>
-    </div>
+    <div class="featured-grid" id="featured-grid"></div>
   </div>
 
-  <!-- ── SELF-QUANTIFICATION ── -->
-  <div class="topic-section rv">
+  <!-- ── POST GRID (populated dynamically) ── -->
+  <div class="topic-section rv" id="posts-section" style="display:none">
     <div class="topic-head">
       <div>
-        <span class="sec-label">01 · Self-Quantification</span>
-        <h2 class="topic-title">Knowing oneself<br><em>with data.</em></h2>
+        <span class="sec-label" id="posts-sec-label">01 · Latest</span>
+        <h2 class="topic-title">From the<br><em>team.</em></h2>
       </div>
-      <p class="topic-desc">The quantified self movement started with step counters. Chronis goes somewhere more interesting: the patterns underneath decision-making, emotion, and relationship.</p>
+      <p class="topic-desc">Notes, research, and product updates from the people building Chronis.</p>
     </div>
-    <div class="grid3">
-      <a class="art-card" href="#">
-        <span class="art-tag">Framework</span>
-        <h3>Your Hidden <em>Decision Architecture</em></h3>
-        <p>Every person has a decision-making style as unique as a fingerprint. How to surface yours — and use it.</p>
-        <div class="art-card-foot">
-          <span class="ac-meta">5 min read</span>
-          <span class="ac-arrow">→</span>
-        </div>
-      </a>
-      <a class="art-card" href="#">
-        <span class="art-tag amber">Science</span>
-        <h3>The Rhythm <em>Inside Your Speech</em></h3>
-        <p>Prosody — the music of how you talk — carries more personality information than the words themselves. The research is striking.</p>
-        <div class="art-card-foot">
-          <span class="ac-meta">4 min read</span>
-          <span class="ac-arrow">→</span>
-        </div>
-      </a>
-      <a class="art-card" href="#">
-        <span class="coming-chip">Coming soon</span>
-        <h3>Mapping Your <em>Emotional Baseline</em></h3>
-        <p>What does your face do when you're thinking — not performing? Continuous ambient capture reveals what snapshots never can.</p>
-        <div class="art-card-foot">
-          <span class="ac-meta">6 min read</span>
-          <span class="ac-arrow">→</span>
-        </div>
-      </a>
-    </div>
+    <div class="grid3" id="posts-grid"></div>
+    <div id="posts-pagination" style="display:flex;justify-content:center;gap:10px;margin-top:8px"></div>
   </div>
 
-  <!-- ── PATTERN INTELLIGENCE ── -->
-  <div class="topic-section rv">
-    <div class="topic-head">
-      <div>
-        <span class="sec-label">02 · Pattern Intelligence</span>
-        <h2 class="topic-title">Replicating how<br><em>you think.</em></h2>
-      </div>
-      <p class="topic-desc">The deepest goal of Chronis isn't preservation — it's understanding. What makes a mind recognisably itself? How do we encode that?</p>
-    </div>
-    <div class="grid3">
-      <a class="art-card" href="#">
-        <span class="art-tag">Research</span>
-        <h3>Can a Machine <em>Reason Like You Do?</em></h3>
-        <p>Not generally — but trained on years of your specific patterns, surprisingly close. The science behind personalised reasoning models.</p>
-        <div class="art-card-foot">
-          <span class="ac-meta">7 min read</span>
-          <span class="ac-arrow">→</span>
-        </div>
-      </a>
-      <a class="art-card" href="#">
-        <span class="art-tag teal">Deep Dive</span>
-        <h3>The Signature <em>of a Human Existence</em></h3>
-        <p>What distinguishes one person's intelligence from another? Turns out, it's compressible — and that changes everything about AI personalisation.</p>
-        <div class="art-card-foot">
-          <span class="ac-meta">8 min read</span>
-          <span class="ac-arrow">→</span>
-        </div>
-      </a>
-      <a class="art-card" href="#">
-        <span class="coming-chip">Coming soon</span>
-        <h3>Longitudinal Self: <em>How You Change Over Decades</em></h3>
-        <p>The self is not static. Data collected continuously over years shows patterns invisible in any single snapshot. A long study.</p>
-        <div class="art-card-foot">
-          <span class="ac-meta">10 min read</span>
-          <span class="ac-arrow">→</span>
-        </div>
-      </a>
-    </div>
-  </div>
-
-  <!-- ── MEMORY SCIENCE ── -->
-  <div class="topic-section rv">
-    <div class="topic-head">
-      <div>
-        <span class="sec-label">03 · Memory Science</span>
-        <h2 class="topic-title">What memory<br><em>actually is.</em></h2>
-      </div>
-      <p class="topic-desc">Most people think of memory as a recording. Neuroscience says it's a prediction engine. The difference matters enormously for what we build.</p>
-    </div>
-    <div class="grid3">
-      <a class="art-card" href="#">
-        <span class="art-tag">Practical</span>
-        <h3>How to Preserve a Voice <em>Before It's Too Late</em></h3>
-        <p>A practical guide for families who still have time. What to record, how to record it, and what to do with it. Written honestly.</p>
-        <div class="art-card-foot">
-          <span class="ac-meta">6 min read</span>
-          <span class="ac-arrow">→</span>
-        </div>
-      </a>
-      <a class="art-card" href="#">
-        <span class="art-tag amber">Guide</span>
-        <h3>The Difference Between <em>Memory and Presence</em></h3>
-        <p>A photograph is a memory. A voicemail is a memory. A person is something else entirely. On the gap Chronis is trying to close.</p>
-        <div class="art-card-foot">
-          <span class="ac-meta">5 min read</span>
-          <span class="ac-arrow">→</span>
-        </div>
-      </a>
-      <a class="art-card" href="#">
-        <span class="coming-chip">Coming soon</span>
-        <h3>What Grief Does <em>to Memory</em></h3>
-        <p>Bereavement systematically distorts memory. Understanding the neuroscience helps explain why preserved data matters more than recalled data.</p>
-        <div class="art-card-foot">
-          <span class="ac-meta">5 min read</span>
-          <span class="ac-arrow">→</span>
-        </div>
-      </a>
-    </div>
+  <!-- ── EMPTY STATE ── -->
+  <div class="rv" id="empty-state" style="display:none;text-align:center;padding:80px 24px">
+    <p style="font-family:var(--fd);font-size:26px;font-weight:300;color:var(--ch);margin-bottom:12px">The Journal is just getting started.</p>
+    <p style="color:var(--mu);font-size:14px;max-width:440px;margin:0 auto">Our first dispatches are on the way. Check back soon — or if you're on the team, head to Chronis OS to publish the first one.</p>
   </div>
 
   <!-- ── NEWSLETTER ── -->
@@ -471,11 +348,125 @@ const io=new IntersectionObserver(entries=>{
 },{threshold:.08});
 document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 
-/* ── Filter ── */
-function filterCat(btn,cat){
+/* ── Blog data layer ── */
+let CURRENT_CATEGORY = 'all';
+let CURRENT_PAGE = 1;
+
+function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(d){ return new Date(d).toLocaleDateString('en-IN',{year:'numeric',month:'long'}); }
+
+async function loadCategories(){
+  try{
+    const res = await fetch('/api/blog/categories');
+    if(!res.ok) return;
+    const cats = await res.json();
+    const wrap = document.getElementById('cat-filters');
+    cats.forEach(c=>{
+      const btn = document.createElement('button');
+      btn.className = 'f-pill';
+      btn.textContent = c.category;
+      btn.onclick = () => filterCat(btn, c.category);
+      wrap.appendChild(btn);
+    });
+  }catch(err){ console.error('loadCategories', err); }
+}
+
+function filterCat(btn, cat){
   document.querySelectorAll('.f-pill').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
+  CURRENT_CATEGORY = cat;
+  CURRENT_PAGE = 1;
+  loadPosts();
 }
+
+async function loadPosts(){
+  const params = new URLSearchParams({ page: CURRENT_PAGE, pageSize: 12 });
+  if (CURRENT_CATEGORY !== 'all') params.set('category', CURRENT_CATEGORY);
+
+  try{
+    const res = await fetch(`/api/blog/posts?${params}`);
+    if(!res.ok) throw new Error('fetch failed');
+    const { posts, page, totalPages } = await res.json();
+
+    document.getElementById('empty-state').style.display = posts.length ? 'none' : 'block';
+    document.getElementById('featured-section').style.display = 'none';
+    document.getElementById('posts-section').style.display = posts.length ? 'block' : 'none';
+
+    let list = posts;
+    // Show first featured/first post big on page 1 with no category filter
+    if (page === 1 && CURRENT_CATEGORY === 'all' && posts.length){
+      renderFeatured(posts[0], posts.slice(1,3));
+      list = posts.slice(1);
+      document.getElementById('featured-section').style.display = list.length || posts.length ? 'block' : 'none';
+    }
+
+    renderPostGrid(list);
+    renderPagination(page, totalPages);
+  }catch(err){
+    console.error('loadPosts', err);
+    document.getElementById('posts-section').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'block';
+  }
+}
+
+function renderFeatured(main, side){
+  if (!main) { document.getElementById('featured-section').style.display = 'none'; return; }
+  document.getElementById('featured-section').style.display = 'block';
+  document.getElementById('featured-grid').innerHTML = `
+    <a class="art-main liquid-card" href="/blog/${main.slug}">
+      <span class="art-tag">${escHtml(main.category)}</span>
+      <h2>${escHtml(main.title)}</h2>
+      <p>${escHtml(main.excerpt || '')}</p>
+      <div class="art-meta">
+        <span>${escHtml(main.author_name || 'Chronis Team')}</span>
+        <span>${main.read_minutes} min read</span>
+        <span>${fmtDate(main.published_at)}</span>
+        <span class="art-arrow">→</span>
+      </div>
+    </a>
+    <div class="art-side">
+      ${(side||[]).map(p=>`
+        <a class="art-sm" href="/blog/${p.slug}">
+          <span class="art-tag">${escHtml(p.category)}</span>
+          <h3>${escHtml(p.title)}</h3>
+          <p>${escHtml(p.excerpt || '')}</p>
+          <div class="art-meta">${p.read_minutes} min · ${fmtDate(p.published_at)}</div>
+        </a>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderPostGrid(posts){
+  const grid = document.getElementById('posts-grid');
+  if (!posts.length) { document.getElementById('posts-section').style.display = 'none'; return; }
+  document.getElementById('posts-section').style.display = 'block';
+  grid.innerHTML = posts.map(p=>`
+    <a class="art-card" href="/blog/${p.slug}">
+      <span class="art-tag">${escHtml(p.category)}</span>
+      <h3>${escHtml(p.title)}</h3>
+      <p>${escHtml(p.excerpt || '')}</p>
+      <div class="art-card-foot">
+        <span class="ac-meta">${p.read_minutes} min read</span>
+        <span class="ac-arrow">→</span>
+      </div>
+    </a>
+  `).join('');
+}
+
+function renderPagination(page, totalPages){
+  const el = document.getElementById('posts-pagination');
+  if (totalPages <= 1) { el.innerHTML=''; return; }
+  let html = '';
+  if (page > 1) html += `<button class="f-pill" onclick="goToPage(${page-1})">← Prev</button>`;
+  html += `<span style="align-self:center;font-size:12px;color:var(--mu)">Page ${page} of ${totalPages}</span>`;
+  if (page < totalPages) html += `<button class="f-pill" onclick="goToPage(${page+1})">Next →</button>`;
+  el.innerHTML = html;
+}
+function goToPage(p){ CURRENT_PAGE = p; loadPosts(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+loadCategories();
+loadPosts();
 
 /* ── Newsletter ── */
 function handleSub(e){

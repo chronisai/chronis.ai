@@ -39,7 +39,7 @@ from fastapi import (
     Request, UploadFile, WebSocket, WebSocketDisconnect,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from gradio_client import Client, handle_file
 
@@ -68,19 +68,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-@app.middleware("http")
-async def add_os_csp_header(request: Request, call_next):
-    response = await call_next(request)
-    if request.url.path.startswith("/os"):
-        response.headers["Content-Security-Policy"] = (
-            "default-src 'self' https: data: blob:; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; "
-            "style-src 'self' 'unsafe-inline' https:; "
-            "font-src 'self' https: data:; "
-            "connect-src 'self' wss: https:; "
-            "img-src 'self' data: https: blob:;"
-        )
-    return response
+
 # Register onboarding routes (/api/v2/onboard/*)
 app.include_router(onboarding_router)
 
@@ -1149,6 +1137,178 @@ async def live(email: str = ""):
     Admin bypass: ?admin_secret=SECRET
     """
     return FileResponse("static/live.html")
+
+
+
+# ── Public Blog — read-only proxy + SSR meta tags for SEO ────────────────────
+# NOTE: distinct from /os/api/blog/* (auth-gated write routes for Chronis OS
+# staff). These are the only blog routes meant for the public / search
+# crawlers, so they live outside /os and are NOT secret-gated.
+
+@app.get("/robots.txt")
+async def robots_txt():
+    return FileResponse("robots.txt", media_type="text/plain")
+
+
+@app.get("/favicon.ico")
+async def favicon_ico():
+    return FileResponse("favicon.ico", media_type="image/x-icon")
+
+
+@app.get("/sitemap.xml")
+async def sitemap_xml():
+    """
+    Dynamic sitemap: static pages (from sitemap.xml on disk) + every published
+    blog post, pulled live from the Chronis OS backend. This is what actually
+    gets new posts indexed quickly — a static file has to be hand-edited.
+    """
+    try:
+        with open("sitemap.xml", encoding="utf-8") as f:
+            base = f.read()
+    except FileNotFoundError:
+        base = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n</urlset>'
+
+    post_entries = ""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            r = await client.get(f"{OS_INTERNAL_URL}/api/blog/posts", params={"page": 1, "pageSize": 200})
+        if r.status_code == 200:
+            for post in r.json().get("posts", []):
+                lastmod = (post.get("updated_at") or post.get("published_at") or "")[:10]
+                post_entries += (
+                    f"  <url>\n"
+                    f"    <loc>{SITE_URL}/blog/{post['slug']}</loc>\n"
+                    f"    <lastmod>{lastmod}</lastmod>\n"
+                    f"    <changefreq>monthly</changefreq>\n"
+                    f"    <priority>0.7</priority>\n"
+                    f"  </url>\n"
+                )
+    except (httpx.ConnectError, httpx.TimeoutException):
+        pass  # fall back to static sitemap only if the blog service is down
+
+    merged = base.replace("</urlset>", post_entries + "</urlset>") if post_entries else base
+    return Response(content=merged, media_type="application/xml")
+
+
+@app.get("/blog")
+async def blog_index():
+    """Public blog listing page — clean URL (canonical), same file as /static/blog.html."""
+    return FileResponse("static/blog.html")
+
+
+@app.get("/api/blog/posts")
+async def blog_posts_public(page: int = 1, pageSize: int = 12, category: str = "", tag: str = "", search: str = ""):
+    """Public JSON feed of published posts. Proxies to the Chronis OS Node backend."""
+    params = {"page": page, "pageSize": pageSize}
+    if category: params["category"] = category
+    if tag: params["tag"] = tag
+    if search: params["search"] = search
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            r = await client.get(f"{OS_INTERNAL_URL}/api/blog/posts", params=params)
+        return Response(content=r.content, status_code=r.status_code, media_type="application/json")
+    except (httpx.ConnectError, httpx.TimeoutException):
+        raise HTTPException(status_code=503, detail="Blog service unavailable")
+
+
+@app.get("/api/blog/categories")
+async def blog_categories_public():
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            r = await client.get(f"{OS_INTERNAL_URL}/api/blog/categories")
+        return Response(content=r.content, status_code=r.status_code, media_type="application/json")
+    except (httpx.ConnectError, httpx.TimeoutException):
+        raise HTTPException(status_code=503, detail="Blog service unavailable")
+
+
+@app.get("/api/blog/posts/{slug}")
+async def blog_post_public(slug: str):
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            r = await client.get(f"{OS_INTERNAL_URL}/api/blog/posts/{slug}")
+        return Response(content=r.content, status_code=r.status_code, media_type="application/json")
+    except (httpx.ConnectError, httpx.TimeoutException):
+        raise HTTPException(status_code=503, detail="Blog service unavailable")
+
+
+def _inject_meta(html: str, *, title: str, description: str, canonical: str,
+                  image: str = "", published_time: str = "", jsonld: str = "",
+                  og_title: str = "", keywords: str = "") -> str:
+    """Swap in per-page <title>/meta/OG tags so crawlers see real content,
+    not the generic blog.html defaults, without needing JS execution."""
+    import html as _html
+    title = _html.escape(title)[:70]
+    description = _html.escape(description)[:160]
+    social_title = _html.escape(og_title)[:70] if og_title else title
+    tags = f'''<title>{title}</title>
+<meta name="description" content="{description}">
+<link rel="canonical" href="{canonical}">
+<meta property="og:title" content="{social_title}">
+<meta property="og:description" content="{description}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{canonical}">
+<meta name="twitter:card" content="{"summary_large_image" if image else "summary"}">
+<meta name="twitter:title" content="{social_title}">
+<meta name="twitter:description" content="{description}">'''
+    if keywords:
+        tags += f'\n<meta name="keywords" content="{_html.escape(keywords)}">'
+    if image:
+        tags += f'\n<meta property="og:image" content="{image}">'
+        tags += f'\n<meta name="twitter:image" content="{image}">'
+    if published_time:
+        tags += f'\n<meta property="article:published_time" content="{published_time}">'
+    if jsonld:
+        tags += f'\n<script type="application/ld+json">{jsonld}</script>'
+
+    out = re.sub(r"<title>.*?</title>", "", html, flags=re.S)
+    out = re.sub(r'<meta name="description"[^>]*>', "", out)
+    out = re.sub(r'<link rel="canonical"[^>]*>', "", out)
+    return out.replace("</head>", tags + "\n</head>")
+
+
+@app.get("/blog/{slug}")
+async def blog_post_page(slug: str):
+    """
+    Individual blog post — server-rendered meta tags for SEO.
+    Falls back to the generic blog page shell if the post can't be found;
+    the client-side script fills in the article body.
+    """
+    base_html = open("static/blog-post.html", encoding="utf-8").read() if os.path.exists("static/blog-post.html") \
+        else open("static/blog.html", encoding="utf-8").read()
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            r = await client.get(f"{OS_INTERNAL_URL}/api/blog/posts/{slug}")
+        if r.status_code == 200:
+            data = r.json()
+            post = data["post"]
+            canonical = f"{SITE_URL}/blog/{slug}"
+            jsonld = json.dumps({
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": post["title"],
+                "description": post.get("meta_description") or post.get("excerpt", ""),
+                "image": post.get("cover_image_url") or "",
+                "datePublished": post.get("published_at", ""),
+                "dateModified": post.get("updated_at", ""),
+                "author": {"@type": "Person", "name": post.get("author_name", "Chronis Team")},
+                "publisher": {"@type": "Organization", "name": "Chronis"},
+                "mainEntityOfPage": canonical,
+            })
+            html = _inject_meta(
+                base_html,
+                title=f"{post['title']} — The Chronis Journal",
+                description=post.get("meta_description") or post.get("excerpt", ""),
+                canonical=canonical,
+                image=post.get("cover_image_url", ""),
+                published_time=post.get("published_at", ""),
+                jsonld=jsonld,
+                og_title=post.get("og_title", ""),
+                keywords=", ".join(filter(None, [post.get("focus_keyword", "")] + (post.get("tags") or []))),
+            )
+            return HTMLResponse(html)
+    except (httpx.ConnectError, httpx.TimeoutException):
+        pass
+    return HTMLResponse(base_html, status_code=404)
 
 
 @app.get("/leaderboard")

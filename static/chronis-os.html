@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chronis HQ</title>
+<title>Chronis OS — Command Intelligence Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -36,18 +36,11 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 #view-login::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 20%,rgba(124,58,237,.09) 0%,transparent 70%);pointer-events:none}
 .login-bg-orb{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.12) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:orbFloat 8s ease-in-out infinite;pointer-events:none}
 @keyframes orbFloat{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-52%) scale(1.06)}}
-@keyframes gridMove{0%{transform:translateY(0)}100%{transform:translateY(60px)}}
-@keyframes particleDrift{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:.4}100%{transform:translateY(-120vh) translateX(40px);opacity:0}}
-@keyframes scanLine{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
-.login-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(124,58,237,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.04) 1px,transparent 1px);background-size:60px 60px;animation:gridMove 8s linear infinite;pointer-events:none;z-index:0}
-.login-scan{position:fixed;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,.18),transparent);animation:scanLine 12s linear infinite;pointer-events:none;z-index:0}
-.login-particles{position:fixed;inset:0;pointer-events:none;z-index:0}
-.lp{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--ne2);animation:particleDrift linear infinite}
 .login-card{position:relative;z-index:2;width:min(440px,92vw);background:linear-gradient(180deg,rgba(255,255,255,.038),rgba(255,255,255,.018));border:1px solid var(--bd2);border-radius:24px;padding:40px;backdrop-filter:blur(24px);box-shadow:0 24px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
-.login-logo{display:flex;align-items:center;flex-direction:column;gap:0;margin-bottom:16px;justify-content:center}
-
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
+.login-logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--ne) 0%,var(--ne2) 100%);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:18px;color:#fff;font-weight:300;letter-spacing:-1px}
 .login-logo-text{font-family:var(--fd);font-size:26px;font-weight:300;letter-spacing:-.5px}
-.login-logo-sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);font-weight:500;text-align:center;margin-top:4px;margin-bottom:28px;opacity:.8}
+.login-logo-sub{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;text-align:center;margin-top:-8px;margin-bottom:28px}
 .login-field{margin-bottom:14px}
 .login-field label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:7px}
 .fi{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:var(--r10);color:var(--tx);font-size:14px;font-family:var(--fb);padding:13px 15px;outline:none;transition:border-color .2s,background .2s}
@@ -60,7 +53,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 .role-dot{width:6px;height:6px;border-radius:50%}
 
 /* ===================== MAIN LAYOUT ===================== */
-#view-app{width:100%;min-height:100vh;flex-direction:column}
+#view-app{flex-direction:column;min-height:100vh}
 .app-shell{display:flex;flex:1;overflow:hidden}
 .sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s}
 .sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
@@ -86,7 +79,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 .logout-btn:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--rd2)}
 
 /* MAIN CONTENT */
-.main-content{margin-left:240px;display:flex;flex-direction:column;min-height:100vh;width:calc(100% - 240px)}
+.main-content{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh}
 .topbar{height:60px;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 28px;gap:16px;background:rgba(5,5,5,.8);backdrop-filter:blur(20px);position:sticky;top:0;z-index:50}
 .topbar-title{font-family:var(--fd);font-size:22px;font-weight:300;letter-spacing:-.3px;flex:1}
 .topbar-actions{display:flex;align-items:center;gap:10px}
@@ -323,6 +316,11 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 .fade-up{animation:fadeUp .4s ease both}
 </style>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png">
+<link rel="manifest" href="/static/icons/site.webmanifest">
 </head>
 <body>
 
@@ -332,23 +330,15 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 <!-- LOGIN VIEW -->
 <div id="view-login" class="view active" style="display:flex!important">
   <div class="login-bg-orb"></div>
-  <div class="login-grid"></div>
-  <div class="login-scan"></div>
-  <div class="login-particles">
-    <div class="lp" style="left:8%;animation-duration:18s;animation-delay:0s;width:2px;height:2px"></div>
-    <div class="lp" style="left:18%;animation-duration:24s;animation-delay:3s;width:1px;height:1px;opacity:.6"></div>
-    <div class="lp" style="left:32%;animation-duration:20s;animation-delay:6s"></div>
-    <div class="lp" style="left:47%;animation-duration:28s;animation-delay:1s;width:1px;height:1px"></div>
-    <div class="lp" style="left:61%;animation-duration:22s;animation-delay:9s;width:3px;height:3px;opacity:.5"></div>
-    <div class="lp" style="left:74%;animation-duration:16s;animation-delay:4s"></div>
-    <div class="lp" style="left:85%;animation-duration:26s;animation-delay:7s;width:1px;height:1px"></div>
-    <div class="lp" style="left:92%;animation-duration:19s;animation-delay:2s"></div>
-  </div>
   <div class="login-card fade-up">
-    <div class="login-logo" style="flex-direction:column;gap:6px;margin-bottom:8px">
-      <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:38px;font-weight:300;font-style:italic;letter-spacing:-1px;color:var(--tx);line-height:1">chronis.</div>
+    <div class="login-logo">
+      <div class="login-logo-mark">C</div>
+      <div>
+        <div style="font-family:var(--fd);font-size:22px;font-weight:300;letter-spacing:-.3px">Chronis</div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);font-weight:600">OS</div>
+      </div>
     </div>
-    <div class="login-logo-sub">Chronis HQ</div>
+    <div class="login-logo-sub">Command Intelligence Platform</div>
     <div id="login-role-indicator" class="login-role-badge">
       <span class="role-dot" id="login-role-dot" style="background:var(--mu)"></span>
       <span id="login-role-text">Enter credentials</span>
@@ -361,17 +351,18 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
       <label>Password</label>
       <input class="fi" type="password" id="login-password" placeholder="Password issued by admin">
     </div>
-    <button class="login-btn" onclick="doLogin()">Enter Chronis HQ →</button>
+    <button class="login-btn" onclick="doLogin()">Enter Chronis OS →</button>
     <div class="login-err" id="login-err"></div>
     <div style="margin-top:20px;padding:12px;background:var(--sf);border-radius:var(--r10);font-size:12px;color:var(--mu);text-align:center;line-height:1.7">
-      <strong style="color:var(--mu2)">login with the credentials sent through mail</strong><br>
-      support at founders@chronis.in &nbsp; &nbsp; <br>
+      <strong style="color:var(--mu2)">Demo accounts:</strong><br>
+      ceo@chronis.in / ceo123 &nbsp;|&nbsp; cto@chronis.in / cto123<br>
+      manager@chronis.in / mgr123 &nbsp;|&nbsp; alice@chronis.in / intern123
     </div>
   </div>
 </div>
 
 <!-- APP VIEW -->
-<div id="view-app" class="view">
+<div id="view-app" class="view" style="display:none!important">
   <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
@@ -437,7 +428,7 @@ let currentUser  = null;
 let socket       = null;
 
 // Local cache — populated from API on login
-let CACHE = { users: [], tasks: [], notifications: [] };
+let CACHE = { users: [], tasks: [], notifications: [], posts: [], editingPostId: null };
 
 // Countdown intervals tracker
 let countdownIntervals = {};
@@ -478,14 +469,16 @@ async function apiFetch(path, options = {}) {
 // ── Load all initial data in one pass ────────────
 async function loadInitialData() {
   try {
-    const [usersRes, tasksRes, notifsRes] = await Promise.all([
+    const [usersRes, tasksRes, notifsRes, postsRes] = await Promise.all([
       apiFetch('/users'),
       apiFetch('/tasks'),
       apiFetch('/notifications'),
+      apiFetch('/blog/admin/posts'),
     ]);
     CACHE.users         = await usersRes.json();
     CACHE.tasks         = await tasksRes.json();
     CACHE.notifications = await notifsRes.json();
+    CACHE.posts         = postsRes && postsRes.ok ? await postsRes.json() : [];
   } catch (err) {
     console.error('loadInitialData error:', err);
     toast('error', 'Failed to load data. Check your connection.');
@@ -650,15 +643,8 @@ function updateLoginRole() {
 }
 
 function switchView(v) {
-  const login = document.getElementById("view-login");
-  const app   = document.getElementById("view-app");
-  if (v === "app") {
-    login.style.cssText = "display:none!important;";
-    app.style.cssText   = "display:flex!important;width:100%!important;min-height:100vh!important;flex-direction:column!important;";
-  } else {
-    login.style.cssText = "display:flex!important;";
-    app.style.cssText   = "display:none!important;";
-  }
+  document.getElementById('view-login').style.display = v === 'login' ? 'flex' : 'none';
+  document.getElementById('view-app').style.display   = v === 'app'   ? 'flex' : 'none';
 }
 
 // ===================================================
@@ -694,6 +680,7 @@ function buildSidebarNav() {
     { id: 'leaderboard',    icon: '⭑', label: 'Leaderboard' },
     { id: 'directory',      icon: '◈', label: 'Intern Directory' },
     { id: 'notifications',  icon: '◎', label: 'Notifications',  badge: unread || 0 },
+    { id: 'blog',           icon: '✎', label: 'Blog Studio' },
   ];
   commonPages.forEach(p => {
     html += `<div class="nav-item" id="nav-${p.id}" onclick="showPage('${p.id}')">`
@@ -734,6 +721,7 @@ function showPage(page) {
   const titles = {
     dashboard: 'Dashboard', tasks: 'My Tasks', profile: 'My Profile',
     leaderboard: 'Leaderboard', directory: 'Intern Directory', notifications: 'Notifications',
+    blog: 'Blog Studio', 'blog-editor': 'Write Post',
     'manage-tasks': 'Task Control', 'intern-mgmt': 'Intern Management',
     heatmap: 'Activity Heatmap', 'create-profile': 'Create Profile',
     'cto-panel': 'CTO Command', analytics: 'Analytics',
@@ -752,6 +740,8 @@ function showPage(page) {
     leaderboard:      buildLeaderboard,
     directory:        buildDirectory,
     notifications:    buildNotifications,
+    blog:             buildBlog,
+    'blog-editor':    buildBlogEditor,
     'manage-tasks':   buildManageTasks,
     'intern-mgmt':    buildInternMgmt,
     heatmap:          buildHeatmap,
@@ -774,6 +764,7 @@ function afterBuild(page) {
   if (page === 'leaderboard') animateLeaderboard();
   if (page === 'notifications') markAllRead();
   if (page === 'heatmap') loadHeatmaps();
+  if (page === 'blog-editor') initBlogEditor();
 }
 
 // ===================================================
@@ -1794,6 +1785,374 @@ function buildOrg() {
       `).join('')}
     </div>
   </div>`;
+}
+
+// ===================================================
+// BLOG STUDIO
+// ===================================================
+const PUBLISHER_ROLES = ['manager', 'cto', 'ceo'];
+function canPublish() { return PUBLISHER_ROLES.includes(currentUser.role); }
+
+function postStatusBadge(s) {
+  return {
+    draft:      '<span class="badge badge-grey">◌ Draft</span>',
+    in_review:  '<span class="badge badge-amber">↻ In Review</span>',
+    published:  '<span class="badge badge-green">✓ Published</span>',
+  }[s] || s;
+}
+
+// Minimal, dependency-free markdown → HTML for the live preview and public render.
+// Not exhaustive by design — headings, bold/italic, links, lists, blockquotes, code, paragraphs.
+function mdToHtml(md) {
+  if (!md) return '';
+  let h = md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+    .replace(/^&gt; (.*)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/!\[(.*?)\]\((https?:\/\/[^\s)]+?)(?:\s+"(.*?)")?\)/g, (m, alt, src, caption) => {
+      const img = `<img src="${src}" alt="${alt.replace(/"/g,'&quot;')}" style="max-width:100%;border-radius:10px">`;
+      return caption ? `<figure>${img}<figcaption style="font-size:12px;color:var(--mu);margin-top:6px">${caption}</figcaption></figure>` : img;
+    })
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/^- (.*)$/gm, '<li>$1</li>');
+  h = h.replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`);
+  h = h.split(/\n{2,}/).map(block => {
+    if (/^<(h1|h2|h3|ul|blockquote|figure|img)/.test(block.trim())) return block;
+    return block.trim() ? `<p>${block.trim().replace(/\n/g, '<br>')}</p>` : '';
+  }).join('\n');
+  return h;
+}
+
+function buildBlog() {
+  const r = currentUser.role;
+  const mine = CACHE.posts.filter(p => p.author_id === currentUser.id);
+  const drafts    = mine.filter(p => p.status === 'draft');
+  const inReview  = CACHE.posts.filter(p => p.status === 'in_review');
+  const published = CACHE.posts.filter(p => p.status === 'published');
+
+  return `
+  <div class="fade-up">
+    <div class="stats-grid">
+      <div class="stat-card purple"><div class="stat-label">Your Drafts</div><div class="stat-val stat-glow-purple">${drafts.length}</div></div>
+      <div class="stat-card amber"><div class="stat-label">${canPublish() ? 'Awaiting Review' : 'In Review'}</div><div class="stat-val stat-glow-amber">${canPublish() ? inReview.length : mine.filter(p => p.status === 'in_review').length}</div></div>
+      <div class="stat-card green"><div class="stat-label">Published</div><div class="stat-val stat-glow-green">${published.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Total Views</div><div class="stat-val">${published.reduce((a, p) => a + (p.view_count || 0), 0)}</div></div>
+    </div>
+
+    <div class="section-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="panel-kicker">The Chronis Journal</div>
+          <div class="panel-title">Blog Studio</div>
+        </div>
+        <button class="btn btn-primary" onclick="openBlogEditor()">✎ Write New Post</button>
+      </div>
+      ${canPublish() && inReview.length ? `
+        <div class="inline-alert warn">📝 ${inReview.length} post${inReview.length > 1 ? 's' : ''} waiting for your review.</div>
+      ` : ''}
+      ${buildPostTable(canPublish() ? CACHE.posts : mine)}
+    </div>
+  </div>`;
+}
+
+function buildPostTable(posts) {
+  if (!posts.length) return `<div style="color:var(--mu);text-align:center;padding:40px">No posts yet. Click "Write New Post" to get started.</div>`;
+  const sorted = [...posts].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+  return `
+  <div style="display:flex;flex-direction:column;gap:10px">
+    ${sorted.map(p => `
+      <div class="section-panel" style="padding:16px 18px;margin-bottom:0" id="post-row-${p.id}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+              ${postStatusBadge(p.status)}
+              <span class="badge badge-purple">${p.category}</span>
+              ${p.featured ? '<span class="badge badge-blue">★ Featured</span>' : ''}
+            </div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:400">${p.title}</div>
+            <div style="font-size:12px;color:var(--mu);margin-top:4px">
+              By ${p.author_name} · ${p.read_minutes} min read
+              ${p.status === 'published' ? ` · ${p.view_count || 0} views · ${new Date(p.published_at).toLocaleDateString('en-IN')}` : ` · updated ${new Date(p.updated_at).toLocaleDateString('en-IN')}`}
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${p.status !== 'published' && (p.author_id === currentUser.id || canPublish()) ? `<button class="btn btn-sm" onclick="openBlogEditor('${p.id}')">Edit</button>` : ''}
+            ${p.status === 'published' ? `<a class="btn btn-sm" href="/blog/${p.slug}" target="_blank">View ↗</a>` : ''}
+            ${p.status === 'draft' && p.author_id === currentUser.id ? `<button class="btn btn-sm btn-primary" onclick="submitPostForReview('${p.id}')">Submit for Review</button>` : ''}
+            ${p.status === 'in_review' && canPublish() ? `<button class="btn btn-sm btn-primary" onclick="publishPost('${p.id}')">✓ Publish</button>` : ''}
+            ${p.status === 'published' && canPublish() ? `<button class="btn btn-sm btn-warn" onclick="unpublishPost('${p.id}')">Unpublish</button>` : ''}
+            ${(p.status === 'draft' && p.author_id === currentUser.id) || canPublish() ? `<button class="btn btn-sm btn-danger" onclick="deletePost('${p.id}','${p.title.replace(/'/g, "\\'")}')">Delete</button>` : ''}
+          </div>
+        </div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+function openBlogEditor(postId = '') {
+  CACHE.editingPostId = postId || null;
+  showPage('blog-editor');
+}
+
+function buildBlogEditor() {
+  const editing = CACHE.editingPostId ? CACHE.posts.find(p => p.id === CACHE.editingPostId) : null;
+  const locked = editing && editing.status === 'published' && !canPublish();
+
+  return `
+  <div class="fade-up">
+    <div class="section-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div>
+          <div class="panel-kicker">${editing ? postStatusBadge(editing.status).replace(/<[^>]+>/g, '') : 'New'}</div>
+          <div class="panel-title">${editing ? 'Edit Post' : 'Write New Post'}</div>
+        </div>
+        <button class="btn" onclick="showPage('blog')">← Back to Blog Studio</button>
+      </div>
+
+      <div class="form-row full"><div class="form-group">
+        <label class="form-label">Title</label>
+        <input class="fi" id="p-title" placeholder="A clear, compelling headline" value="${editing ? escAttr(editing.title) : ''}" ${locked ? 'disabled' : ''}>
+      </div></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <input class="fi" id="p-category" placeholder="e.g. Memory Science" value="${editing ? escAttr(editing.category) : ''}" ${locked ? 'disabled' : ''}>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tags (comma separated)</label>
+          <input class="fi" id="p-tags" placeholder="e.g. neuroscience, habits" value="${editing ? escAttr((editing.tags || []).join(', ')) : ''}" ${locked ? 'disabled' : ''}>
+        </div>
+      </div>
+
+      <div class="form-row full"><div class="form-group">
+        <label class="form-label">Excerpt (shown on cards, ~1-2 sentences)</label>
+        <textarea class="fi" id="p-excerpt" placeholder="A short teaser for the article listing..." style="min-height:60px;resize:vertical" ${locked ? 'disabled' : ''}>${editing ? escHtml(editing.excerpt || '') : ''}</textarea>
+      </div></div>
+
+      <div class="form-row full"><div class="form-group">
+        <label class="form-label">Cover Image</label>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="file" id="p-cover-input" accept="image/*" style="display:none" onchange="handleCoverUpload(event)">
+          <button class="btn btn-sm" onclick="document.getElementById('p-cover-input').click()" ${locked ? 'disabled' : ''}>Upload Image</button>
+          <span id="p-cover-status" style="font-size:12px;color:var(--mu)">${editing && editing.cover_image_url ? 'Cover uploaded ✓' : 'No cover uploaded'}</span>
+        </div>
+        <input type="hidden" id="p-cover-url" value="${editing ? escAttr(editing.cover_image_url || '') : ''}">
+        <img id="p-cover-thumb" src="${editing ? escAttr(editing.cover_image_url || '') : ''}" style="max-width:260px;border-radius:10px;border:1px solid var(--bd);margin-top:10px;${editing && editing.cover_image_url ? '' : 'display:none'}">
+      </div></div>
+
+      <div class="form-row full"><div class="form-group">
+        <label class="form-label">Cover Image Alt Text (for accessibility & image SEO)</label>
+        <input class="fi" id="p-cover-alt" placeholder="Describe the image for screen readers and Google Images" value="${editing ? escAttr(editing.cover_image_alt || '') : ''}" ${locked ? 'disabled' : ''}>
+      </div></div>
+
+      <div class="section-divider" style="margin:24px 0 18px;padding-top:18px;border-top:1px solid var(--bd)">
+        <div class="panel-kicker">Search & Social</div>
+        <div class="panel-title" style="font-size:16px">SEO Settings</div>
+      </div>
+
+      <div class="form-row full"><div class="form-group">
+        <label class="form-label">Focus Keyword (the main phrase you want this post to rank for)</label>
+        <input class="fi" id="p-keyword" placeholder="e.g. voice memory preservation" value="${editing ? escAttr(editing.focus_keyword || '') : ''}" ${locked ? 'disabled' : ''}>
+      </div></div>
+
+      <div class="form-row full"><div class="form-group">
+        <label class="form-label">Social Title Override (optional — shown when shared on X / LinkedIn, defaults to Title)</label>
+        <input class="fi" id="p-og-title" placeholder="Leave blank to reuse the article title" value="${editing ? escAttr(editing.og_title || '') : ''}" ${locked ? 'disabled' : ''}>
+      </div></div>
+
+      <div class="form-row full"><div class="form-group">
+        <label class="form-label">SEO Meta Description (~155 characters, shown in Google results)</label>
+        <textarea class="fi" id="p-meta" placeholder="What should search engines show under the title?" style="min-height:50px;resize:vertical" maxlength="160" ${locked ? 'disabled' : ''}>${editing ? escHtml(editing.meta_description || '') : ''}</textarea>
+        <span id="p-meta-count" style="font-size:11px;color:var(--mu)"></span>
+      </div></div>
+
+      <div class="form-row full"><div class="form-group">
+        <label class="form-label">Body (Markdown supported: # headings, **bold**, *italic*, - lists, > quotes, [links](url), ![alt](image-url) for images)</label>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input type="file" id="p-inline-img-input" accept="image/*" style="display:none" onchange="handleInlineImageUpload(event)">
+          <button class="btn btn-sm" onclick="document.getElementById('p-inline-img-input').click()" ${locked ? 'disabled' : ''}>🖼 Insert Image</button>
+          <span id="p-inline-img-status" style="font-size:12px;color:var(--mu);align-self:center"></span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <textarea class="fi" id="p-body" oninput="updateMdPreview()" placeholder="Write your article here..." style="min-height:420px;resize:vertical;font-family:ui-monospace,monospace;font-size:13px;line-height:1.6" ${locked ? 'disabled' : ''}>${editing ? escHtml(editing.body_md || '') : ''}</textarea>
+          <div id="p-preview" style="min-height:420px;overflow-y:auto;background:rgba(255,255,255,.02);border:1px solid var(--bd);border-radius:var(--r10);padding:16px;font-size:14px;line-height:1.7;color:var(--mu2)"></div>
+        </div>
+      </div></div>
+
+      ${canPublish() ? `
+      <div class="form-row"><div class="form-group">
+        <label class="form-label"><input type="checkbox" id="p-featured" ${editing && editing.featured ? 'checked' : ''}> Feature this post on the blog homepage</label>
+      </div></div>` : ''}
+
+      <div class="form-actions">
+        <button class="btn" onclick="showPage('blog')">Cancel</button>
+        <button class="btn btn-primary" onclick="savePost('${editing ? editing.id : ''}')" ${locked ? 'disabled' : ''}>${editing ? 'Save Changes' : 'Save Draft'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function escHtml(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function escAttr(s) { return escHtml(s).replace(/"/g, '&quot;'); }
+
+function initBlogEditor() {
+  updateMdPreview();
+  updateMetaCount();
+  const metaEl = document.getElementById('p-meta');
+  if (metaEl) metaEl.addEventListener('input', updateMetaCount);
+}
+function updateMetaCount() {
+  const el = document.getElementById('p-meta');
+  const counter = document.getElementById('p-meta-count');
+  if (!el || !counter) return;
+  const len = el.value.length;
+  counter.textContent = `${len}/155 characters${len > 155 ? ' — a bit long, may get truncated in search results' : ''}`;
+  counter.style.color = len > 155 ? 'var(--am2)' : 'var(--mu)';
+}
+function updateMdPreview() {
+  const body = document.getElementById('p-body');
+  const prev = document.getElementById('p-preview');
+  if (body && prev) prev.innerHTML = mdToHtml(body.value) || '<span style="color:var(--mu)">Preview will appear here as you type…</span>';
+}
+
+async function handleCoverUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('p-cover-status').textContent = 'Uploading…';
+  const fd = new FormData();
+  fd.append('cover', file);
+  try {
+    const res = await fetch(`${API}/upload/blog-cover`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok) { toast('error', data.error || 'Upload failed'); document.getElementById('p-cover-status').textContent = 'Upload failed'; return; }
+    document.getElementById('p-cover-url').value = data.url;
+    document.getElementById('p-cover-status').textContent = 'Cover uploaded ✓';
+    const thumb = document.getElementById('p-cover-thumb');
+    thumb.src = data.url;
+    thumb.style.display = 'block';
+    toast('success', 'Cover image uploaded');
+  } catch (err) {
+    console.error(err);
+    toast('error', 'Upload failed. Check your connection.');
+    document.getElementById('p-cover-status').textContent = 'Upload failed';
+  }
+}
+
+async function handleInlineImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('p-inline-img-status');
+  statusEl.textContent = 'Uploading…';
+  const fd = new FormData();
+  fd.append('cover', file); // reuses the same upload endpoint/transform
+  try {
+    const res = await fetch(`${API}/upload/blog-cover`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      body: fd,
+    });
+    const data = await res.json();
+    if (!res.ok) { toast('error', data.error || 'Upload failed'); statusEl.textContent = ''; return; }
+
+    const alt = prompt('Alt text for this image (helps SEO & accessibility):', '') || 'Image';
+    const body = document.getElementById('p-body');
+    const markdown = `\n![${alt}](${data.url})\n`;
+    const pos = body.selectionStart || body.value.length;
+    body.value = body.value.slice(0, pos) + markdown + body.value.slice(pos);
+    updateMdPreview();
+    statusEl.textContent = 'Image inserted ✓';
+    toast('success', 'Image inserted into post');
+    setTimeout(() => { statusEl.textContent = ''; }, 2500);
+  } catch (err) {
+    console.error(err);
+    toast('error', 'Upload failed. Check your connection.');
+    statusEl.textContent = '';
+  }
+}
+
+async function savePost(existingId) {
+  const title   = document.getElementById('p-title').value.trim();
+  const body_md = document.getElementById('p-body').value.trim();
+  const category = document.getElementById('p-category').value.trim() || 'General';
+  const tags     = document.getElementById('p-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+  const excerpt  = document.getElementById('p-excerpt').value.trim();
+  const meta_description = document.getElementById('p-meta').value.trim();
+  const cover_image_url  = document.getElementById('p-cover-url').value.trim();
+  const cover_image_alt  = document.getElementById('p-cover-alt').value.trim();
+  const focus_keyword    = document.getElementById('p-keyword').value.trim();
+  const og_title          = document.getElementById('p-og-title').value.trim();
+  const featuredEl = document.getElementById('p-featured');
+  const featured = featuredEl ? featuredEl.checked : undefined;
+
+  if (!title)   { toast('error', 'Title is required.'); return; }
+  if (!body_md) { toast('error', 'Post body cannot be empty.'); return; }
+
+  const payload = { title, body_md, category, tags, excerpt, meta_description, cover_image_url, cover_image_alt, focus_keyword, og_title };
+  if (featured !== undefined) payload.featured = featured;
+
+  const res = existingId
+    ? await apiFetch(`/blog/posts/${existingId}`, { method: 'PATCH', body: JSON.stringify(payload) })
+    : await apiFetch('/blog/posts', { method: 'POST', body: JSON.stringify(payload) });
+
+  const data = await res.json();
+  if (!res.ok) { toast('error', data.error || 'Failed to save post'); return; }
+
+  const idx = CACHE.posts.findIndex(p => p.id === data.id);
+  if (idx >= 0) CACHE.posts[idx] = data; else CACHE.posts.push(data);
+
+  toast('success', existingId ? 'Post updated' : 'Draft saved');
+  CACHE.editingPostId = data.id;
+  showPage('blog');
+}
+
+async function submitPostForReview(id) {
+  const res = await apiFetch(`/blog/posts/${id}/submit`, { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) { toast('error', data.error); return; }
+  const idx = CACHE.posts.findIndex(p => p.id === id);
+  if (idx >= 0) CACHE.posts[idx] = data;
+  toast('success', 'Submitted for review');
+  showPage('blog');
+}
+
+async function publishPost(id) {
+  const res = await apiFetch(`/blog/posts/${id}/publish`, { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) { toast('error', data.error); return; }
+  const idx = CACHE.posts.findIndex(p => p.id === id);
+  if (idx >= 0) CACHE.posts[idx] = data;
+  toast('success', `"${data.title}" is live 🎉`);
+  showPage('blog');
+}
+
+async function unpublishPost(id) {
+  const res = await apiFetch(`/blog/posts/${id}/unpublish`, { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) { toast('error', data.error); return; }
+  const idx = CACHE.posts.findIndex(p => p.id === id);
+  if (idx >= 0) CACHE.posts[idx] = data;
+  toast('info', 'Post moved back to draft');
+  showPage('blog');
+}
+
+async function deletePost(id, title) {
+  if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+  const res = await apiFetch(`/blog/posts/${id}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) { toast('error', data.error); return; }
+  CACHE.posts = CACHE.posts.filter(p => p.id !== id);
+  toast('success', 'Post deleted');
+  showPage('blog');
 }
 
 // ===================================================

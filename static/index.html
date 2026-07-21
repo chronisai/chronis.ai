@@ -263,6 +263,11 @@ footer{position:relative;z-index:1}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="/static/js/chronis-nav.js" defer></script>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png">
+<link rel="manifest" href="/static/icons/site.webmanifest">
 </head>
 <body>
 <canvas id="bgc"></canvas>
@@ -386,6 +391,9 @@ async function loadCount(){
 }
 loadCount();
 
+/* ── Capture referral code from URL ── */
+const _ref=new URLSearchParams(window.location.search).get('ref')||'';
+
 /* ── Join waitlist ── */
 async function joinWL(){
   const btn=document.getElementById('jb'),msg=document.getElementById('msg');
@@ -397,7 +405,7 @@ async function joinWL(){
   btn.disabled=true;btn.innerHTML='Joining… <span class="join-arrow">↻</span>';
   msg.className='form-msg';msg.textContent='';
   try{
-    const r=await fetch('/api/waitlist/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,country})});
+    const r=await fetch('/api/waitlist/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,country,ref:_ref})});
     const d=await r.json();
     if(r.ok&&d.success){window.location.href='/thankyou'}
     else{msg.className='form-msg err';msg.textContent=d.detail||d.error||'Something went wrong.';btn.disabled=false;btn.innerHTML='Join the waitlist <span class="join-arrow">→</span>'}
