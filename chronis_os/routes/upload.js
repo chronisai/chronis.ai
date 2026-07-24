@@ -1,7 +1,7 @@
 const router     = require('express').Router();
 const cloudinary = require('cloudinary').v2;
 const multer     = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { CloudinaryStorage } = require('../utils/cloudinaryStorage');
 const db         = require('../db');
 const auth       = require('../middleware/auth');
 const { logActivity } = require('../services/activityLog');
