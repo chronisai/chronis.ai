@@ -34,7 +34,28 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 /* ===================== LOGIN PAGE ===================== */
 #view-login{min-height:100vh;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-direction:column}
 #view-login::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 20%,rgba(124,58,237,.09) 0%,transparent 70%);pointer-events:none}
+.login-logo{display:flex;align-items:center;justify-content:center;margin-bottom:32px}
+.login-wordmark{font-family:var(--fd);font-style:italic;font-weight:300;font-size:38px;letter-spacing:.5px;
+  background:linear-gradient(135deg,#fff 0%,#c9c9d1 35%,#8b8b96 60%,#dcdce2 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-align:center}
+
+/* Layered luxury ambience behind the login card */
 .login-bg-orb{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.12) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:orbFloat 8s ease-in-out infinite;pointer-events:none}
+.login-bg-orb2{position:fixed;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.05) 0%,transparent 72%);top:42%;left:58%;transform:translate(-50%,-50%);animation:orbFloat2 14s ease-in-out infinite;pointer-events:none}
+.login-bg-sweep{position:fixed;width:900px;height:900px;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:conic-gradient(from 0deg,transparent 0deg,rgba(167,139,250,.05) 90deg,transparent 180deg,rgba(196,181,253,.04) 270deg,transparent 360deg);
+  animation:sweepRotate 40s linear infinite;pointer-events:none;filter:blur(2px)}
+@keyframes orbFloat2{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.7}50%{transform:translate(-52%,-46%) scale(1.12);opacity:1}}
+@keyframes sweepRotate{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+.login-card::before{content:'';position:absolute;inset:-1px;border-radius:24px;padding:1px;
+  background:linear-gradient(120deg,transparent 20%,rgba(196,181,253,.35) 50%,transparent 80%);
+  background-size:250% 250%;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  animation:borderShimmer 6s ease-in-out infinite;pointer-events:none}
+@keyframes borderShimmer{0%,100%{background-position:0% 0%}50%{background-position:100% 100%}}
 @keyframes orbFloat{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-52%) scale(1.06)}}
 .login-card{position:relative;z-index:2;width:min(440px,92vw);background:linear-gradient(180deg,rgba(255,255,255,.038),rgba(255,255,255,.018));border:1px solid var(--bd2);border-radius:24px;padding:40px;backdrop-filter:blur(24px);box-shadow:0 24px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
 .login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
@@ -329,16 +350,13 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 
 <!-- LOGIN VIEW -->
 <div id="view-login" class="view active" style="display:flex!important">
+  <div class="login-bg-sweep"></div>
   <div class="login-bg-orb"></div>
+  <div class="login-bg-orb2"></div>
   <div class="login-card fade-up">
     <div class="login-logo">
-      <div class="login-logo-mark">C</div>
-      <div>
-        <div style="font-family:var(--fd);font-size:22px;font-weight:300;letter-spacing:-.3px">Chronis</div>
-        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ne2);font-weight:600">OS</div>
-      </div>
+      <div class="login-wordmark">Chronis</div>
     </div>
-    <div class="login-logo-sub">Command Intelligence Platform</div>
     <div id="login-role-indicator" class="login-role-badge">
       <span class="role-dot" id="login-role-dot" style="background:var(--mu)"></span>
       <span id="login-role-text">Enter credentials</span>
@@ -353,11 +371,6 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
     </div>
     <button class="login-btn" onclick="doLogin()">Enter Chronis OS →</button>
     <div class="login-err" id="login-err"></div>
-    <div style="margin-top:20px;padding:12px;background:var(--sf);border-radius:var(--r10);font-size:12px;color:var(--mu);text-align:center;line-height:1.7">
-      <strong style="color:var(--mu2)">Demo accounts:</strong><br>
-      ceo@chronis.in / ceo123 &nbsp;|&nbsp; cto@chronis.in / cto123<br>
-      manager@chronis.in / mgr123 &nbsp;|&nbsp; alice@chronis.in / intern123
-    </div>
   </div>
 </div>
 

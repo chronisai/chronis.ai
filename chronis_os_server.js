@@ -75,6 +75,7 @@ app.use('/api/tasks',         require('./chronis_os/routes/tasks'));
 app.use('/api/notifications', require('./chronis_os/routes/notifications'));
 app.use('/api/analytics',     require('./chronis_os/routes/analytics'));
 app.use('/api/upload',        require('./chronis_os/routes/upload'));
+app.use('/api/blog',          require('./chronis_os/routes/blog'));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok', service: 'Chronis OS' }));
 
@@ -89,7 +90,7 @@ app.use((err, _req, res, _next) => {
 // ── Startup ────────────────────────────────────────────────────────────────
 const PORT = parseInt(process.env.OS_PORT || '3001', 10);
 
-server.listen(PORT, "127.0.0.1", async () => {
+server.listen(PORT, async () => {
   console.log(`\n🏢 Chronis OS backend running on internal port ${PORT}`);
   console.log(`   Accessible via FastAPI proxy at /os/\n`);
 
