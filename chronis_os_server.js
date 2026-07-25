@@ -42,6 +42,21 @@ const initSocket         = require('./chronis_os/socket');
 const { sweepOverdueTasks } = require('./chronis_os/services/taskStatus');
 
 const app    = express();
+
+// Disable ETag generation — this is a live dashboard, not a static content
+// server. With ETags on, Express hashes every JSON response and returns 304
+// Not Modified for unchanged data, but a 304 has NO body per HTTP spec. Any
+// client that doesn't perfectly replicate browser disk-cache semantics on
+// every request (custom fetch wrappers, Authorization headers, etc.) gets an
+// empty body it can't parse — which is exactly what was breaking the OS
+// dashboard's initial data load. Simplest permanent fix: never generate them.
+app.set('etag', false);
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  }
+  next();
+});
 const server = http.createServer(app);
 
 // ── CORS — only allow requests coming from FastAPI proxy (same origin) ─────

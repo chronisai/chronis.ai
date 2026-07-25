@@ -496,12 +496,12 @@ async function loadInitialData() {
     ]);
     for (const [name, r] of [['users', usersRes], ['tasks', tasksRes], ['notifications', notifsRes], ['posts', postsRes]]) {
       if (r === null) throw new Error(`${name}: request was aborted (session invalid — see apiFetch logs above)`);
-      if (!r.ok) throw new Error(`${name}: server returned ${r.status} ${r.statusText}`);
+      if (!r.ok && r.status !== 304) throw new Error(`${name}: server returned ${r.status} ${r.statusText}`);
     }
-    CACHE.users         = await usersRes.json();
-    CACHE.tasks         = await tasksRes.json();
-    CACHE.notifications = await notifsRes.json();
-    CACHE.posts         = await postsRes.json();
+    CACHE.users         = await usersRes.json().catch(() => CACHE.users);
+    CACHE.tasks         = await tasksRes.json().catch(() => CACHE.tasks);
+    CACHE.notifications = await notifsRes.json().catch(() => CACHE.notifications);
+    CACHE.posts         = await postsRes.json().catch(() => CACHE.posts);
   } catch (err) {
     console.error('loadInitialData error:', err);
     toast('error', 'Failed to load data. Check your connection.');
