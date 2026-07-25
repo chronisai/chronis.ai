@@ -33,6 +33,7 @@ from typing import Dict, Optional
 
 import httpx
 import requests
+import websockets as ws_client
 from services.razorpay_client import create_order, verify_payment, RAZORPAY_KEY_ID as _RZP_KEY_CONFIGURED
 from fastapi import (
     BackgroundTasks, FastAPI, File, Form, HTTPException,
@@ -1079,6 +1080,61 @@ async def os_api_proxy(path: str, request: Request):
         raise HTTPException(status_code=503, detail="Chronis OS backend not running. Start with: node chronis_os_server.js")
     except httpx.TimeoutException:
         raise HTTPException(status_code=504, detail="Chronis OS backend timed out")
+
+
+@app.websocket("/os/socket.io/{path:path}")
+async def os_socketio_ws_proxy(client_ws: WebSocket, path: str):
+    """
+    Proxies the Socket.IO WEBSOCKET transport to the Chronis OS Node.js backend.
+    The api_route above only ever handled polling (plain HTTP GET/POST); a real
+    upgrade request has nowhere to go without this handler, which is why the
+    browser saw 403 on 'transport=websocket' and silently fell back to polling.
+    """
+    query = client_ws.url.query
+    internal_ws_url = f"{OS_INTERNAL_URL.replace('http://', 'ws://').replace('https://', 'wss://')}/os/socket.io/{path}"
+    if query:
+        internal_ws_url += f"?{query}"
+
+    await client_ws.accept(subprotocol=client_ws.headers.get("sec-websocket-protocol"))
+
+    try:
+        async with ws_client.connect(internal_ws_url, open_timeout=10) as backend_ws:
+            async def client_to_backend():
+                try:
+                    while True:
+                        msg = await client_ws.receive()
+                        if msg["type"] == "websocket.disconnect":
+                            break
+                        if "text" in msg and msg["text"] is not None:
+                            await backend_ws.send(msg["text"])
+                        elif "bytes" in msg and msg["bytes"] is not None:
+                            await backend_ws.send(msg["bytes"])
+                except WebSocketDisconnect:
+                    pass
+
+            async def backend_to_client():
+                try:
+                    async for message in backend_ws:
+                        if isinstance(message, bytes):
+                            await client_ws.send_bytes(message)
+                        else:
+                            await client_ws.send_text(message)
+                except Exception:
+                    pass
+
+            done, pending = await asyncio.wait(
+                [asyncio.create_task(client_to_backend()), asyncio.create_task(backend_to_client())],
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            for task in pending:
+                task.cancel()
+    except Exception as e:
+        print(f"[OS socket proxy] error: {type(e).__name__}: {e}", flush=True)
+    finally:
+        try:
+            await client_ws.close()
+        except Exception:
+            pass
 
 
 @app.api_route("/os/socket.io/{path:path}", methods=["GET", "POST"])
