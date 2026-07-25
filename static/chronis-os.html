@@ -469,9 +469,15 @@ async function apiFetch(path, options = {}) {
         accessToken = d.accessToken;
         // Retry original request with new token
         return apiFetch(path, options);
+      } else {
+        const errBody = await rRes.json().catch(() => ({}));
+        console.error(`[apiFetch] refresh failed (${rRes.status}) after 401 on ${path}:`, errBody.error || rRes.statusText);
       }
-    } catch (_) {}
+    } catch (refreshErr) {
+      console.error(`[apiFetch] refresh request threw after 401 on ${path}:`, refreshErr);
+    }
     // Refresh failed — kick to login
+    console.error(`[apiFetch] logging out — 401 on ${path} could not be resolved by refresh`);
     doLogout();
     return null;
   }
@@ -488,10 +494,14 @@ async function loadInitialData() {
       apiFetch('/notifications'),
       apiFetch('/blog/admin/posts'),
     ]);
+    for (const [name, r] of [['users', usersRes], ['tasks', tasksRes], ['notifications', notifsRes], ['posts', postsRes]]) {
+      if (r === null) throw new Error(`${name}: request was aborted (session invalid — see apiFetch logs above)`);
+      if (!r.ok) throw new Error(`${name}: server returned ${r.status} ${r.statusText}`);
+    }
     CACHE.users         = await usersRes.json();
     CACHE.tasks         = await tasksRes.json();
     CACHE.notifications = await notifsRes.json();
-    CACHE.posts         = postsRes && postsRes.ok ? await postsRes.json() : [];
+    CACHE.posts         = await postsRes.json();
   } catch (err) {
     console.error('loadInitialData error:', err);
     toast('error', 'Failed to load data. Check your connection.');
