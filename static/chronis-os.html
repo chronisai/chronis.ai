@@ -349,7 +349,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 <div id="toast-container"></div>
 
 <!-- LOGIN VIEW -->
-<div id="view-login" class="view active" style="display:flex!important">
+<div id="view-login" class="view active">
   <div class="login-bg-sweep"></div>
   <div class="login-bg-orb"></div>
   <div class="login-bg-orb2"></div>
@@ -375,7 +375,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;
 </div>
 
 <!-- APP VIEW -->
-<div id="view-app" class="view" style="display:none!important">
+<div id="view-app" class="view">
   <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
@@ -666,8 +666,8 @@ function updateLoginRole() {
 }
 
 function switchView(v) {
-  document.getElementById('view-login').style.display = v === 'login' ? 'flex' : 'none';
-  document.getElementById('view-app').style.display   = v === 'app'   ? 'flex' : 'none';
+  document.getElementById('view-login').classList.toggle('active', v === 'login');
+  document.getElementById('view-app').classList.toggle('active', v === 'app');
 }
 
 // ===================================================
