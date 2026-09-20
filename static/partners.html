@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support Partners — Chronis · Built Alongside</title>
+<meta name="description" content="The institutions and companies supporting Chronis with manufacturing resources, AI infrastructure, and academic mentorship. All support is non-equity; Chronis retains full ownership of its IP.">
+<link rel="canonical" href="https://chronis.in/static/partners.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050505;--bg2:#0b0b0b;--bg3:#111111;
+  --sf:rgba(255,255,255,.024);--sf2:rgba(255,255,255,.044);
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.14);
+  --tx:#ece8e2;--mu:rgba(236,232,226,.38);--mu2:rgba(236,232,226,.62);--ch:rgba(236,232,226,.84);
+  --ne:#7c3aed;--ne2:#a78bfa;--ne3:#c4b5fd;
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{padding-top:64px;background:var(--bg);color:var(--tx);font-family:var(--fb);font-weight:400;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+main,footer,nav{position:relative;z-index:1}
+
+/* ── HERO ── */
+.hero{
+  position:relative;min-height:calc(70svh - 64px);
+  display:flex;align-items:center;justify-content:center;
+  padding:80px 24px 90px;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 65% at 50% 20%, rgba(124,58,237,.09) 0%, rgba(124,58,237,.03) 46%, transparent 74%),
+    linear-gradient(180deg, rgba(255,255,255,.013) 0%, transparent 28%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;left:50%;top:-44px;transform:translateX(-50%);
+  width:min(920px,90vw);height:clamp(210px,32vh,310px);
+  background:radial-gradient(ellipse at center, rgba(167,139,250,.17) 0%, rgba(124,58,237,.1) 36%, rgba(124,58,237,.03) 60%, transparent 78%);
+  filter:blur(32px);opacity:.88;
+  animation:heroGlow 8s ease-in-out infinite;pointer-events:none;
+}
+@keyframes heroGlow{0%,100%{transform:translateX(-50%) scale(1);opacity:.76}50%{transform:translateX(-50%) scale(1.07);opacity:1}}
+.hero-inner{position:relative;z-index:3;width:100%;max-width:760px;text-align:center;display:flex;flex-direction:column;align-items:center;padding-top:clamp(24px,5vh,64px)}
+.hero-ey{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);
+  background:var(--sf);border:1px solid var(--bd);border-radius:999px;
+  padding:8px 18px;margin-bottom:30px;font-weight:500;backdrop-filter:blur(12px);
+  animation:fadeUp .85s ease both;
+}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:var(--ne2);box-shadow:0 0 10px rgba(167,139,250,.9);animation:dotPulse 2.2s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.32}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.hero h1{
+  font-family:var(--fd);font-size:clamp(38px,7.5vw,72px);font-weight:300;line-height:1.02;
+  letter-spacing:-1.2px;margin:0 auto 22px;animation:fadeUp .95s .07s ease both;
+}
+.hero h1 em{font-style:italic;color:var(--mu2)}
+.hero-sub{
+  max-width:560px;font-size:clamp(14px,1.85vw,16px);line-height:1.86;color:var(--mu);font-weight:300;
+  margin:0 auto;animation:fadeUp 1.05s .15s ease both;
+}
+
+/* ── SECTIONS ── */
+.blk{padding:88px 24px;max-width:1100px;margin:0 auto}
+.blk-narrow{padding:88px 24px;max-width:720px;margin:0 auto}
+.sec-label{display:block;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--mu);font-weight:500;margin-bottom:14px}
+.sec-title{font-family:var(--fd);font-size:clamp(30px,5vw,48px);font-weight:300;line-height:1.06;letter-spacing:-.5px;color:var(--tx);margin-bottom:14px}
+.sec-title em{font-style:italic;color:var(--mu2)}
+.sec-copy{font-size:14.5px;line-height:1.84;color:var(--mu);font-weight:300;max-width:580px}
+.divider{border:none;border-top:1px solid var(--bd);margin:0}
+
+/* ── REVEAL ── */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .72s ease,transform .72s ease}
+.rv.vs{opacity:1;transform:translateY(0)}
+
+/* ── PARTNER CARDS ── */
+.partners-grid{display:flex;flex-direction:column;gap:16px;margin-top:52px}
+.pcard{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(180deg, rgba(255,255,255,.026), rgba(255,255,255,.010));
+  border:1px solid var(--bd);border-radius:22px;padding:36px;
+  transition:transform .3s ease,border-color .3s ease;
+}
+.pcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.28),transparent)}
+.pcard::after{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;z-index:0;
+  background:radial-gradient(circle 220px at var(--gx,-400px) var(--gy,-400px), rgba(167,139,250,.6) 0%, rgba(124,58,237,.24) 44%, transparent 68%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;transition:opacity .35s ease;
+}
+.pcard:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.18)}
+.pcard:hover::after{opacity:1}
+
+.pbody{position:relative;z-index:1}
+.pkicker{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px}
+.pkicker .ptag{
+  font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;font-weight:600;
+  padding:5px 11px;border-radius:999px;border:1px solid rgba(167,139,250,.2);
+  color:var(--ne3);background:rgba(167,139,250,.06);
+}
+.pbody h3{font-family:var(--fd);font-size:clamp(21px,3.2vw,27px);font-weight:400;color:var(--ch);line-height:1.15;margin-bottom:2px}
+.pbody .prole{font-size:12px;color:var(--mu2);font-weight:400;letter-spacing:.2px;margin-bottom:14px}
+.pbody p{font-size:14px;line-height:1.8;color:var(--mu);font-weight:300;max-width:640px}
+@media(max-width:640px){
+  .pcard{padding:28px 24px}
+}
+
+/* ── NOTE STRIP ── */
+.note{
+  margin-top:56px;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);
+  padding:32px 6px;display:flex;gap:18px;align-items:flex-start;
+}
+.note-mark{
+  flex-shrink:0;width:30px;height:30px;border-radius:50%;
+  border:1px solid rgba(167,139,250,.3);display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-style:italic;font-size:15px;color:var(--ne3);margin-top:2px;
+}
+.note p{font-size:13px;line-height:1.8;color:var(--mu);font-weight:300;max-width:640px}
+.note p strong{color:var(--ch);font-weight:500}
+
+/* ── PULL QUOTE ── */
+.pq{border-left:2px solid rgba(167,139,250,.32);padding:24px 30px;background:rgba(124,58,237,.025);border-radius:0 12px 12px 0;margin:60px 0}
+.pq-text{font-family:var(--fd);font-size:clamp(18px,3vw,24px);font-weight:300;font-style:italic;color:var(--ch);line-height:1.6;margin-bottom:12px}
+.pq-attr{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu);font-weight:500}
+</style>
+<script src="/static/js/chronis-nav.js" defer></script>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png">
+<link rel="manifest" href="/static/icons/site.webmanifest">
+</head>
+<body>
+
+<nav></nav>
+
+<main>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-ey"><span class="hero-dot"></span>Ecosystem · Support Partners</div>
+    <h1>Built with help.<br><em>Owned by Chronis.</em></h1>
+    <p class="hero-sub">The institutions and teams lending us resources, infrastructure, and expertise while we build. None of them hold a stake in what we're building.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── PARTNERS ─── -->
+<section class="blk rv">
+  <span class="sec-label">Who's supporting us</span>
+  <h2 class="sec-title">Three partners,<br><em>three kinds of runway.</em></h2>
+  <p class="sec-copy">Chronis is built by a small team moving fast on hardware, models, and infrastructure at once. These partners give us the room to do that without slowing down to solve problems that are already someone else's expertise.</p>
+
+  <div class="partners-grid">
+
+    <div class="pcard">
+      <div class="pbody">
+        <div class="pkicker"><span class="ptag">Manufacturing & Incubation</span></div>
+        <h3>Hansraj College · MHCIIE</h3>
+        <div class="prole">Manufacturing resources and incubation support</div>
+        <p>Hansraj College and its innovation and incubation cell, MHCIIE, back the physical build of the Chronis wearable. Their labs, fabrication access, and incubation framework let us move hardware iterations from prototype to production line without setting up manufacturing infrastructure from scratch.</p>
+      </div>
+    </div>
+
+    <div class="pcard">
+      <div class="pbody">
+        <div class="pkicker"><span class="ptag">AI Infrastructure</span></div>
+        <h3>Sarvam AI</h3>
+        <div class="prole">Compute credits and multilingual model access</div>
+        <p>Sarvam AI supports Chronis with AI credits and API access to their language models, giving us the multilingual foundation to build a memory platform that understands and responds across Indian languages rather than defaulting to English alone.</p>
+      </div>
+    </div>
+
+    <div class="pcard">
+      <div class="pbody">
+        <div class="pkicker"><span class="ptag">Academic Mentorship</span></div>
+        <h3>IIT BHU</h3>
+        <div class="prole">Infrastructure and mentorship through faculty advisors</div>
+        <p>IIT (BHU) Varanasi provides infrastructure support and technical guidance through a group of professors acting as mentors and advisors, helping us stress test the engineering and research decisions behind Chronis against academic rigor.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pq rv">
+    <p class="pq-text">Support that compounds the work without touching who owns it.</p>
+    <p class="pq-attr">Team Chronis</p>
+  </div>
+
+</section>
+
+<!-- ─── NOTE ─── -->
+<section class="blk-narrow rv" style="padding-top:0">
+  <div class="note">
+    <div class="note-mark">i</div>
+    <p>Every partnership listed here is a <strong>non-equity relationship</strong>. Resources, infrastructure, and mentorship are provided in support of the mission, not in exchange for ownership. All intellectual property, technology, and product decisions for Chronis remain the sole property of Chronis, held exclusively by its founding team.</p>
+  </div>
+</section>
+
+</main>
+
+<script>
+const obs = new IntersectionObserver(es => {
+  es.forEach(e => { if(e.isIntersecting) e.target.classList.add('vs'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>

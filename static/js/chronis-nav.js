@@ -15,6 +15,7 @@
     howItWorks: { url: '/static/how-it-works.html',   label: 'How it works', nav: true },
     locket:     { url: '/static/locket.html',         label: 'The Locket', nav: true },
     compare:    { url: '/static/comparison.html',     label: 'Compare',    nav: true },
+    partners:   { url: '/static/partners.html',       label: 'Partners',   nav: true },
     blog:       { url: '/static/blog.html',           label: 'Resources',  nav: true },
     ethics:     { url: '/static/ethics.html',         label: 'Ethics',     nav: true },
     demo:       { url: '/demo',                       label: 'Demo',       nav: true, cta: true },
